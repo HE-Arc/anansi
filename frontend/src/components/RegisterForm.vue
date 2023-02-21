@@ -30,6 +30,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { useAuthStore } from 'src/stores/auth';
 
 export default defineComponent({
   data() {
@@ -39,6 +40,12 @@ export default defineComponent({
       password: '',
       password2: '',
       errors: {}
+    };
+  },
+  setup() {
+    const authStore = useAuthStore();
+    return {
+      authStore
     };
   },
   methods: {
@@ -51,6 +58,7 @@ export default defineComponent({
           password2: this.password2
         });
         console.log(response.data);
+        this.authStore.login();
       } catch (error) {
         console.log(error);
       }

@@ -1,5 +1,5 @@
 <template>
-  <q-layout>
+  <q-layout view="lHh Lpr lFf">
     <nav-bar />
     <q-page-container>
       <router-view />
@@ -10,18 +10,17 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import NavBar from './components/NavBar.vue';
+import { useAuthStore } from './stores/auth';
 
 export default defineComponent({
   name: 'App',
   components: {
     NavBar
   },
-  data() {
+  setup() {
+    const authStore = useAuthStore();
     return {
-      state: {
-        csrf: '',
-        isAuthenticated: false,
-      }
+      authStore
     };
   },
   methods: {
@@ -29,7 +28,7 @@ export default defineComponent({
       fetch('/api/session')
         .then((response) => response.json())
         .then((data) => {
-          this.state.isAuthenticated = data.isAuthenticated;
+          data.isAuthenticated ? this.authStore.login() : this.authStore.logout();
         });
     }
   },
