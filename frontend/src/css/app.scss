@@ -1,1 +1,19 @@
 // app global css in SCSS form
+@font-face {
+  font-family: 'QuickSand';
+  src: url('./fonts/quicksand.ttf') format('truetype');
+}
+
+.quicksand {
+  font-family: 'QuickSand';
+}
+
+h1 {
+  font-family: 'QuickSand', sans-serif;
+  font-weight: bold;
+  font-size: xx-large;
+}
+
+text {
+  font-family: 'QuickSand', sans-serif;
+}
