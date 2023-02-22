@@ -45,7 +45,8 @@ export default defineComponent({
       email: '',
       password: '',
       password2: '',
-      errors: {}
+      errors: {},
+      csrf: '',
     };
   },
   setup() {
@@ -62,13 +63,32 @@ export default defineComponent({
           email: this.email,
           password: this.password,
           password2: this.password2
+        },{
+          withCredentials: true,
+          headers: {
+            'X-CSRFToken': this.csrf
+          }
         });
         console.log(response.data);
+
+        const isLoggedIn = await this.$axios.get('http://127.0.0.1:8000/api/session', {
+          withCredentials: true,
+          /*headers: {
+            'X-CSRFToken': this.csrf
+            }*/
+          });
+        console.log(isLoggedIn);
         this.authStore.login();
       } catch (error) {
         console.log(error);
       }
     }
+  },
+  async mounted(){
+    console.log('onMounted');
+    const response = await this.$axios.get('http://127.0.0.1:8000/api/csrf')
+    console.log(response);
+    this.csrf = response.data.csrfToken;
   }
 });
 </script>

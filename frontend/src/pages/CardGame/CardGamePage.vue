@@ -22,12 +22,12 @@
         <q-card-section>
           <q-btn
             color="primary"
-            @click="() => console.log('edit')"
+            @click="() => editCardGame(cardGame.id)"
             icon="edit"
           />
           <q-btn
             color="primary"
-            @click="() => console.log('delete')"
+            @click="() => deleteCardGame(cardGame.id)"
             icon="delete"
           />
         </q-card-section>
@@ -63,6 +63,7 @@ export default defineComponent({
               name: cardGame.name,
               privacy: cardGame.privacy,
               user: cardGame.user,
+              user_object: cardGame.user_object,
             });
           });
           if(isProxy(this.cardGames)){
@@ -73,17 +74,19 @@ export default defineComponent({
         console.log(error);
       }
     },
-    editCardGame(){
+    editCardGame(id){
       console.log("edit");
     },
     async putchCardGame(){
       console.log("putch");
     },
-    async deleteCardGame(){
+    async deleteCardGame(id){
       console.log("delete");
       const response = await this.$axios.delete(`http://127.0.0.1:8000/api/cardgames/${id}/`, {
         withCredentials: true,
       });
+      console.log(response);
+      this.fetchCardGames();
     },
   },
   mounted() {
