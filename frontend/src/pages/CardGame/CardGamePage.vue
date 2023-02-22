@@ -11,7 +11,7 @@
     </div>
     <div>
       <!-- Si il n'y a pas de jeu de carte, afficher un message-->
-      <div v-if="cardGames == undefined">
+      <div v-if="cardGames.length == 0">
         <h2>There is no card game</h2>
       </div>
       <div v-else>
@@ -48,6 +48,7 @@ export default defineComponent({
     return {
       cardGames: ref([]),
       cardGamesArray: [],
+      csrf: ''
     };
   },
   methods: {
@@ -66,9 +67,6 @@ export default defineComponent({
               user_object: cardGame.user_object,
             });
           });
-          if(isProxy(this.cardGames)){
-            console.log("cardgames : ", this.cardGames);
-          }
         });
       } catch (error) {
         console.log(error);
@@ -84,12 +82,18 @@ export default defineComponent({
       console.log("delete");
       const response = await this.$axios.delete(`http://127.0.0.1:8000/api/cardgames/${id}/`, {
         withCredentials: true,
+        /*headers: {
+          'X-CSRFToken': this.csrf,
+        },*/
       });
       console.log(response);
       this.fetchCardGames();
     },
   },
-  mounted() {
+  async mounted() {
+    console.log('onMounted');
+    const response = await this.$axios.get('http://127.0.0.1:8000/api/csrf')
+    console.log(response);
     this.fetchCardGames();
   }
 });

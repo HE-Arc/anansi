@@ -98,22 +98,13 @@ class CardGameViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         print(self.request.user)
         return self.queryset.filter(user=self.request.user)
-        # print(result)
-        # return JsonResponse({'cardgames': result})
 
     def create(self, request, *args, **kwargs):
-        # print(request.data)
         print("is auth : ", request.user.is_authenticated)
-
-        # get the user with the id in the request
         user = User.objects.get(id=request.data['user'])
-        # userUrl = user.get_absolute_url()
         userUrl = 'http:///api/users/' + str(user.id) + '/'
-
         request.data['user'] = userUrl
-
         print(request.data)
-
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -121,6 +112,12 @@ class CardGameViewSet(viewsets.ModelViewSet):
 
         print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def destroy(self, request, *args, **kwargs):
+        print("is auth : ", request.user.is_authenticated)
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     # def perform_create(self, serializer):
     #    serializer.save(user=self.request.user)
