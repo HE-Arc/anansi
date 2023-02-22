@@ -80,7 +80,7 @@ export default defineComponent({
     },
     {
       title: 'My card games',
-      link: 'mycardgames',
+      link: 'cardgames',
       icon: 'dashboard',
       authRequired: true
     },

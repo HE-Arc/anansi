@@ -2,23 +2,30 @@ from django.shortcuts import render
 
 from rest_framework import viewsets
 from .models import CardGame
-from .serializers import CardGameSerializer
+from .serializers import CardGameSerializer, ComplexCardGameSerializer, UserSerializer
 from django.contrib.auth import authenticate, login, logout
 from django.http import JsonResponse
 from rest_framework.authentication import SessionAuthentication
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth.models import User
 from django.middleware.csrf import get_token
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils.decorators import method_decorator
+from rest_framework import status
 
 
 class CSRFTokenView(APIView):
     def get(self, request):
         print(request.user)
         return JsonResponse({'csrfToken': get_token(request)})
+
+
+class UserIdView(APIView):
+    def get(self, request):
+        print(request.user)
+        return JsonResponse({'userId': request.user.id})
 
 
 class SessionView(APIView):
@@ -76,17 +83,44 @@ class RegisterView(APIView):
         return Response({"error": "Something went wrong"})
 
 
-class CardGameViewSet(viewsets.ModelViewSet):
-    print("CardGameViewSet")
+class UserViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 
-    # authentication_classes = [SessionAuthentication]
-    # permission_classes = [IsAuthenticated]
+
+class CardGameViewSet(viewsets.ModelViewSet):
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated | AllowAny]
 
     queryset = CardGame.objects.all()
-    serializer_class = CardGameSerializer
+    serializer_class = ComplexCardGameSerializer
 
     def get_queryset(self):
-        print("get_queryset")
-        print(self.request)
         print(self.request.user)
         return self.queryset.filter(user=self.request.user)
+        # print(result)
+        # return JsonResponse({'cardgames': result})
+
+    def create(self, request, *args, **kwargs):
+        # print(request.data)
+        print("is auth : ", request.user.is_authenticated)
+
+        # get the user with the id in the request
+        user = User.objects.get(id=request.data['user'])
+        # userUrl = user.get_absolute_url()
+        userUrl = 'http:///api/users/' + str(user.id) + '/'
+
+        request.data['user'] = userUrl
+
+        print(request.data)
+
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        print(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # def perform_create(self, serializer):
+    #    serializer.save(user=self.request.user)

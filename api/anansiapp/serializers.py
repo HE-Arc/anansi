@@ -6,12 +6,19 @@ from django.contrib.auth.models import User
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'url', 'username']
+        fields = ['url', 'id', 'username']
 
 
 class CardGameSerializer(serializers.HyperlinkedModelSerializer):
-    user = UserSerializer(read_only=True)
+    class Meta:
+        model = CardGame
+        fields = ['url', 'id', 'user', 'name', 'privacy']
+
+
+class ComplexCardGameSerializer(CardGameSerializer):
+    user_object = UserSerializer(source='user', read_only=True)
 
     class Meta:
         model = CardGame
-        fields = ['id', 'url', 'name', 'user']
+        # fields = ['url', 'id', 'user', 'name', 'privacy']
+        fields = CardGameSerializer.Meta.fields + ['user_object']

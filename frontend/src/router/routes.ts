@@ -21,22 +21,22 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/login',
     name: 'login',
-    component: () => import('pages/LoginPage.vue'),
+    component: () => import('src/pages/Auth/LoginPage.vue'),
   },
   {
     path: '/register',
     name: 'register',
-    component: () => import('pages/RegisterPage.vue'),
+    component: () => import('src/pages/Auth/RegisterPage.vue'),
   },
   {
     path: '/mycardgames',
     name: 'cardgames',
-    component: () => import('pages/CardGamePage.vue')
+    component: () => import('src/pages/CardGame/CardGamePage.vue')
   },
   {
     path: '/mycardgames/create',
     name: 'cardgames.create',
-    component: () => import('pages/CreateCardGamePage.vue')
+    component: () => import('src/pages/CardGame/CreateCardGamePage.vue')
   },
   // Always leave this as last one,
   // but you can also remove it
