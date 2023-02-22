@@ -79,8 +79,13 @@ export default defineComponent({
       icon: 'sports_esports',
     },
     {
-      title: 'My card games',
+      title: 'Search card games',
       link: 'cardgames',
+      icon: 'search'
+    },
+    {
+      title: 'My card games',
+      link: 'mycardgames',
       icon: 'dashboard',
       authRequired: true
     },

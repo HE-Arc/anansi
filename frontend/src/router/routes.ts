@@ -30,7 +30,7 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/mycardgames',
-    name: 'cardgames',
+    name: 'mycardgames',
     component: () => import('src/pages/CardGame/CardGamePage.vue')
   },
   {

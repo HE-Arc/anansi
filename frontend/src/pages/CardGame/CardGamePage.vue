@@ -72,7 +72,19 @@ export default defineComponent({
       } catch (error) {
         console.log(error);
       }
-    }
+    },
+    editCardGame(){
+      console.log("edit");
+    },
+    async putchCardGame(){
+      console.log("putch");
+    },
+    async deleteCardGame(){
+      console.log("delete");
+      const response = await this.$axios.delete(`http://127.0.0.1:8000/api/cardgames/${id}/`, {
+        withCredentials: true,
+      });
+    },
   },
   mounted() {
     this.fetchCardGames();
