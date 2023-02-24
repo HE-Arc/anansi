@@ -5,7 +5,7 @@ from .models import CardGame
 from .serializers import CardGameSerializer, ComplexCardGameSerializer, UserSerializer
 from django.contrib.auth import authenticate, login, logout
 from django.http import JsonResponse
-from rest_framework.authentication import SessionAuthentication
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -29,7 +29,7 @@ class UserIdView(APIView):
 
 
 class SessionView(APIView):
-    authentication_classes = [SessionAuthentication]
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -89,31 +89,33 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class CardGameViewSet(viewsets.ModelViewSet):
-    authentication_classes = [SessionAuthentication]
-    permission_classes = [IsAuthenticated | AllowAny]
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
 
     queryset = CardGame.objects.all()
     serializer_class = ComplexCardGameSerializer
 
     def get_queryset(self):
-        print(self.request.user)
+        print("user get card game : ", self.request.user)
         return self.queryset.filter(user=self.request.user)
 
     def create(self, request, *args, **kwargs):
+        print("user create card game : ", request.user)
         print("is auth : ", request.user.is_authenticated)
-        user = User.objects.get(id=request.data['user'])
-        userUrl = 'http:///api/users/' + str(user.id) + '/'
-        request.data['user'] = userUrl
+        # user = User.objects.get(id=request.data['user'])
+        # userUrl = 'http:///api/users/' + str(user.id) + '/'
+        # request.data['user'] = userUrl
         print(request.data)
-        serializer = self.get_serializer(data=request.data)
+        serializer = self.get_serializer(data=request.data, user=request.user)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        print(serializer.errors)
+        # print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, *args, **kwargs):
+        print("user destroy card game : ", request.user)
         print("is auth : ", request.user.is_authenticated)
         instance = self.get_object()
         self.perform_destroy(instance)

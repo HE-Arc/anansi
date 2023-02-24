@@ -33,7 +33,7 @@ export default defineComponent({
     }
   },
   onMounted: function() {
-    this.getSession();
+    //this.getSession();
   }
 });
 </script>

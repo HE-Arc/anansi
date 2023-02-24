@@ -54,9 +54,22 @@ export default defineComponent({
   methods: {
     async fetchCardGames() {
       try{
-        await this.$axios.get('http://127.0.0.1:8000/api/cardgames', {
+        /*await this.$axios.get('http://127.0.0.1:8000/api/cardgames', {
           withCredentials: true,
         }).then(response => {
+          this.cardGames = [];
+          response.data.forEach(cardGame => {
+            this.cardGames.push({
+              id: cardGame.id,
+              name: cardGame.name,
+              privacy: cardGame.privacy,
+              user: cardGame.user,
+              user_object: cardGame.user_object,
+            });
+          });
+        });*/
+
+        await this.$api.get('cardgames').then(response => {
           this.cardGames = [];
           response.data.forEach(cardGame => {
             this.cardGames.push({
@@ -80,20 +93,20 @@ export default defineComponent({
     },
     async deleteCardGame(id){
       console.log("delete");
-      const response = await this.$axios.delete(`http://127.0.0.1:8000/api/cardgames/${id}/`, {
+      const response = await this.$axios.delete(`http://127.0.0.1:8000/api/cardgames/${id}/`/*, {
         withCredentials: true,
-        /*headers: {
+        headers: {
           'X-CSRFToken': this.csrf,
-        },*/
-      });
+        },
+      }*/);
       console.log(response);
       this.fetchCardGames();
     },
   },
   async mounted() {
     console.log('onMounted');
-    const response = await this.$axios.get('http://127.0.0.1:8000/api/csrf')
-    console.log(response);
+    //const response = await this.$axios.get('http://127.0.0.1:8000/api/csrf')
+    //console.log(response);
     this.fetchCardGames();
   }
 });

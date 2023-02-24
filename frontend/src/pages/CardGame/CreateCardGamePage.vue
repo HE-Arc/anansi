@@ -49,10 +49,10 @@ export default defineComponent({
     },
     async createCardGame(){
       try {
-        const test = await this.$axios.get('http://127.0.0.1:8000/api/session/', {
+        /*const test = await this.$axios.get('http://127.0.0.1:8000/api/session/', {
           withCredentials: true,
         });
-        console.log(test);
+        console.log(test);*/
 
         const userId = await this.$axios.get('http://127.0.0.1:8000/api/userid', {
           withCredentials: true,
@@ -60,24 +60,21 @@ export default defineComponent({
 
         console.log(userId.data.userId);
 
-        const response = await this.$axios.post('http://127.0.0.1:8000/api/cardgames/', {
+        const response = await this.$api.post('cardgames/', {
           name: this.name,
           privacy: this.privacy,
           user: userId.data.userId,
-        }/*, {
-          'X-CSRFToken': this.csrf,
-        }*//*, {
-          withCredentials: true,
-        }*/);
+        });
+
         console.log(response);
-        this.$router.push({ name: 'cardgames' });
+        this.$router.push({ name: 'mycardgames' });
       } catch (error) {
         console.log(error);
       }
     }
   },
   mounted() {
-    this.getCSRF();
+    //this.getCSRF();
   },
 });
 </script>

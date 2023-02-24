@@ -44,26 +44,18 @@
   methods: {
     async login() {
       try {
-        const response = await this.$axios.post('http://127.0.0.1:8000/api/login/', {
+        const response = await this.$api.post('login/', {
           username: this.username,
           password: this.password,
-        },{
-          withCredentials: true,
-          headers: {
-            'X-CSRFToken': this.csrf
-          }
         });
 
         console.log(response);
 
-        const isLoggedIn = await this.$axios.get('http://127.0.0.1:8000/api/session', {
-          withCredentials: true,
-          /*headers: {
-            'X-CSRFToken': this.csrf
-            }*/
-          });
+        const isLoggedIn = await this.$api.get('session');
         console.log(isLoggedIn);
         this.authStore.login();
+
+        this.$router.push({ name: 'home' });
       } catch (error) {
         console.log(error);
       }
@@ -71,9 +63,9 @@
   },
   async mounted(){
     console.log('onMounted');
-    const response = await this.$axios.get('http://127.0.0.1:8000/api/csrf')
-    console.log(response);
-    this.csrf = response.data.csrfToken;
+    //const response = await this.$axios.get('http://127.0.0.1:8000/api/csrf')
+    //console.log(response);
+    //this.csrf = response.data.csrfToken;
   }
 });
 </script>
