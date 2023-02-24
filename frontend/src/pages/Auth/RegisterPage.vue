@@ -63,12 +63,7 @@ export default defineComponent({
           email: this.email,
           password: this.password,
           password2: this.password2
-        }/*,{
-          withCredentials: true,
-          headers: {
-            'X-CSRFToken': this.csrf
-          }
-        }*/);
+        });
         console.log(response.data);
 
         const isLoggedIn = await this.$api.get('session');
