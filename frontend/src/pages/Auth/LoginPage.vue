@@ -32,7 +32,6 @@
     return {
       username: '',
       password: '',
-      csrf: '',
     };
   },
   setup() {
@@ -51,7 +50,7 @@
 
         console.log(response);
 
-        const isLoggedIn = await this.$api.get('session');
+        const isLoggedIn = await this.$api.get('session', { withCredentials: true });
         console.log(isLoggedIn);
         this.authStore.login();
 
@@ -63,9 +62,6 @@
   },
   async mounted(){
     console.log('onMounted');
-    //const response = await this.$axios.get('http://127.0.0.1:8000/api/csrf')
-    //console.log(response);
-    //this.csrf = response.data.csrfToken;
   }
 });
 </script>

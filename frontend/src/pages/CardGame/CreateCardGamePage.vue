@@ -26,27 +26,13 @@ export default defineComponent({
   setup() {
     const name = ref('');
     const privacy = ref('');
-    const csrf = ref('');
 
     return {
-      csrf,
       name,
       privacy,
     };
   },
   methods: {
-    async getCSRF(){
-      try {
-        const response = await this.$axios.get('http://127.0.0.1:8000/api/csrf', {
-          withCredentials: true,
-        });
-
-        this.csrf = response.data.csrfToken;
-        console.log(this.csrf);
-      } catch (error) {
-        console.log(error);
-      }
-    },
     async createCardGame(){
       try {
         /*const test = await this.$axios.get('http://127.0.0.1:8000/api/session/', {
@@ -54,7 +40,7 @@ export default defineComponent({
         });
         console.log(test);*/
 
-        const userId = await this.$axios.get('http://127.0.0.1:8000/api/userid', {
+        const userId = await this.$api.get('userid', {
           withCredentials: true,
         });
 
@@ -72,9 +58,6 @@ export default defineComponent({
         console.log(error);
       }
     }
-  },
-  mounted() {
-    //this.getCSRF();
   },
 });
 </script>

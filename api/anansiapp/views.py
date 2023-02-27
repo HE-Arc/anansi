@@ -29,7 +29,7 @@ class UserIdView(APIView):
 
 
 class SessionView(APIView):
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    # authentication_classes = [SessionAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -89,7 +89,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class CardGameViewSet(viewsets.ModelViewSet):
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    # authentication_classes = [SessionAuthentication]
     permission_classes = [IsAuthenticated]
 
     queryset = CardGame.objects.all()
@@ -102,16 +102,15 @@ class CardGameViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         print("user create card game : ", request.user)
         print("is auth : ", request.user.is_authenticated)
-        # user = User.objects.get(id=request.data['user'])
-        # userUrl = 'http:///api/users/' + str(user.id) + '/'
-        # request.data['user'] = userUrl
+        user = User.objects.get(id=request.data['user'])
+        userUrl = 'http:///api/users/' + str(user.id) + '/'
+        request.data['user'] = userUrl
         print(request.data)
-        serializer = self.get_serializer(data=request.data, user=request.user)
+        serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        # print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, *args, **kwargs):

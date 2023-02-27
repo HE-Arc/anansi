@@ -46,7 +46,6 @@ export default defineComponent({
       password: '',
       password2: '',
       errors: {},
-      csrf: '',
     };
   },
   setup() {
@@ -77,9 +76,6 @@ export default defineComponent({
   },
   async mounted(){
     console.log('onMounted');
-    //const response = await this.$axios.get('http://127.0.0.1:8000/api/csrf')
-    //console.log(response);
-    //this.csrf = response.data.csrfToken;
   }
 });
 </script>
