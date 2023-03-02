@@ -130,3 +130,6 @@ wsproto==1.2.0
 zipp==1.0.0
 zope.event==4.6
 zope.interface==4.7.1
+djangorestframework==3.14.0
+django-cors-headers==3.14.0
+channels==4.0.0
