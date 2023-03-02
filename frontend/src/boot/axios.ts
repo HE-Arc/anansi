@@ -20,7 +20,6 @@ const api = axios.create({ baseURL: process.env.API_URL, withCredentials: true})
 
 // ajout d’un intercepteur de requête
 api.interceptors.request.use(function (config) {
-  console.log('intercepteur de requête');
   config.headers['accept'] = 'application/json';
   config.headers['content-type'] = 'application/json';
   config.withCredentials = true;
