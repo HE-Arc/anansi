@@ -14,22 +14,10 @@ from django.middleware.csrf import get_token
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils.decorators import method_decorator
 from rest_framework import status
-
-
-class CSRFTokenView(APIView):
-    def get(self, request):
-        print(request.user)
-        return JsonResponse({'csrfToken': get_token(request)})
-
-
-class UserIdView(APIView):
-    def get(self, request):
-        print(request.user)
-        return JsonResponse({'userId': request.user.id})
+from django.urls import reverse
 
 
 class SessionView(APIView):
-    # authentication_classes = [SessionAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -63,24 +51,29 @@ class LogoutView(APIView):
 
 class RegisterView(APIView):
     def post(self, request):
-        username = request.data.get("username")
-        email = request.data.get("email")
-        password = request.data.get("password")
-        password2 = request.data.get("password2")
+        username = request.data.get('username')
+        email = request.data.get('email')
+        password = request.data.get('password')
+        password2 = request.data.get('password2')
 
         if password != password2:
-            return Response({"error": "Passwords must match"})
+            return Response({'error': 'Passwords must match'})
+
+        try:
+            user = User.objects.get(username=username)
+            return Response({'error': 'Username already exists'})
+        except User.DoesNotExist:
+            pass
 
         user = User.objects.create_user(
             username=username, email=email, password=password)
         user.save()
 
         if user:
-            # login(request, user)
             login(request, user)
             return Response({'success': 'Login Successful'})
 
-        return Response({"error": "Something went wrong"})
+        return Response({'error': 'Something went wrong'})
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
@@ -89,36 +82,27 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class CardGameViewSet(viewsets.ModelViewSet):
-    # authentication_classes = [SessionAuthentication]
     permission_classes = [IsAuthenticated]
 
     queryset = CardGame.objects.all()
     serializer_class = ComplexCardGameSerializer
 
     def get_queryset(self):
-        print("user get card game : ", self.request.user)
         return self.queryset.filter(user=self.request.user)
 
     def create(self, request, *args, **kwargs):
-        print("user create card game : ", request.user)
-        print("is auth : ", request.user.is_authenticated)
-        user = User.objects.get(id=request.data['user'])
-        userUrl = 'http:///api/users/' + str(user.id) + '/'
-        request.data['user'] = userUrl
-        print(request.data)
+        # Récupérer l'URL de l'utilisateur actuel
+        user_url = request.build_absolute_uri(
+            reverse('user-detail', args=[request.user.id]))
+
+        # Ajouter l'URL de l'utilisateur à la requête POST
+        request.data['user'] = user_url
         serializer = self.get_serializer(data=request.data)
+
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            print(serializer.errors)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def destroy(self, request, *args, **kwargs):
-        print("user destroy card game : ", request.user)
-        print("is auth : ", request.user.is_authenticated)
-        instance = self.get_object()
-        self.perform_destroy(instance)
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-    # def perform_create(self, serializer):
-    #    serializer.save(user=self.request.user)

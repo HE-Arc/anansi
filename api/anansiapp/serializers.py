@@ -20,5 +20,4 @@ class ComplexCardGameSerializer(CardGameSerializer):
 
     class Meta:
         model = CardGame
-        # fields = ['url', 'id', 'user', 'name', 'privacy']
         fields = CardGameSerializer.Meta.fields + ['user_object']
