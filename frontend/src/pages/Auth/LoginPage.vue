@@ -41,6 +41,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { useAuthStore } from "src/stores/auth";
+import { useQuasar } from "quasar";
 
 export default defineComponent({
   name: "LoginPage",
@@ -52,7 +53,9 @@ export default defineComponent({
   },
   setup() {
     const authStore = useAuthStore();
+    const $q = useQuasar();
     return {
+      $q,
       authStore,
     };
   },
@@ -69,6 +72,11 @@ export default defineComponent({
         const isLoggedIn = await this.$api.get("session", { withCredentials: true });
         console.log(isLoggedIn);
         this.authStore.login();
+
+        this.$q.notify({
+          message: "Login successful",
+          color: "positive",
+        });
 
         this.$router.push({ name: "home" });
       } catch (error) {

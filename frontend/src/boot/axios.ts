@@ -8,6 +8,8 @@ declare module '@vue/runtime-core' {
   }
 }
 
+//dotenv.config();
+
 // Be careful when using SSR for cross-request state pollution
 // due to creating a Singleton instance here;
 // If any client changes this (global) instance, it might be a
@@ -15,6 +17,8 @@ declare module '@vue/runtime-core' {
 // "export default () => {}" function below (which runs individually
 // for each client)
 const api = axios.create({ baseURL: process.env.API_URL, withCredentials: true});
+
+console.log('.env API_URL', process.env.API_URL)
 
 // ajout d’un intercepteur de requête
 api.interceptors.request.use(function (config) {
