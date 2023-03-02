@@ -21,27 +21,51 @@
         <!-- Display card games -->
         <q-list separator>
           <q-item clickable v-for="cardGame in this.cardGames" :key="cardGame.id">
-            <q-item-section>
-              {{ cardGame.name }}
-            </q-item-section>
+            <q-input
+              v-model="cardGame.name"
+              :readonly="cardGame.readonly"
+              :class="{ editable: !cardGame.readonly }"
+            />
             <!-- Privacy -->
             <q-item-section side>
               <q-btn
                 class="q-px-xs"
                 :color="cardGame.privacy == 'private' ? 'primary' : 'grey-8'"
-                @click="() => editCardGamePrivacy(cardGame.id, cardGame.privacy)"
+                @click="() => putchCardGamePrivacy(cardGame.id, cardGame.privacy)"
                 icon="lock"
                 flat
               />
             </q-item-section>
             <q-item-section side>
               <q-btn
+                v-if="cardGame.readonly == true"
                 class="q-px-xs"
                 color="primary"
-                @click="() => editCardGameName(cardGame.id)"
+                @click="
+                  () => {
+                    cardGame.readonly = false;
+                    cardGame.lastName = cardGame.name;
+                  }
+                "
                 icon="edit"
                 flat
               />
+              <q-btn-group v-else>
+                <q-btn
+                  class="q-px-xs"
+                  color="primary"
+                  @click="() => putchCardGameName(cardGame.id, cardGame.name)"
+                  icon="check"
+                  flat
+                />
+                <q-btn
+                  class="q-px-xs"
+                  color="primary"
+                  @click="() => cancelEditCardGameName(cardGame)"
+                  icon="close"
+                  flat
+                />
+              </q-btn-group>
             </q-item-section>
             <q-item-section side>
               <q-btn
@@ -68,7 +92,6 @@ export default defineComponent({
   data() {
     return {
       cardGames: ref([]),
-      cardGamesArray: [],
     };
   },
   methods: {
@@ -83,6 +106,7 @@ export default defineComponent({
               privacy: cardGame.privacy,
               user: cardGame.user,
               user_object: cardGame.user_object,
+              readonly: true,
             });
           });
         });
@@ -90,15 +114,24 @@ export default defineComponent({
         console.log(error);
       }
     },
-    async editCardGamePrivacy(id, lastPrivacy) {
+    async putchCardGamePrivacy(id, lastPrivacy) {
       const response = await this.$api.patch(`cardgames/${id}/`, {
         privacy: lastPrivacy == "private" ? "public" : "private",
       });
       console.log(response);
       this.fetchCardGames();
     },
-    async putchCardGame() {
-      console.log("putch");
+    cancelEditCardGameName(cardGame) {
+      cardGame.name = cardGame.lastName;
+      cardGame.readonly = true;
+    },
+    async putchCardGameName(id, name) {
+      console.log(name);
+      const response = await this.$api.patch(`cardgames/${id}/`, {
+        name: name,
+      });
+      console.log(response);
+      this.fetchCardGames();
     },
     async deleteCardGame(id) {
       const response = await this.$api.delete(`cardgames/${id}/`);
