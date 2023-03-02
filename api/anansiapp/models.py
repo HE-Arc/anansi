@@ -10,6 +10,7 @@ class CardGame(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
-    privacy = models.CharField(max_length=100, default="private")
+    privacy = models.CharField(
+        max_length=10, default='private', choices=[('public', 'Public'), ('private', 'Private')])
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

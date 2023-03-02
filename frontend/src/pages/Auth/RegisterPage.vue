@@ -53,6 +53,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { useAuthStore } from "src/stores/auth";
+import { useQuasar } from "quasar";
 
 export default defineComponent({
   data() {
@@ -66,7 +67,10 @@ export default defineComponent({
   },
   setup() {
     const authStore = useAuthStore();
+    const $q = useQuasar();
+
     return {
+      $q,
       authStore,
     };
   },
@@ -79,11 +83,14 @@ export default defineComponent({
           password: this.password,
           password2: this.password2,
         });
-        console.log(response.data);
 
-        const isLoggedIn = await this.$api.get("session");
-        console.log(isLoggedIn);
         this.authStore.login();
+
+        $q.notify({
+          message: "You have successfully registered and logged in!",
+          color: "positive",
+        });
+
         this.$router.push({ name: "home" });
       } catch (error) {
         console.log(error);

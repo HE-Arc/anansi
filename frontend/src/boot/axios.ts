@@ -18,8 +18,6 @@ declare module '@vue/runtime-core' {
 // for each client)
 const api = axios.create({ baseURL: process.env.API_URL, withCredentials: true});
 
-console.log('.env API_URL', process.env.API_URL)
-
 // ajout d’un intercepteur de requête
 api.interceptors.request.use(function (config) {
   console.log('intercepteur de requête');

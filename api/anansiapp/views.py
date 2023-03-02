@@ -91,11 +91,9 @@ class CardGameViewSet(viewsets.ModelViewSet):
         return self.queryset.filter(user=self.request.user)
 
     def create(self, request, *args, **kwargs):
-        # Récupérer l'URL de l'utilisateur actuel
         user_url = request.build_absolute_uri(
             reverse('user-detail', args=[request.user.id]))
 
-        # Ajouter l'URL de l'utilisateur à la requête POST
         request.data['user'] = user_url
         serializer = self.get_serializer(data=request.data)
 

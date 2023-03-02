@@ -118,7 +118,6 @@ export default defineComponent({
       const response = await this.$api.patch(`cardgames/${id}/`, {
         privacy: lastPrivacy == "private" ? "public" : "private",
       });
-      console.log(response);
       this.fetchCardGames();
     },
     cancelEditCardGameName(cardGame) {
@@ -126,16 +125,13 @@ export default defineComponent({
       cardGame.readonly = true;
     },
     async putchCardGameName(id, name) {
-      console.log(name);
       const response = await this.$api.patch(`cardgames/${id}/`, {
         name: name,
       });
-      console.log(response);
       this.fetchCardGames();
     },
     async deleteCardGame(id) {
       const response = await this.$api.delete(`cardgames/${id}/`);
-      console.log(response);
       this.fetchCardGames();
     },
   },

@@ -27,7 +27,7 @@
           <q-select
             v-model="privacy"
             label="Privacy"
-            :options="['private', 'public']"
+            :options="options"
             :rules="[(val) => !!val || 'Privacy is required']"
           />
           <q-btn
@@ -45,14 +45,21 @@
 
 <script>
 import { defineComponent, ref } from "vue";
+import { useQuasar } from "quasar";
 
 export default defineComponent({
   name: "CreateCardGamePage",
   setup() {
     const name = ref("");
     const privacy = ref("");
+    const $q = useQuasar();
 
     return {
+      options: [
+        { label: "Private", value: "private" },
+        { label: "Public", value: "public" },
+      ],
+      $q,
       name,
       privacy,
     };
@@ -62,10 +69,14 @@ export default defineComponent({
       try {
         const response = await this.$api.post("cardgames/", {
           name: this.name,
-          privacy: this.privacy,
+          privacy: this.privacy.value,
         });
 
-        console.log(response);
+        this.$q.notify({
+          message: "Card game created",
+          color: "positive",
+        });
+
         this.$router.push({ name: "mycardgames" });
       } catch (error) {
         console.log(error);

@@ -67,10 +67,6 @@ export default defineComponent({
           password: this.password,
         });
 
-        console.log(response);
-
-        const isLoggedIn = await this.$api.get("session", { withCredentials: true });
-        console.log(isLoggedIn);
         this.authStore.login();
 
         this.$q.notify({
@@ -83,9 +79,6 @@ export default defineComponent({
         console.log(error);
       }
     },
-  },
-  async mounted() {
-    console.log("onMounted");
   },
 });
 </script>
