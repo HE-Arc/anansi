@@ -2,6 +2,7 @@
   <q-page class="row q-mx-xl">
     <div class="col-12 col-md-6 col-lg-4">
       <h1>Login</h1>
+      <ErrorBanner :errors="errors" />
       <form @submit.prevent="login">
         <q-input
           v-model="username"
@@ -39,21 +40,27 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
 import { useAuthStore } from "src/stores/auth";
 import { useQuasar } from "quasar";
+import ErrorBanner from "src/components/ErrorBanner.vue";
 
 export default defineComponent({
   name: "LoginPage",
+  components: {
+    ErrorBanner,
+  },
   data() {
     return {
       username: "",
       password: "",
+      errors: ref([]),
     };
   },
   setup() {
     const authStore = useAuthStore();
     const $q = useQuasar();
+
     return {
       $q,
       authStore,
@@ -66,6 +73,12 @@ export default defineComponent({
           username: this.username,
           password: this.password,
         });
+
+        if (response.data.error) {
+          this.errors = [response.data.error];
+          console.log(this.errors);
+          return;
+        }
 
         this.authStore.login();
 
