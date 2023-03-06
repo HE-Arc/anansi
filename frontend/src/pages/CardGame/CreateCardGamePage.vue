@@ -13,6 +13,10 @@
 
       <div class="col-12 col-md-6 col-lg-4 q-mx-xl">
         <h1 class="q-mt-xs">New card game</h1>
+
+        <!-- Error banner -->
+        <ErrorBanner :errors="errors" />
+
         <!-- Form -->
         <form @submit.prevent="createCardGame">
           <!-- Name -->
@@ -46,9 +50,18 @@
 <script>
 import { defineComponent, ref } from "vue";
 import { useQuasar } from "quasar";
+import ErrorBanner from "src/components/ErrorBanner.vue";
 
 export default defineComponent({
   name: "CreateCardGamePage",
+  components: {
+    ErrorBanner,
+  },
+  data() {
+    return {
+      errors: ref([]),
+    };
+  },
   setup() {
     const name = ref("");
     const privacy = ref("");
@@ -79,7 +92,12 @@ export default defineComponent({
 
         this.$router.push({ name: "mycardgames" });
       } catch (error) {
-        console.log(error);
+        this.errors = [];
+        for (var key in error.response.data) {
+          for (var key2 in error.response.data[key]) {
+            this.errors.push(key + " : " + error.response.data[key][key2]);
+          }
+        }
       }
     },
   },

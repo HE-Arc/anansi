@@ -2,6 +2,7 @@
   <q-page class="row q-mx-xl">
     <div class="col-12 col-md-6 col-lg-4">
       <h1>Register</h1>
+      <ErrorBanner :errors="errors" />
       <form @submit.prevent="register">
         <q-input
           v-model="username"
@@ -51,18 +52,23 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
 import { useAuthStore } from "src/stores/auth";
 import { useQuasar } from "quasar";
+import ErrorBanner from "src/components/ErrorBanner.vue";
 
 export default defineComponent({
+  name: "RegisterPage",
+  components: {
+    ErrorBanner,
+  },
   data() {
     return {
       username: "",
       email: "",
       password: "",
       password2: "",
-      errors: {},
+      errors: ref([]),
     };
   },
   setup() {
@@ -86,6 +92,7 @@ export default defineComponent({
 
         this.authStore.login();
 
+        console.log("response " + response);
         $q.notify({
           message: "You have successfully registered and logged in!",
           color: "positive",
@@ -93,7 +100,12 @@ export default defineComponent({
 
         this.$router.push({ name: "home" });
       } catch (error) {
-        console.log(error);
+        this.errors = [];
+        for (var key in error.response.data) {
+          for (var key2 in error.response.data[key]) {
+            this.errors.push(key + " : " + error.response.data[key][key2]);
+          }
+        }
       }
     },
   },

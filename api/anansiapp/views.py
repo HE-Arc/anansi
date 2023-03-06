@@ -2,7 +2,7 @@ from django.shortcuts import render
 
 from rest_framework import viewsets
 from .models import CardGame
-from .serializers import CardGameSerializer, ComplexCardGameSerializer, UserSerializer
+from .serializers import CardGameSerializer, ComplexCardGameSerializer, UserSerializer, RegisterSerializer
 from django.contrib.auth import authenticate, login, logout
 from django.http import JsonResponse
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
@@ -15,6 +15,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils.decorators import method_decorator
 from rest_framework import status
 from django.urls import reverse
+from rest_framework import generics
 
 
 class SessionView(APIView):
@@ -49,31 +50,9 @@ class LogoutView(APIView):
         return Response({'success': 'Logout Successful'})
 
 
-class RegisterView(APIView):
-    def post(self, request):
-        username = request.data.get('username')
-        email = request.data.get('email')
-        password = request.data.get('password')
-        password2 = request.data.get('password2')
-
-        if password != password2:
-            return Response({'error': 'Passwords must match'})
-
-        try:
-            user = User.objects.get(username=username)
-            return Response({'error': 'Username already exists'})
-        except User.DoesNotExist:
-            pass
-
-        user = User.objects.create_user(
-            username=username, email=email, password=password)
-        user.save()
-
-        if user:
-            login(request, user)
-            return Response({'success': 'Login Successful'})
-
-        return Response({'error': 'Something went wrong'})
+class RegisterView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = RegisterSerializer
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
