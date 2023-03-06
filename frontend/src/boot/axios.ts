@@ -45,7 +45,7 @@ api.interceptors.response.use(function (response) {
   // Do something with response error
 
   // si c'est une erreur d'autorisations, on redirige vers la page de login
-  if (error.response.status === 401) {
+  if (error.response.status === 401 || error.response.status === 403) {
     window.location.href = '/login';
   }
 

@@ -90,9 +90,18 @@ export default defineComponent({
           password2: this.password2,
         });
 
+        console.log(response);
+
+        const responseLogin = await this.$api.post("login/", {
+          username: this.username,
+          password: this.password,
+        });
+
+        console.log(responseLogin);
+
         this.authStore.login();
 
-        $q.notify({
+        this.$q.notify({
           message: "You have successfully registered and logged in!",
           color: "positive",
         });

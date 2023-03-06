@@ -75,17 +75,19 @@ export default defineComponent({
       if (response.data["success"]) {
         this.$q.notify({
           message: "You have been logged out",
-          color: "success",
+          color: "positive",
         });
         this.authStore.logout();
       } else {
         this.$q.notify({
           message: response.data["error"],
-          color: "primary",
+          color: "negative",
         });
       }
 
       this.authStore.logout();
+
+      this.$router.push({ name: "home" });
     },
   },
   data() {
