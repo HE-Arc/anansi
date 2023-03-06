@@ -24,8 +24,5 @@ export default defineComponent({
       type: Array,
     },
   },
-  mounted() {
-    console.log("ErrorBanner mounted");
-  },
 });
 </script>

@@ -92,7 +92,6 @@ export default defineComponent({
 
         this.authStore.login();
 
-        console.log("response " + response);
         $q.notify({
           message: "You have successfully registered and logged in!",
           color: "positive",
@@ -108,9 +107,6 @@ export default defineComponent({
         }
       }
     },
-  },
-  async mounted() {
-    console.log("onMounted");
   },
 });
 </script>

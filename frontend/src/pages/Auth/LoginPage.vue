@@ -76,7 +76,6 @@ export default defineComponent({
 
         if (response.data.error) {
           this.errors = [response.data.error];
-          console.log(this.errors);
           return;
         }
 
