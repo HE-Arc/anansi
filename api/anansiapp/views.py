@@ -1,5 +1,4 @@
 from django.shortcuts import render
-
 from rest_framework import viewsets
 from .models import CardGame
 from .serializers import CardGameSerializer, ComplexCardGameSerializer, UserSerializer, RegisterSerializer

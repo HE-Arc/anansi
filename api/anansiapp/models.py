@@ -9,8 +9,8 @@ from django.dispatch import receiver
 class CardGame(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE)
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, blank=False)
     privacy = models.CharField(
-        max_length=10, default='private', choices=[('public', 'Public'), ('private', 'Private')])
+        max_length=10, choices=[('public', 'Public'), ('private', 'Private')], blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

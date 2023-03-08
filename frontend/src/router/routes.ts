@@ -7,17 +7,6 @@ const routes: RouteRecordRaw[] = [
     alias: ['/home', '/index'],
     component: () => import('pages/IndexPage.vue'),
   },
-  /*{
-    path: '/',
-    component: () => import('layouts/AppLayout.vue'),
-    children: [
-      { path: '', component: () => import('pages/IndexPage.vue') },
-      { path: '/login', component: () => import('pages/LoginPage.vue') },
-      { path: '/register', component: () => import('pages/RegisterPage.vue') },
-      { path: '/mycardgames', component: () => import('pages/CardGamePage.vue') },
-    ]
-    //component: () => import('pages/IndexPage.vue'),
-  },*/
   {
     path: '/login',
     name: 'login',
