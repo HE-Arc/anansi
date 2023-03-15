@@ -1,7 +1,5 @@
-django-environ==0.10.0
 asgiref==3.6.0
 attrs==22.2.0
-autobahn==23.1.2
 Automat==22.10.0
 cffi==1.15.1
 channels==4.0.0
@@ -24,9 +22,5 @@ pytz==2022.7.1
 service-identity==21.1.0
 six==1.16.0
 sqlparse==0.4.3
-Twisted==22.10.0
-twisted-iocpsupport==1.0.2
 txaio==23.1.1
 typing_extensions==4.5.0
-tzdata==2022.7
-zope.interface==5.5.2
