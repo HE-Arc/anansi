@@ -4,9 +4,11 @@ export const useAuthStore = defineStore({
   id: "auth",
   state: () => ({
     isLoggedIn: false,
+    username: "",
   }),
   getters: {
     get: (state) => state.isLoggedIn,
+    getUsername: (state) => state.username,
   },
   actions: {
     login() {
@@ -15,5 +17,8 @@ export const useAuthStore = defineStore({
     logout() {
       this.isLoggedIn = false;
     },
+    setUsername(username: string) {
+      this.username = username;
+    }
   },
 });

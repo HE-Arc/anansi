@@ -67,9 +67,9 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CORS_ALLOWED_ORIGINS = env('CORS_CSRF_ORIGIN_WHITELIST').split(' ')
+CORS_ALLOWED_ORIGINS = [env('CORS_CSRF_ORIGIN_WHITELIST')]
 
-CSRF_TRUSTED_ORIGINS = env('CORS_CSRF_ORIGIN_WHITELIST').split(' ')
+CSRF_TRUSTED_ORIGINS = [env('CORS_CSRF_ORIGIN_WHITELIST')]
 
 # Added parameter for credentials
 # CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']  # valeur par défaut
@@ -96,6 +96,15 @@ TEMPLATES = [
 
 # WSGI_APPLICATION = 'anansi.wsgi.application'
 ASGI_APPLICATION = 'anansi.asgi.application'
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases

@@ -100,7 +100,7 @@ export default defineComponent({
         },
         {
           title: "Play",
-          link: "play",
+          link: "game",
           icon: "sports_esports",
         },
         {
