@@ -28,13 +28,13 @@ class GamePlayer(models.Model):
 
 class Game(models.Model):
     creator = models.ForeignKey(
-        "GamePlayer", on_delete=models.CASCADE, related_name='creator')
+        "GamePlayer", on_delete=models.CASCADE, null=True, related_name='creator')
     name = models.CharField(max_length=100)
     winner = models.ForeignKey(
         "GamePlayer", on_delete=models.CASCADE, null=True, related_name='winner')
 
-    cardgame = models.ForeignKey(
-        CardGame, on_delete=models.CASCADE)
+    # cardgame = models.ForeignKey(
+    #     CardGame, on_delete=models.CASCADE)
 
     game_code = models.CharField(max_length=100)
 

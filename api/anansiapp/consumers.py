@@ -1,41 +1,66 @@
 import json
-from channels.generic.websocket import WebsocketConsumer
-from asgiref.sync import async_to_sync
+from channels.generic.websocket import AsyncWebsocketConsumer
+from asgiref.sync import async_to_sync, sync_to_async
+import logging
+from .models import Game, GamePlayer
 
+class GameConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        self.game_name = self.scope['url_route']['kwargs']['room_name']
+        self.game_group_name = 'game_%s' % self.game_name
 
-class GameConsumer(WebsocketConsumer):
-    def connect(self):
-        self.room_name = self.scope['url_route']['kwargs']['room_name']
-        self.room_group_name = 'game_%s' % self.room_name
-        self.players = []
-
-        # Join room group
-        async_to_sync(self.channel_layer.group_add)(
-            self.room_group_name, self.channel_name
+        # Join game group
+        await self.channel_layer.group_add(
+            self.game_group_name,
+            self.channel_name
         )
 
-        self.accept()
+        await self.accept()
 
-    def disconnect(self, close_code):
-        # Leave room group
-        async_to_sync(self.channel_layer.group_discard)(
-            self.room_group_name, self.channel_name
+    async def disconnect(self, close_code):
+        # Leave game group
+        await self.channel_layer.group_discard(
+            self.game_group_name,
+            self.channel_name
         )
 
-    def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        username = text_data_json["username"]
-        self.players.append(username)
-        async_to_sync(self.channel_layer.group_send)(
-            self.room_group_name, {"type": "game_join",
-                                   "username": username, "players": self.players}
-        )
+    # Receive message from WebSocket
+    async def receive(self, text_data):
+        data = json.loads(text_data)
+        action = data['action']
 
-    def game_join(self, event):
-        username = event['username']
-        players = event['players']
-        self.send(text_data=json.dumps({
-            "type": "game_join",
-            "username": username,
-            "players": players
-        }))
+        if action == 'create_or_join_game':
+            game = await sync_to_async(Game.objects.get_or_create)(name=self.game_name)
+            
+            # Join game
+            # Get player name, if not provided, use Anonymous
+            player_name = data['username'] if data['username'] != '' else 'Anonymous'
+            
+            game = await sync_to_async(Game.objects.get)(name=self.game_name)
+
+            # Create GamePlayer object
+            player = await sync_to_async(GamePlayer.objects.create)(username=player_name, game=game)
+
+            # Send message to all players in game
+            players_names = []
+            async for p in GamePlayer.objects.filter(game=game):
+                players_names.append(p.username)
+            
+            response = {
+                'type': 'player_list',
+                'test': 'test',
+                'players': players_names,
+            }
+            
+            await self.channel_layer.group_send(
+                self.game_group_name,
+                {
+                    'type': 'player_list',
+                    'message': json.dumps(response),
+                }
+            )
+            
+    # Receive message from game group
+    async def player_list(self, event):
+        message = event['message']
+        await self.send(text_data=message)
