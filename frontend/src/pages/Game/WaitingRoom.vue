@@ -1,3 +1,52 @@
+<script lang="ts" setup>
+import { defineComponent, ref, onMounted } from "vue";
+import { useAuthStore } from "src/stores/auth";
+import { useRoute } from "vue-router";
+
+const authStore = useAuthStore();
+const username = authStore.getUsername;
+const players = ref([]);
+const gameSocket = ref(null);
+const route = useRoute();
+
+const connectToGameSocket = () => {
+  // Get room_id from url
+  const room_id = route.params.room_id;
+
+  console.log(route.params);
+
+  console.log("room_id : " + room_id);
+  const url = "ws://127.0.0.1:8000/game/" + room_id + "/";
+
+  gameSocket.value = new WebSocket(url);
+
+  // var vm = this;
+
+  gameSocket.value.onmessage = function (e) {
+    const data = JSON.parse(e.data);
+    console.log("message : " + data.username);
+    players.value.push(data.username);
+    // vm.players.push(data.username);
+  };
+
+  gameSocket.value.onclose = function (e) {
+    console.error("Chat socket closed unexpectedly");
+  };
+
+  gameSocket.value.onopen = function () {
+    const msg = {
+      username: username,
+    };
+    console.log("open " + username);
+    gameSocket.value.send(JSON.stringify(msg));
+  };
+};
+
+onMounted(() => {
+  connectToGameSocket();
+});
+</script>
+
 <template>
   <q-page class="row justify-evenly content-start">
     <div class="col-11 col-md-6 col-lg-4">
@@ -14,66 +63,3 @@
     </div>
   </q-page>
 </template>
-<script lang="ts">
-import { defineComponent, ref } from 'vue';
-import { useAuthStore } from 'src/stores/auth';
-
-export default defineComponent({
-  name: 'IndexRoom',
-
-  data: function() {
-    const authStore = useAuthStore();
-    const username = authStore.getUsername;
-    const players = ref([]);
-    const gameSocket = ref(null);
-
-    return { username, players, gameSocket };
-  },
-
-  methods: {
-    connectToGameSocket: function(){
-      const room_id = this.$route.params.id;
-      console.log('room_id : ' + room_id);
-      const url = 'ws://127.0.0.1:8000/game/' + room_id + '/';
-
-      const authStore = useAuthStore();
-      const username = authStore.getUsername;
-
-      console.log(this.gameSocket);
-
-      console.log(this.players);
-
-      var gameSocket = new WebSocket(url);
-
-      // Create a new WebSocket connection
-      // this.gameSocket.value = new WebSocket(url);
-
-      console.log('socket : ' + this.gameSocket)
-
-      // var vm = this;
-
-      gameSocket.onmessage = function (e) {
-        const data = JSON.parse(e.data);
-        console.log('message : ' + data.username);
-        // vm.players.push(data.username);
-      };
-
-      gameSocket.onclose = function (e) {
-        console.error('Chat socket closed unexpectedly');
-      };
-
-      gameSocket.onopen = function () {
-        const msg = {
-          username: username,
-        };
-        console.log('open ' + username);
-        gameSocket.send(JSON.stringify(msg));
-      };
-    }
-  },
-
-  mounted() {
-    this.connectToGameSocket();
-  },
-});
-</script>
