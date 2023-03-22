@@ -14,3 +14,29 @@ class CardGame(models.Model):
         max_length=10, choices=[('public', 'Public'), ('private', 'Private')], blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+
+class GamePlayer(models.Model):
+    game = models.ForeignKey(
+        'Game', related_name='game', on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, null=True)
+
+    username = models.CharField(max_length=100)
+    score = models.IntegerField(default=0)
+
+
+class Game(models.Model):
+    creator = models.ForeignKey(
+        "GamePlayer", on_delete=models.CASCADE, related_name='creator')
+    name = models.CharField(max_length=100)
+    winner = models.ForeignKey(
+        "GamePlayer", on_delete=models.CASCADE, null=True, related_name='winner')
+
+    cardgame = models.ForeignKey(
+        CardGame, on_delete=models.CASCADE)
+
+    game_code = models.CharField(max_length=100)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)

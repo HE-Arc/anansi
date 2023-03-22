@@ -26,6 +26,8 @@ const connectToGameSocket = () => {
     const data = JSON.parse(e.data);
     console.log("message : " + data.username);
     players.value.push(data.username);
+    console.log("players : ");
+    console.log(data.players);
     // vm.players.push(data.username);
   };
 
