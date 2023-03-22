@@ -74,7 +74,7 @@ export default defineComponent({
       this.room_id = id;
     },
     goToGameWaitingRoom() {
-      if (this.room_id == '' || this.username == '') {
+      if (this.room_id == "" || this.username == "") {
         return;
       }
 
@@ -82,7 +82,7 @@ export default defineComponent({
       useAuthStore().setUsername(this.username);
 
       this.$router.push({
-        name: 'game.id',
+        name: "game.id",
         params: { id: this.room_id, username: this.username },
         props: { username: this.username },
       });

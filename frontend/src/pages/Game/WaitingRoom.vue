@@ -2,6 +2,7 @@
 import { defineComponent, ref, onMounted } from "vue";
 import { useAuthStore } from "src/stores/auth";
 import { useRoute } from "vue-router";
+import { Dictionary } from "express-serve-static-core";
 
 const authStore = useAuthStore();
 const username = authStore.getUsername;
@@ -9,26 +10,54 @@ const players = ref([]);
 const gameSocket = ref(null);
 const route = useRoute();
 
+// Dictionary of functions that handle the game
+const handlingGameFunctions: Dictionary<(data: any) => void> = {
+  update_players: (data: any) => {
+    console.log("update_players");
+    console.log(data);
+    players.value = data.players;
+  },
+  update_cards: (data: any) => {
+    // TODO
+  },
+
+  display_round_winner: (data: any) => {
+    // TODO
+  },
+
+  display_game_winner: (data: any) => {
+    // TODO
+  },
+};
+
 const connectToGameSocket = () => {
   // Get room_id from url
-  const room_id = route.params.room_id;
-
-  console.log(route.params);
+  const room_id = route.params.id;
 
   console.log("room_id : " + room_id);
   const url = "ws://127.0.0.1:8000/game/" + room_id + "/";
 
   gameSocket.value = new WebSocket(url);
 
-  // var vm = this;
+  // Check if the socket has been created
+  if (gameSocket.value == null) {
+    console.log("Socket is null");
+    return;
+  }
 
-  gameSocket.value.onmessage = function (e) {
+  gameSocket.value.onmessage = function (e: any) {
     const data = JSON.parse(e.data);
-    console.log("message : " + data.username);
-    players.value.push(data.username);
-    console.log("players : ");
-    console.log(data.players);
-    // vm.players.push(data.username);
+
+    // Get action of type string
+    const action: string = data.action;
+
+    // IF action is in handlingGameFunctions
+    if (action in handlingGameFunctions) {
+      // Call the function that handles the game
+      handlingGameFunctions[action](data);
+    } else {
+      console.log("Action not found");
+    }
   };
 
   gameSocket.value.onclose = function (e) {
@@ -37,8 +66,11 @@ const connectToGameSocket = () => {
 
   gameSocket.value.onopen = function () {
     const msg = {
+      action: "create_or_join_game",
+      game_name: room_id,
       username: username,
     };
+
     console.log("open " + username);
     gameSocket.value.send(JSON.stringify(msg));
   };

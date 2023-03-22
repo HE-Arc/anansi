@@ -46,9 +46,8 @@ class GameConsumer(AsyncWebsocketConsumer):
             async for p in GamePlayer.objects.filter(game=game):
                 players_names.append(p.username)
             
-            response = {
-                'type': 'player_list',
-                'test': 'test',
+            message = {
+                'action': 'update_players',
                 'players': players_names,
             }
             
@@ -56,7 +55,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                 self.game_group_name,
                 {
                     'type': 'player_list',
-                    'message': json.dumps(response),
+                    'message': json.dumps(message),
                 }
             )
             
