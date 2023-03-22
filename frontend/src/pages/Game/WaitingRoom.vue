@@ -15,50 +15,63 @@
   </q-page>
 </template>
 <script lang="ts">
-import { defineComponent, ref } from "vue";
-import { useAuthStore } from "src/stores/auth";
+import { defineComponent, ref } from 'vue';
+import { useAuthStore } from 'src/stores/auth';
 
 export default defineComponent({
-  name: "IndexRoom",
-  setup() {
+  name: 'IndexRoom',
+
+  data: function() {
     const authStore = useAuthStore();
     const username = authStore.getUsername;
     const players = ref([]);
     const gameSocket = ref(null);
 
-    function connectToGameSocket(){
+    return { username, players, gameSocket };
+  },
+
+  methods: {
+    connectToGameSocket: function(){
       const room_id = this.$route.params.id;
-      console.log("room_id : " + room_id);
-      const url = "ws://127.0.0.1:8000/game/" + room_id + "/";
+      console.log('room_id : ' + room_id);
+      const url = 'ws://127.0.0.1:8000/game/' + room_id + '/';
 
       const authStore = useAuthStore();
       const username = authStore.getUsername;
 
-      this.gameSocket = new WebSocket(url);
+      console.log(this.gameSocket);
 
-      console.log("socket : " + this.gameSocket)
+      console.log(this.players);
 
-      this.gameSocket.onmessage = function (e) {
+      var gameSocket = new WebSocket(url);
+
+      // Create a new WebSocket connection
+      // this.gameSocket.value = new WebSocket(url);
+
+      console.log('socket : ' + this.gameSocket)
+
+      // var vm = this;
+
+      gameSocket.onmessage = function (e) {
         const data = JSON.parse(e.data);
-        console.log("message : " + data.username);
-        this.players.push(data.username);
+        console.log('message : ' + data.username);
+        // vm.players.push(data.username);
       };
 
-      this.gameSocket.onclose = function (e) {
-        console.error("Chat socket closed unexpectedly");
+      gameSocket.onclose = function (e) {
+        console.error('Chat socket closed unexpectedly');
       };
 
-      this.gameSocket.onopen = function () {
+      gameSocket.onopen = function () {
         const msg = {
           username: username,
         };
-        console.log("open " + username);
-        this.gameSocket.send(JSON.stringify(msg));
+        console.log('open ' + username);
+        gameSocket.send(JSON.stringify(msg));
       };
     }
-
-    return { username, players, gameSocket };
   },
+
   mounted() {
     this.connectToGameSocket();
   },
