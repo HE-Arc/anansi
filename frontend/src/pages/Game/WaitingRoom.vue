@@ -19,15 +19,18 @@ const handlingGameFunctions: Dictionary<(data: any) => void> = {
     isCreator.value = true;
   },
 
-  game_joined: (data: any) => {
-    console.log("game joined");
-  },
-
   update_players: (data: any) => {
     console.log("update_players");
     console.log(data);
     players.value = data.players;
   },
+
+  game_starting: (data: any) => {
+    console.log("game_starting");
+    console.log(data);
+    // TODO
+  },
+
   update_cards: (data: any) => {
     // TODO
   },
@@ -105,7 +108,20 @@ onMounted(() => {
       <div class="row justify-evenly align-center">
         <!-- Pseudo -->
         <h1>Welcome {{ username }}</h1>
-        <h2 v-if="isCreator">Your are the game owner</h2>
+        <h5 v-if="isCreator">Your are the game owner</h5>
+        <!-- Button create room -->
+        <q-btn
+          v-if="isCreator"
+          class="q-mt-sm"
+          color="primary"
+          @click="
+            () => {
+              startGame();
+            }
+          "
+          flat
+          label="Start game"
+        />
         <!-- print players in a list -->
         <ul>
           <li v-for="player in players" :key="player">
