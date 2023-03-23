@@ -3,15 +3,26 @@ import { defineComponent, ref, onMounted } from "vue";
 import { useAuthStore } from "src/stores/auth";
 import { useRoute } from "vue-router";
 import { Dictionary } from "express-serve-static-core";
+import { isDeepStrictEqual } from "util";
 
 const authStore = useAuthStore();
 const username = authStore.getUsername;
 const players = ref([]);
 const gameSocket = ref(null);
 const route = useRoute();
+const isCreator = ref(false);
 
 // Dictionary of functions that handle the game
 const handlingGameFunctions: Dictionary<(data: any) => void> = {
+  game_created: (data: any) => {
+    console.log("game created");
+    isCreator.value = true;
+  },
+
+  game_joined: (data: any) => {
+    console.log("game joined");
+  },
+
   update_players: (data: any) => {
     console.log("update_players");
     console.log(data);
@@ -76,6 +87,13 @@ const connectToGameSocket = () => {
   };
 };
 
+const startGame = () => {
+  const msg = {
+    action: "start_game",
+  };
+  gameSocket.value.send(JSON.stringify(msg));
+};
+
 onMounted(() => {
   connectToGameSocket();
 });
@@ -87,6 +105,7 @@ onMounted(() => {
       <div class="row justify-evenly align-center">
         <!-- Pseudo -->
         <h1>Welcome {{ username }}</h1>
+        <h2 v-if="isCreator">Your are the game owner</h2>
         <!-- print players in a list -->
         <ul>
           <li v-for="player in players" :key="player">

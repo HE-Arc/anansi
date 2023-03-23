@@ -59,7 +59,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         action = data['action']
 
         if action == 'create_or_join_game':
-            game = await sync_to_async(Game.objects.get_or_create)(name=self.game_name)
+            game, created = await sync_to_async(Game.objects.get_or_create)(name=self.game_name)
             
             # Join game
             # Get player name, if not provided, use Anonymous
@@ -69,6 +69,19 @@ class GameConsumer(AsyncWebsocketConsumer):
 
             # Create GamePlayer object
             self.player = await sync_to_async(GamePlayer.objects.create)(username=self.player_name, game=game)
+            
+            if created:
+                message = {
+                    'action': 'game_created',
+                }
+                
+                await self.channel_layer.group_send(
+                    self.game_group_name,
+                    {
+                        'type': 'basic_message_receive',
+                        'message': json.dumps(message),
+                    }
+                )
 
             # Send message to all players in game
             players_names = []
@@ -83,12 +96,27 @@ class GameConsumer(AsyncWebsocketConsumer):
             await self.channel_layer.group_send(
                 self.game_group_name,
                 {
-                    'type': 'player_list',
+                    'type': 'basic_message_receive',
+                    'message': json.dumps(message),
+                }
+            )
+            
+        elif action == "start_game":
+            # Send a message to every player
+            message = {
+                'action': 'game_starting',
+                'message': 'Game is starting',
+            }
+            
+            await self.channel_layer.group_send(
+                self.game_group_name,
+                {
+                    'type': 'basic_message_receive',
                     'message': json.dumps(message),
                 }
             )
             
     # Receive message from game group
-    async def player_list(self, event):
+    async def basic_message_receive(self, event):
         message = event['message']
         await self.send(text_data=message)
