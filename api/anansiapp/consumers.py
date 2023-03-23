@@ -20,33 +20,33 @@ class GameConsumer(AsyncWebsocketConsumer):
         await self.accept()
 
     async def disconnect(self, close_code):      
-        # Remove the player from database
         if self.player_name and self.player:
-            # await sync_to_async(GamePlayer.objects.get)(username=self.player_name)
-            
+            # Remove the player from database
             await sync_to_async(self.player.delete)()
             
-            # Update players list for other players
+            # Get player from the game
             players_names = []
             async for p in GamePlayer.objects.filter(game=self.player.game):
                 players_names.append(p.username)
-            
-            message = {
-                'action': 'update_players',
-                'players': players_names,
-            }
-            
-            await self.channel_layer.group_send(
-                self.game_group_name,
-                {
-                    'type': 'player_list',
-                    'message': json.dumps(message),
+                
+            # If there is no player, delete the room
+            if len(players_names) == 0:
+                await sync_to_async(self.player.game.delete)()
+            else:
+                # If there are still players in the room, update the players list for other players
+                message = {
+                    'action': 'update_players',
+                    'players': players_names,
                 }
-            )
-            
-        # If the game (room) is empty, remove it from database
-        # TODO
-
+                
+                await self.channel_layer.group_send(
+                    self.game_group_name,
+                    {
+                        'type': 'player_list',
+                        'message': json.dumps(message),
+                    }
+                )
+                
         # Leave game group
         await self.channel_layer.group_discard(
             self.game_group_name,
