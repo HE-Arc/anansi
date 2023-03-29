@@ -69,6 +69,15 @@
             </q-item-section>
             <q-item-section side>
               <q-btn
+                class="q-mt-sm"
+                color="primary"
+                @click="() => $router.push({ name: 'cardgames.open' })"
+                icon="style"
+                flat
+              />
+            </q-item-section>
+            <q-item-section side>
+              <q-btn
                 class="q-px-xs"
                 color="primary"
                 @click="() => deleteCardGame(cardGame.id)"

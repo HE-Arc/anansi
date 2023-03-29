@@ -37,6 +37,12 @@ const routes: RouteRecordRaw[] = [
     name: 'game.id',
     props: true,
     component: () => import('src/pages/Game/WaitingRoom.vue')
+
+  },
+  {
+    path: '/mycardgames/open',
+    name: 'cardgames.open',
+    component: () => import('src/pages/CardGame/CardPage.vue')
   },
   // Always leave this as last one,
   // but you can also remove it
