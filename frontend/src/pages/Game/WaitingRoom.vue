@@ -11,6 +11,7 @@ const players = ref([]);
 const gameSocket = ref(null);
 const route = useRoute();
 const isCreator = ref(false);
+const cards = ref([]);
 
 // Dictionary of functions that handle the game
 const handlingGameFunctions: Dictionary<(data: any) => void> = {
@@ -29,16 +30,21 @@ const handlingGameFunctions: Dictionary<(data: any) => void> = {
     console.log("game_starting");
     console.log(data);
     // TODO
+
+    // Display the received cards
+    cards.value = data.cards;
   },
 
   update_creator: (data: any) => {
     console.log("update_creator");
     console.log(data);
+
     isCreator.value = data.new_creator == username;
   },
 
   update_cards: (data: any) => {
     // TODO
+
   },
 
   display_round_winner: (data: any) => {
@@ -96,6 +102,22 @@ const connectToGameSocket = () => {
   };
 };
 
+const sendCard = (card: string) => {
+  const msg = {
+    action: "send_card",
+    card: card,
+  };
+  gameSocket.value.send(JSON.stringify(msg));
+};
+
+const chooseRoundWinner = (winner: string) => {
+  const msg = {
+    action: "choose_round_winner",
+    winner: winner,
+  };
+  gameSocket.value.send(JSON.stringify(msg));
+};
+
 const startGame = () => {
   const msg = {
     action: "start_game",
@@ -134,7 +156,26 @@ onMounted(() => {
             {{ player }}
           </li>
         </ul>
-        <h2>Your cards</h2>
+        <h2 v-if="cards.length > 0">Your cards</h2>
+        <div v-if="cards.length > 0" class="row justify-evenly">
+          <q-card v-for="card in cards" :key="card" class="col-4">
+            <q-card-section>
+              <div class="text-h6">{{ card }}</div>
+            </q-card-section>
+            <q-card-actions align="right">
+              <q-btn
+                color="primary"
+                flat
+                label="Send"
+                @click="
+                  () => {
+                    sendCard(card);
+                  }
+                "
+              />
+            </q-card-actions>
+          </q-card>
+        </div>
       </div>
     </div>
   </q-page>

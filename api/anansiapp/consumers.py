@@ -90,7 +90,6 @@ class GameConsumer(AsyncWebsocketConsumer):
         if action == 'create_or_join_game':
             game, created = await database_sync_to_async(Game.objects.get_or_create)(name=self.game_name)
             
-            # Join game
             # Get player name, if not provided, use Anonymous
             self.player_name = data['username'] if data['username'] != '' else 'Anonymous'
 
@@ -134,16 +133,10 @@ class GameConsumer(AsyncWebsocketConsumer):
             
         elif action == "start_game":
             # Send a message to every player
-            message = {
-                'action': 'game_starting',
-                'message': 'Game is starting',
-            }
-            
             await self.channel_layer.group_send(
                 self.game_group_name,
                 {
-                    'type': 'basic_message_receive',
-                    'message': json.dumps(message),
+                    'type': 'generate_cards'
                 }
             )
             
@@ -151,6 +144,24 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def basic_message_receive(self, event):
         message = event['message']
         await self.send(text_data=message)
+        
+    # Receive message from game group
+    async def generate_cards(self, event):
+        # Get 7 random cards
+        cards = await self.get_random_cards()
+        
+        # Send the cards to the player
+        message = {
+            'action': 'game_starting',
+            'cards': cards,
+        }
+        
+        await self.send(text_data=json.dumps(message))
+    
+    @database_sync_to_async
+    def get_random_cards(self):
+        # TODO : Get 7 random cards
+        return []
         
     # Get game creator
     @database_sync_to_async
