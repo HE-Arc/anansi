@@ -4,6 +4,9 @@ import { useAuthStore } from "src/stores/auth";
 import { useRoute } from "vue-router";
 import { Dictionary } from "express-serve-static-core";
 import { isDeepStrictEqual } from "util";
+import { useQuasar } from "quasar";
+
+const $q = useQuasar();
 
 const authStore = useAuthStore();
 const username = authStore.getUsername;
@@ -12,12 +15,19 @@ const gameSocket = ref(null);
 const route = useRoute();
 const isCreator = ref(false);
 const cards = ref([]);
+const isGameStarted = ref(false);
 
 // Dictionary of functions that handle the game
 const handlingGameFunctions: Dictionary<(data: any) => void> = {
   game_created: (data: any) => {
     console.log("game created");
     isCreator.value = true;
+
+    $q.loading.hide();
+  },
+
+  game_joined: (data: any) => {
+    $q.loading.hide();
   },
 
   update_players: (data: any) => {
@@ -29,10 +39,13 @@ const handlingGameFunctions: Dictionary<(data: any) => void> = {
   game_starting: (data: any) => {
     console.log("game_starting");
     console.log(data);
-    // TODO
+
+    isGameStarted.value = true;
 
     // Display the received cards
     cards.value = data.cards;
+
+    $q.loading.hide();
   },
 
   update_creator: (data: any) => {
@@ -44,7 +57,6 @@ const handlingGameFunctions: Dictionary<(data: any) => void> = {
 
   update_cards: (data: any) => {
     // TODO
-
   },
 
   display_round_winner: (data: any) => {
@@ -57,6 +69,8 @@ const handlingGameFunctions: Dictionary<(data: any) => void> = {
 };
 
 const connectToGameSocket = () => {
+  $q.loading.show();
+
   // Get room_id from url
   const room_id = route.params.id;
 
@@ -103,6 +117,8 @@ const connectToGameSocket = () => {
 };
 
 const sendCard = (card: string) => {
+  $q.loading.show();
+
   const msg = {
     action: "send_card",
     card: card,
@@ -111,6 +127,8 @@ const sendCard = (card: string) => {
 };
 
 const chooseRoundWinner = (winner: string) => {
+  $q.loading.show();
+
   const msg = {
     action: "choose_round_winner",
     winner: winner,
@@ -119,6 +137,8 @@ const chooseRoundWinner = (winner: string) => {
 };
 
 const startGame = () => {
+  $q.loading.show();
+
   const msg = {
     action: "start_game",
   };
@@ -139,7 +159,7 @@ onMounted(() => {
         <h5 v-if="isCreator">Your are the game owner</h5>
         <!-- Button create room -->
         <q-btn
-          v-if="isCreator"
+          v-if="isCreator && !isGameStarted"
           class="q-mt-sm"
           color="primary"
           @click="
@@ -150,12 +170,15 @@ onMounted(() => {
           flat
           label="Start game"
         />
-        <!-- print players in a list -->
-        <ul>
-          <li v-for="player in players" :key="player">
-            {{ player }}
-          </li>
-        </ul>
+        <!-- print players in a list using quasar component -->
+        <h2 v-if="players.length > 0">Players</h2>
+        <q-list v-if="players.length > 0">
+          <q-item v-for="player in players" :key="player" clickable>
+            <q-item-section>{{ player }}</q-item-section>
+          </q-item>
+        </q-list>
+
+        <!-- Display cards -->
         <h2 v-if="cards.length > 0">Your cards</h2>
         <div v-if="cards.length > 0" class="row justify-evenly">
           <q-card v-for="card in cards" :key="card" class="col-4">

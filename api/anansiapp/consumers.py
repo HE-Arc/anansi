@@ -43,6 +43,7 @@ class GameConsumer(AsyncWebsocketConsumer):
             if len(players_names) == 0:
                 await database_sync_to_async(game.delete)()
             else: # If there are still players in the room
+                # TODO : Fix this shit
                 # If the leaving player is the creator, update the creator (change to the first player in the list)
                 # if self.player_name == game_creator_name:
                 #     game.creator = await sync_to_async(GamePlayer.objects.get)(game=game)
@@ -142,11 +143,13 @@ class GameConsumer(AsyncWebsocketConsumer):
             
     # Receive message from game group
     async def basic_message_receive(self, event):
+        ''' Receive a message from the game group and send it to the player '''
         message = event['message']
         await self.send(text_data=message)
         
     # Receive message from game group
     async def generate_cards(self, event):
+        ''' Generate 7 random cards and send them to the players'''
         # Get 7 random cards
         cards = await self.get_random_cards()
         
@@ -160,10 +163,12 @@ class GameConsumer(AsyncWebsocketConsumer):
     
     @database_sync_to_async
     def get_random_cards(self):
+        ''' Get 7 random cards from the database '''
         # TODO : Get 7 random cards
         return []
         
     # Get game creator
     @database_sync_to_async
     def get_game_creator(self, game):
+        ''' Get the game creator '''
         return game.creator
