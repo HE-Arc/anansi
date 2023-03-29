@@ -31,6 +31,12 @@ const handlingGameFunctions: Dictionary<(data: any) => void> = {
     // TODO
   },
 
+  update_creator: (data: any) => {
+    console.log("update_creator");
+    console.log(data);
+    isCreator.value = data.new_creator == username;
+  },
+
   update_cards: (data: any) => {
     // TODO
   },
@@ -128,6 +134,7 @@ onMounted(() => {
             {{ player }}
           </li>
         </ul>
+        <h2>Your cards</h2>
       </div>
     </div>
   </q-page>

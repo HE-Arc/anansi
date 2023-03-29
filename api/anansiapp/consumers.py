@@ -3,6 +3,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import async_to_sync, sync_to_async
 import logging
 from .models import Game, GamePlayer
+from channels.db import database_sync_to_async
 
 class GameConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -19,21 +20,49 @@ class GameConsumer(AsyncWebsocketConsumer):
 
         await self.accept()
 
-    async def disconnect(self, close_code):      
+    async def disconnect(self, close_code):
         if self.player_name and self.player:
+            game = self.player.game
+            
+            game_creator = await self.get_game_creator(game)
+            game_creator_name = ""
+            
             # Remove the player from database
-            await sync_to_async(self.player.delete)()
+            await database_sync_to_async(self.player.delete)()
             
             # Get player from the game
             players_names = []
-            async for p in GamePlayer.objects.filter(game=self.player.game):
+            async for p in GamePlayer.objects.filter(game=game):
                 players_names.append(p.username)
+                
+                # Get the creator name
+                if p.id == game_creator.id:
+                    game_creator_name = p.username
                 
             # If there is no player, delete the room
             if len(players_names) == 0:
-                await sync_to_async(self.player.game.delete)()
-            else:
-                # If there are still players in the room, update the players list for other players
+                await database_sync_to_async(game.delete)()
+            else: # If there are still players in the room
+                # If the leaving player is the creator, update the creator (change to the first player in the list)
+                # if self.player_name == game_creator_name:
+                #     game.creator = await sync_to_async(GamePlayer.objects.get)(game=game)
+                #     await sync_to_async(game.save)()
+                    
+                #     # Tell the new creator that he is the new creator
+                #     message = {
+                #         'action': 'update_creator',
+                #         'new_creator': game.creator.username,
+                #     }
+                    
+                #     await self.channel_layer.group_send(
+                #         self.game_group_name,
+                #         {
+                #             'type': 'basic_message_receive',
+                #             'message': json.dumps(message),
+                #         }
+                #     )
+                            
+                # update the players list for other players
                 message = {
                     'action': 'update_players',
                     'players': players_names,
@@ -42,7 +71,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                 await self.channel_layer.group_send(
                     self.game_group_name,
                     {
-                        'type': 'player_list',
+                        'type': 'basic_message_receive',
                         'message': json.dumps(message),
                     }
                 )
@@ -59,18 +88,20 @@ class GameConsumer(AsyncWebsocketConsumer):
         action = data['action']
 
         if action == 'create_or_join_game':
-            game, created = await sync_to_async(Game.objects.get_or_create)(name=self.game_name)
+            game, created = await database_sync_to_async(Game.objects.get_or_create)(name=self.game_name)
             
             # Join game
             # Get player name, if not provided, use Anonymous
             self.player_name = data['username'] if data['username'] != '' else 'Anonymous'
-            
-            game = await sync_to_async(Game.objects.get)(name=self.game_name)
 
             # Create GamePlayer object
-            self.player = await sync_to_async(GamePlayer.objects.create)(username=self.player_name, game=game)
+            self.player = await database_sync_to_async(GamePlayer.objects.create)(username=self.player_name, game=game)
             
             if created:
+                # Add creator to the game, and update the game in database
+                game.creator = self.player
+                await database_sync_to_async(game.save)()
+
                 message = {
                     'action': 'game_created',
                 }
@@ -120,3 +151,8 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def basic_message_receive(self, event):
         message = event['message']
         await self.send(text_data=message)
+        
+    # Get game creator
+    @database_sync_to_async
+    def get_game_creator(self, game):
+        return game.creator
