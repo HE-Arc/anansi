@@ -1,9 +1,8 @@
 <script lang="ts" setup>
-import { defineComponent, ref, onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import { useAuthStore } from "src/stores/auth";
 import { useRoute } from "vue-router";
 import { Dictionary } from "express-serve-static-core";
-import { isDeepStrictEqual } from "util";
 import { useQuasar } from "quasar";
 
 const $q = useQuasar();
@@ -20,21 +19,16 @@ const isGameStarted = ref(false);
 
 // Dictionary of functions that handle the game
 const handlingGameFunctions: Dictionary<(data: any) => void> = {
-  game_created: (data: any) => {
-    console.log("game created");
-    isCreator.value = true;
-
-    $q.loading.hide();
-  },
-
-  game_joined: (data: any) => {
-    $q.loading.hide();
-  },
-
   update_players: (data: any) => {
     console.log("update_players");
     console.log(data);
     players.value = data.players;
+
+    gameOwner.value = data.creator;
+
+    isCreator.value = data.new_creator == username;
+
+    $q.loading.hide();
   },
 
   game_starting: (data: any) => {
@@ -47,13 +41,6 @@ const handlingGameFunctions: Dictionary<(data: any) => void> = {
     cards.value = data.cards;
 
     $q.loading.hide();
-  },
-
-  update_creator: (data: any) => {
-    console.log("update_creator");
-    console.log(data);
-
-    isCreator.value = data.new_creator == username;
   },
 
   update_cards: (data: any) => {
@@ -158,6 +145,7 @@ onMounted(() => {
         <!-- Pseudo -->
         <h1>Welcome {{ username }}</h1>
         <h5 v-if="isCreator">Your are the game owner</h5>
+        <h5 v-if="!isCreator">Game owner: {{ gameOwner }}</h5>
         <!-- Button create room -->
         <q-btn
           v-if="isCreator && !isGameStarted"
