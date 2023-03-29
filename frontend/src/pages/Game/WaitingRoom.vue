@@ -10,6 +10,7 @@ const $q = useQuasar();
 
 const authStore = useAuthStore();
 const username = authStore.getUsername;
+const gameOwner = ref("");
 const players = ref([]);
 const gameSocket = ref(null);
 const route = useRoute();
