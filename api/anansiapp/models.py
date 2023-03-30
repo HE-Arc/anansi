@@ -87,8 +87,8 @@ class Round(models.Model):
     master = models.ForeignKey(
         GamePlayer, on_delete=models.CASCADE, related_name='user_master')
     cloze_card = models.ForeignKey(ClozeCard, on_delete=models.CASCADE)
-    response_card_winner = models.ForeignKey(
-        'RoundResponseCard', on_delete=models.CASCADE, null=True)
+    round_response_card_winner = models.ForeignKey(
+        'RoundResponseCard', on_delete=models.CASCADE, null=True, related_name='round_response_card_winner')
     round_number = models.IntegerField(default=0)
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -98,7 +98,8 @@ class Round(models.Model):
 class RoundResponseCard(models.Model):
     """ RoundResponseCard model (carte de réponse d'un tour d'une partie d'un joueur)
     """
-    round = models.ForeignKey(Round, on_delete=models.CASCADE)
+    round = models.ForeignKey(
+        Round, on_delete=models.CASCADE, related_name='round')
     response_card = models.ForeignKey(ResponseCard, on_delete=models.CASCADE)
     player = models.ForeignKey(
         GamePlayer, on_delete=models.CASCADE, related_name='player')
