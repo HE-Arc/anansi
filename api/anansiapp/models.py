@@ -52,7 +52,7 @@ class Game(models.Model):
     """ Game model (partie de jeu)
     """
     creator = models.ForeignKey(
-        "GamePlayer", on_delete=models.CASCADE, related_name='creator')
+        "GamePlayer", on_delete=models.CASCADE, related_name='creator', null=True)
     name = models.CharField(max_length=100)
     winner = models.ForeignKey(
         "GamePlayer", on_delete=models.CASCADE, null=True, related_name='winner')

@@ -10,6 +10,8 @@ django-cors-headers = "*"
 channels = {extras = ["daphne"], version = "*"}
 django-environ = "*"
 channels-redis = "*"
+django-seed = "*"
+psycopg2 = "*"
 
 [dev-packages]
 
