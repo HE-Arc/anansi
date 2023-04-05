@@ -6,6 +6,7 @@
         <q-btn class="q-mt-sm" color="primary" icon="add" flat />
         <div class="q-pa-md">
           <div class="q-gutter-y-md" style="max-width: 400px">
+            <h2>Your cards</h2>
             <q-tabs v-model="tab" narrow-indicator dense align="justify">
               <q-tab class="text-purple" name="cloze" icon="help" label="Cloze cards" />
               <q-tab
@@ -31,7 +32,7 @@
 
                 <q-card class="my-card">
                   <q-card-section class="bg-primary text-white">
-                    <div class="text-h6">J'aimerais trop enfilé _____</div>
+                    <div class="text-h6">J'aimerais trop enfiler _____</div>
                   </q-card-section>
                   <q-separator />
                   <q-card-actions align="right">
@@ -78,8 +79,16 @@ import { ref } from "vue";
 
 export default {
   setup() {
+    const inView = ref(Array.apply(null, Array(50)).map((_) => false));
     return {
-      tab: ref("mails"),
+      tab: ref("cards"),
+      inView,
+      onIntersection(entry) {
+        const index = parseInt(entry.target.dataset.id, 10);
+        setTimeout(() => {
+          inView.value.splice(index, 1, entry.isIntersecting);
+        }, 50);
+      },
     };
   },
 };
