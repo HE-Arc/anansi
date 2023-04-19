@@ -1,8 +1,9 @@
 import json
+import random
 from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import async_to_sync, sync_to_async
 import logging
-from .models import Game, GamePlayer
+from .models import Game, GamePlayer, ResponseCard
 from channels.db import database_sync_to_async
 
 class GameConsumer(AsyncWebsocketConsumer):
@@ -127,10 +128,14 @@ class GameConsumer(AsyncWebsocketConsumer):
         # Get 7 random cards
         cards = await self.get_random_cards()
         
+        # TODO : Fix this shit
+        cards_names = [(card.id, card.text) async for card in cards]
+        
         # Send the cards to the player
         message = {
             'action': 'game_starting',
-            'cards': cards,
+            'cards_count': len(cards),
+            'cards': cards_names, # TODO : Fix this shit
         }
         
         await self.send(text_data=json.dumps(message))
@@ -138,8 +143,23 @@ class GameConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def get_random_cards(self):
         ''' Get 7 random cards from the database '''
-        # TODO : Get 7 random cards
-        return []
+        
+        # Get the game based on the player
+        game = self.player.game
+        
+        # Get the card deck (CardGame)
+        card_game = game.cardgame
+        
+        # Get the cards (Card) from the card deck
+        responseCards = ResponseCard.objects.filter(cardgame=card_game)
+        
+        # Select 7 random cards
+        cards = responseCards # random.sample(list(responseCards), 7)
+        
+        # TODO : Be sure that the cards have not already been distributed to other players
+    
+        
+        return cards
         
     # Get game creator
     @database_sync_to_async

@@ -26,7 +26,7 @@ const handlingGameFunctions: Dictionary<(data: any) => void> = {
 
     gameOwner.value = data.creator;
 
-    isCreator.value = data.new_creator == username;
+    isCreator.value = data.creator == username;
 
     $q.loading.hide();
   },
@@ -159,6 +159,9 @@ onMounted(() => {
           flat
           label="Start game"
         />
+        {{ isGameStarted }}
+        {{ isCreator }}
+
         <!-- print players in a list using quasar component -->
         <h2 v-if="players.length > 0">Players</h2>
         <q-list v-if="players.length > 0">
