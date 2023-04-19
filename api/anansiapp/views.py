@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import viewsets
-from .models import CardGame
-from .serializers import CardGameSerializer, ComplexCardGameSerializer, UserSerializer, RegisterSerializer
+from .models import CardGame, ClozeCard, Game, GamePlayer, GamePlayerResponseCard, ResponseCard, Round, RoundResponseCard
+from .serializers import CardGameSerializer, ClozeCardSerializer, ComplexCardGameSerializer, GamePlayerResponseCardSerializer, GamePlayerSerializer, GameSerializer, ResponseCardSerializer, RoundResponseCardSerializer, RoundSerializer, UserSerializer, RegisterSerializer
 from django.contrib.auth import authenticate, login, logout
 from django.http import JsonResponse
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
@@ -82,3 +82,38 @@ class CardGameViewSet(viewsets.ModelViewSet):
             print(serializer.errors)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ResponseCardViewSet(viewsets.ModelViewSet):
+    queryset = ResponseCard.objects.all()
+    serializer_class = ResponseCardSerializer
+
+
+class ClozeCardViewSet(viewsets.ModelViewSet):
+    queryset = ClozeCard.objects.all()
+    serializer_class = ClozeCardSerializer
+
+
+class GameViewSet(viewsets.ModelViewSet):
+    queryset = Game.objects.all()
+    serializer_class = GameSerializer
+
+
+class GamePlayerViewSet(viewsets.ModelViewSet):
+    queryset = GamePlayer.objects.all()
+    serializer_class = GamePlayerSerializer
+
+
+class RoundViewSet(viewsets.ModelViewSet):
+    queryset = Round.objects.all()
+    serializer_class = RoundSerializer
+
+
+class RoundResponseCardViewSet(viewsets.ModelViewSet):
+    queryset = RoundResponseCard.objects.all()
+    serializer_class = RoundResponseCardSerializer
+
+
+class GamePlayerResponseCardViewSet(viewsets.ModelViewSet):
+    queryset = GamePlayerResponseCard.objects.all()
+    serializer_class = GamePlayerResponseCardSerializer
