@@ -60,7 +60,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class CardGameViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     queryset = CardGame.objects.all()
     serializer_class = ComplexCardGameSerializer
