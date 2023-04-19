@@ -35,6 +35,7 @@ txaio = "==23.1.1"
 typing-extensions = "==4.5.0"
 tzdata = "==2022.7"
 "zope.interface" = "==5.5.2"
+django-seed = "*"
 
 [dev-packages]
 
