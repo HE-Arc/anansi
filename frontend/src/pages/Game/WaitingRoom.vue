@@ -5,6 +5,8 @@ import { useRoute } from "vue-router";
 import { Dictionary } from "express-serve-static-core";
 import { useQuasar } from "quasar";
 
+import CardComponent from "src/components/CardComponent.vue";
+
 const $q = useQuasar();
 
 const authStore = useAuthStore();
@@ -174,10 +176,8 @@ onMounted(() => {
         <h2 v-if="cards.length > 0">Your cards</h2>
         <div v-if="cards.length > 0" class="row justify-evenly">
           <q-card v-for="card in cards" :key="card" class="col-4">
-            <q-card-section>
-              <div class="text-h6">{{ card }}</div>
-            </q-card-section>
-            <q-card-actions align="right">
+            <CardComponent :card="card" />
+            <!-- <q-card-actions align="right">
               <q-btn
                 color="primary"
                 flat
@@ -188,7 +188,7 @@ onMounted(() => {
                   }
                 "
               />
-            </q-card-actions>
+            </q-card-actions> -->
           </q-card>
         </div>
       </div>
