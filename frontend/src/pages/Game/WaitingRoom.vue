@@ -131,11 +131,11 @@ const connectToGameSocket = () => {
 };
 
 const sendCard = (card) => {
-  $q.loading.show();
+  // $q.loading.show();
 
   const msg = {
     action: "send_card",
-    card: card,
+    card_id: card.id,
   };
   gameSocket.value.send(JSON.stringify(msg));
 
