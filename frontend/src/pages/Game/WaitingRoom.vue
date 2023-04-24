@@ -18,6 +18,8 @@ const route = useRoute();
 const isCreator = ref(false);
 const cards = ref([]);
 const isGameStarted = ref(false);
+const card_sent_counter = ref(0);
+const player_count = ref(0);
 
 // Dictionary of functions that handle the game
 const handlingGameFunctions: Dictionary<(data: any) => void> = {
@@ -47,6 +49,19 @@ const handlingGameFunctions: Dictionary<(data: any) => void> = {
 
   update_cards: (data: any) => {
     // TODO
+  },
+
+  // This function is called when a player sends a card, and used to update the counter of cards sent 
+  update_players_count: (data: any) => {
+    console.log(data);
+
+    player_count.value = data.player_number;
+  },
+
+  update_card_sent_counter: (data: any) => {
+    console.log(data);
+
+    card_sent_counter.value = data.card_sent_counter;
   },
 
   display_round_winner: (data: any) => {
@@ -106,7 +121,7 @@ const connectToGameSocket = () => {
   };
 };
 
-const sendCard = (card: string) => {
+const sendCard = (card) => {
   $q.loading.show();
 
   const msg = {
@@ -114,6 +129,8 @@ const sendCard = (card: string) => {
     card: card,
   };
   gameSocket.value.send(JSON.stringify(msg));
+
+  console.log(card);
 };
 
 const chooseRoundWinner = (winner: string) => {
@@ -161,8 +178,6 @@ onMounted(() => {
           flat
           label="Start game"
         />
-        {{ isGameStarted }}
-        {{ isCreator }}
 
         <!-- print players in a list using quasar component -->
         <h2 v-if="players.length > 0">Players</h2>
@@ -172,11 +187,19 @@ onMounted(() => {
           </q-item>
         </q-list>
 
+        <!-- Display card sent counter and number of players-->
+        <h2 v-if="isGameStarted">Cards sent</h2>
+        <h3 v-if="isGameStarted">{{ card_sent_counter }} / {{ player_count }}</h3>
+
         <!-- Display cards -->
         <h2 v-if="cards.length > 0">Your cards</h2>
         <div v-if="cards.length > 0" class="row justify-evenly">
           <q-card v-for="card in cards" :key="card" class="col-4">
-            <CardComponent :card="card" />
+            <CardComponent :card="card"
+              @onSelect="() => {
+                sendCard(card);
+              }"
+            />
             <!-- <q-card-actions align="right">
               <q-btn
                 color="primary"

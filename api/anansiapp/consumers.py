@@ -4,7 +4,7 @@ from .serializers import ResponseCardSerializer
 from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import async_to_sync, sync_to_async
 import logging
-from .models import Game, GamePlayer, ResponseCard
+from .models import Game, GamePlayer, ResponseCard, RoundResponseCard
 from channels.db import database_sync_to_async
 
 
@@ -117,6 +117,53 @@ class GameConsumer(AsyncWebsocketConsumer):
                     'type': 'generate_cards'
                 }
             )
+            
+            # Send the number of players to every player
+            player_number = await self.get_game_players_number(self.player.game)
+            
+            message = {
+                'action': 'update_players_count',
+                'player_number': player_number,
+            }
+            
+            await self.channel_layer.group_send(
+                self.game_group_name,
+                {
+                    'type': 'basic_message_receive',
+                    'message': json.dumps(message),
+                }
+            )
+            
+        elif action == "send_card": # A card is received from one player
+            # Get the card from the card id received
+            card_id = data['card_id']
+            
+            # Get the card from the database
+            card = await database_sync_to_async(ResponseCard.objects.get)(id=card_id)
+            
+            # Get the player who sent the card
+            player = await database_sync_to_async(GamePlayer.objects.get)(username=self.player_name)
+            
+            # Create a RoundResponseCard with the card and the player
+            await database_sync_to_async(RoundResponseCard.objects.create)(player=player, card=card)
+            
+            # Get the number of players in the game
+            players = await self.get_game_players(self.player.game)
+            
+            # Get the number of cards sent by the players
+            # Get the rounds for the game
+            rounds = await database_sync_to_async(RoundResponseCard.objects.filter)(player__game=self.player.game)
+            
+            # Get the last round (with no winner)
+            last_round = await database_sync_to_async(rounds.filter)(round_response_card_winner=None)
+            
+            # Get the number of cards sent in the last round
+            cards_played_in_last_round = await database_sync_to_async(last_round.count)()
+            
+            # Send a message to every player, with the updated counter
+            
+            
+            
 
     # Receive message from game group
     async def basic_message_receive(self, event):
@@ -181,3 +228,15 @@ class GameConsumer(AsyncWebsocketConsumer):
     def get_game_players(self, game):
         ''' Get the game players '''
         return GamePlayer.objects.filter(game=game)
+    
+    # Get card from id
+    @database_sync_to_async
+    def get_responsecard_from_id(self, card_id):
+        ''' Get the card from the card id '''
+        return ResponseCard.objects.get(id=card_id)
+    
+    # get game players number
+    @database_sync_to_async
+    def get_game_players_number(self, game):
+        ''' Get the number of players in the game '''
+        return GamePlayer.objects.filter(game=game).count()
