@@ -20,6 +20,7 @@ const cards = ref([]);
 const isGameStarted = ref(false);
 const card_sent_counter = ref(0);
 const player_count = ref(0);
+const error_message = ref("");
 
 // Dictionary of functions that handle the game
 const handlingGameFunctions: Dictionary<(data: any) => void> = {
@@ -56,6 +57,14 @@ const handlingGameFunctions: Dictionary<(data: any) => void> = {
     console.log(data);
 
     player_count.value = data.player_number;
+  },
+
+  game_already_started: (data: any) => {
+    // TODO : Display error message
+    console.log("game_already_started");
+    error_message.value = "The game has already started";
+
+    $q.loading.hide();
   },
 
   update_card_sent_counter: (data: any) => {
@@ -161,10 +170,26 @@ onMounted(() => {
   <q-page class="row justify-evenly content-start">
     <div class="col-11 col-md-6 col-lg-4">
       <div class="row justify-evenly align-center">
+
+        <!-- Display error message as a banner if not empty -->
+        <div v-if="error_message != ''" class="text-white bg-red">
+          <q-banner dense class="text-white bg-red">
+            {{ error_message }}
+          </q-banner>
+          <!-- Go back to main menu button -->
+          <q-btn
+            class="q-mt-sm"
+            color="text-white"
+            @click="() => $router.push('/')"
+            flat
+            label="Go back to main menu"
+          />
+        </div>
+
         <!-- Pseudo -->
-        <h1>Welcome {{ username }}</h1>
+        <h1 v-if="username">Welcome {{ username }}</h1>
         <h5 v-if="isCreator">Your are the game owner</h5>
-        <h5 v-if="!isCreator">Game owner: {{ gameOwner }}</h5>
+        <h5 v-if="!isCreator && username">Game owner: {{ gameOwner }}</h5>
         <!-- Button create room -->
         <q-btn
           v-if="isCreator && !isGameStarted"

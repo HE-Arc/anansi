@@ -77,6 +77,14 @@ class GameConsumer(AsyncWebsocketConsumer):
 
         if action == 'create_or_join_game':
             game, created = await database_sync_to_async(Game.objects.get_or_create)(name=self.game_name)
+            
+            # If the game is already started, send error message
+            if not created and game.is_started:
+                message = {
+                    'action': 'game_already_started',
+                }
+                await self.send(text_data=json.dumps(message))
+                return
 
             # Get player name, if not provided, use Anonymous
             self.player_name = data['username'] if data['username'] != '' else 'Anonymous'
