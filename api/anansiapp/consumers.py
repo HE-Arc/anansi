@@ -175,15 +175,15 @@ class GameConsumer(AsyncWebsocketConsumer):
             rounds = await database_sync_to_async(Round.objects.filter)(game=self.player.game)
             
             # Get the last round (with no winner)
-            round = await database_sync_to_async(rounds.filter)(round_response_card_winner=None)
+            round = await database_sync_to_async(rounds.get)(round_response_card_winner=None)
             
             # Get the number of cards sent in the last round
-            cards_played_in_round = await database_sync_to_async(RoundResponseCard.objects.filter)(round=round)
+            cards_played_in_round_count = await self.get_cards_played_in_round(round)
             
             # Send a message to every player, with the updated counter
             message = {
                 'action': 'update_card_sent_counter',
-                'cards_played_in_last_round': len(cards_played_in_round),
+                'card_sent_counter': cards_played_in_round_count,
             }
             
             await self.channel_layer.group_send(
@@ -301,3 +301,9 @@ class GameConsumer(AsyncWebsocketConsumer):
         cloze_card = random.choice(cloze_cards)
         
         return cloze_card
+    
+    # Get the number of cards played in the round
+    @database_sync_to_async
+    def get_cards_played_in_round(self, round):
+        ''' Get the number of cards played in the round '''
+        return RoundResponseCard.objects.filter(round=round).count()
