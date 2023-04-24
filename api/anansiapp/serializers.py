@@ -100,7 +100,7 @@ class GameSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Game
-        fields = ['id', 'creator', 'name', 'winner', 'deck',
+        fields = ['id', 'creator', 'name', 'winner', 'deck', 'is_started',
                   'game_code', 'creator_object', 'winner_object', 'deck_object']
 
     def get_creator_object(self, obj):

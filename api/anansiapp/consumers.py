@@ -110,6 +110,13 @@ class GameConsumer(AsyncWebsocketConsumer):
             )
 
         elif action == "start_game":
+            # Update the game status to started
+            game = self.player.game
+            
+            game.is_started = True
+            
+            await database_sync_to_async(game.save)()            
+            
             # Send a message to every player
             await self.channel_layer.group_send(
                 self.game_group_name,

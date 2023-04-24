@@ -60,6 +60,8 @@ class Game(models.Model):
     deck = models.ForeignKey(Deck, on_delete=models.CASCADE, null=True)
 
     game_code = models.CharField(max_length=100)
+    
+    is_started = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
