@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, defineEmits} from "vue";
+import { ref, onMounted, defineEmits } from "vue";
 
 const emits = defineEmits(["onSelect"]);
 
@@ -30,14 +30,20 @@ onMounted(() => {
 </script>
 
 <template>
-  <q-card class="my-card" style="width: {{ width }}px; height: {{ height }}px; background-color: red;">
+  <q-card
+    class="my-card"
+    style="width: {{ width }}px; height: {{ height }}px; background-color: red;"
+  >
     <!-- Display card text, and change color based on the type -->
     <q-card-section class="text-h6 text-white" :class="card_type">
       {{ card_text }}
 
-      <q-btn style="background: blue; color: white" label="Choose" @click="emitCardSelected" />
+      <q-btn
+        style="background: blue; color: white"
+        label="Choose"
+        @click="emitCardSelected"
+      />
     </q-card-section>
-    
   </q-card>
 </template>
 

@@ -24,6 +24,14 @@ const error_message = ref("");
 
 // Dictionary of functions that handle the game
 const handlingGameFunctions: Dictionary<(data: any) => void> = {
+  error: (data: any) => {
+    console.log("error");
+    console.log(data);
+
+    error_message.value = data.message;
+
+    $q.loading.hide();
+  },
   update_players: (data: any) => {
     console.log("update_players");
     console.log(data);
@@ -52,25 +60,31 @@ const handlingGameFunctions: Dictionary<(data: any) => void> = {
     // TODO
   },
 
-  // This function is called when a player sends a card, and used to update the counter of cards sent 
+  // This function is called when a player sends a card, and used to update the counter of cards sent
   update_players_count: (data: any) => {
     console.log(data);
 
     player_count.value = data.player_number;
   },
 
-  game_already_started: (data: any) => {
-    // TODO : Display error message
-    console.log("game_already_started");
-    error_message.value = "The game has already started";
-
-    $q.loading.hide();
-  },
-
   update_card_sent_counter: (data: any) => {
     console.log(data);
 
     card_sent_counter.value = data.card_sent_counter;
+  },
+
+  // End of the round, display response cards
+  display_response_cards: (data: any) => {
+    console.log(data);
+
+    // Send to counter to 0
+    card_sent_counter.value = 0;
+    player_count.value = 0;
+
+    // Display the received cards
+    cards.value = data.cards;
+
+    $q.loading.hide();
   },
 
   display_round_winner: (data: any) => {
@@ -110,12 +124,17 @@ const connectToGameSocket = () => {
       // Call the function that handles the game
       handlingGameFunctions[action](data);
     } else {
-      console.log("Action not found");
+      console.log("Action " + action + " not found");
     }
   };
 
   gameSocket.value.onclose = function (e) {
-    console.error("Chat socket closed unexpectedly");
+    console.log(e);
+    if (e.wasClean) {
+      console.log("Connection closed cleanly");
+    } else {
+      console.log("Connection died");
+    }
   };
 
   gameSocket.value.onopen = function () {
@@ -138,8 +157,6 @@ const sendCard = (card) => {
     card_id: card.id,
   };
   gameSocket.value.send(JSON.stringify(msg));
-
-  console.log(card);
 };
 
 const chooseRoundWinner = (winner: string) => {
@@ -170,7 +187,6 @@ onMounted(() => {
   <q-page class="row justify-evenly content-start">
     <div class="col-11 col-md-6 col-lg-4">
       <div class="row justify-evenly align-center">
-
         <!-- Display error message as a banner if not empty -->
         <div v-if="error_message != ''" class="text-white bg-red">
           <q-banner dense class="text-white bg-red">
@@ -220,10 +236,13 @@ onMounted(() => {
         <h2 v-if="cards.length > 0">Your cards</h2>
         <div v-if="cards.length > 0" class="row justify-evenly">
           <q-card v-for="card in cards" :key="card" class="col-4">
-            <CardComponent :card="card"
-              @onSelect="() => {
-                sendCard(card);
-              }"
+            <CardComponent
+              :card="card"
+              @onSelect="
+                () => {
+                  sendCard(card);
+                }
+              "
             />
             <!-- <q-card-actions align="right">
               <q-btn

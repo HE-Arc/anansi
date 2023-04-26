@@ -1,6 +1,6 @@
 import json
 import random
-from .serializers import ResponseCardSerializer
+from .serializers import ResponseCardSerializer, RoundResponseCardSerializer
 from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import async_to_sync, sync_to_async
 import logging
@@ -80,9 +80,14 @@ class GameConsumer(AsyncWebsocketConsumer):
             # If the game is already started, send error message
             if not created and game.is_started:
                 message = {
-                    'action': 'game_already_started',
+                    'action': 'error',
+                    'message': 'The game has already started.',
                 }
+                
                 await self.send(text_data=json.dumps(message))
+                
+                # Close the connection cleanly, with a normal close frame, and a message indicating why the connection is closing.
+                await self.close(code = 1000, reason = 'The game has already started.') 
                 return
 
             # Get player name, if not provided, use Anonymous
@@ -165,7 +170,7 @@ class GameConsumer(AsyncWebsocketConsumer):
             card = await database_sync_to_async(ResponseCard.objects.get)(id=card_id)
             
             # Get the round for the game, and the last round (with no winner)
-            current_round = await database_sync_to_async(Round.objects.get)(game=self.player.game, round_response_card_winner=None)
+            current_round = await database_sync_to_async(Round.objects.get)(game=self.player.game)
             
             # Create a RoundResponseCard with the card and the player
             await database_sync_to_async(RoundResponseCard.objects.create)(player=self.player, round=current_round, response_card=card)
@@ -174,25 +179,48 @@ class GameConsumer(AsyncWebsocketConsumer):
             # Get the rounds for the game
             rounds = await database_sync_to_async(Round.objects.filter)(game=self.player.game)
             
-            # Get the last round (with no winner)
-            round = await database_sync_to_async(rounds.get)(round_response_card_winner=None)
+            # Get the last round (last created)
+            round = await database_sync_to_async(Round.objects.last)()
             
             # Get the number of cards sent in the last round
-            cards_played_in_round_count = await self.get_cards_played_in_round(round)
+            cards_played_in_round_count = await self.get_cards_played_in_round_count(round)
             
-            # Send a message to every player, with the updated counter
-            message = {
-                'action': 'update_card_sent_counter',
-                'card_sent_counter': cards_played_in_round_count,
-            }
+            # Get the number of players in the game
+            player_number = await self.get_game_players_number(self.player.game)
             
-            await self.channel_layer.group_send(
-                self.game_group_name,
-                {
-                    'type': 'basic_message_receive',
-                    'message': json.dumps(message),
+            # If all the players have sent their cards, send all the cards to the players
+            if cards_played_in_round_count == player_number:
+                # Get all the cards sent by the players
+                cards = await self.get_cards_played_in_round(round)
+                
+                # Send the cards to the players
+                message_cards = {
+                    'action': 'display_response_cards',
+                    'cards': cards,
                 }
-            )
+                
+                await self.channel_layer.group_send(
+                    self.game_group_name,
+                    {
+                        'type': 'basic_message_receive',
+                        'message': json.dumps(message_cards),
+                    }
+                )
+                
+            else:
+                # Send a message to every player, with the updated counter
+                message = {
+                    'action': 'update_card_sent_counter',
+                    'card_sent_counter': cards_played_in_round_count,
+                }
+                
+                await self.channel_layer.group_send(
+                    self.game_group_name,
+                    {
+                        'type': 'basic_message_receive',
+                        'message': json.dumps(message),
+                    }
+                )
             
 
     # Receive message from game group
@@ -304,6 +332,15 @@ class GameConsumer(AsyncWebsocketConsumer):
     
     # Get the number of cards played in the round
     @database_sync_to_async
-    def get_cards_played_in_round(self, round):
+    def get_cards_played_in_round_count(self, round):
         ''' Get the number of cards played in the round '''
         return RoundResponseCard.objects.filter(round=round).count()
+    
+    @database_sync_to_async
+    def get_cards_played_in_round(self, round):
+        ''' Get serialized cards played in the round '''
+        cards = RoundResponseCard.objects.filter(round=round)
+        
+        serializer = RoundResponseCardSerializer(cards, many=True)
+        
+        return serializer.data
