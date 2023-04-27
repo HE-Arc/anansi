@@ -1,6 +1,6 @@
 import json
 import random
-from .serializers import ResponseCardSerializer, RoundResponseCardSerializer
+from .serializers import ResponseCardSerializer, RoundResponseCardSerializer, RoundSerializer
 from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import async_to_sync, sync_to_async
 import logging
@@ -98,8 +98,8 @@ class GameConsumer(AsyncWebsocketConsumer):
 
             if created:
                 # Add creator to the game, and update the game in database
-                game.creator = self.player
-                await database_sync_to_async(game.save)()
+                self.player.is_game_creator = True
+                await database_sync_to_async(self.player.save)()
 
             # Send message to all players in game
             players = await self.get_game_players(game)
@@ -182,6 +182,9 @@ class GameConsumer(AsyncWebsocketConsumer):
             # Get the last round (last created)
             round = await database_sync_to_async(Round.objects.last)()
             
+            # Get the round serialized using sync_to_async
+            ser_round = await self.get_current_round(round)
+            
             # Get the number of cards sent in the last round
             cards_played_in_round_count = await self.get_cards_played_in_round_count(round)
             
@@ -196,6 +199,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                 # Send the cards to the players
                 message_cards = {
                     'action': 'display_response_cards',
+                    'round': ser_round,
                     'cards': cards,
                 }
                 
@@ -279,7 +283,15 @@ class GameConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def get_game_creator(self, game):
         ''' Get the game creator '''
-        return game.creator
+        # Get all the player in the game
+        players = GamePlayer.objects.filter(game=game)
+        
+        # Get the player who created the game using filter
+        for player in players:
+            if player.is_game_creator:
+                return player
+        
+        return None
 
     # Get game players
     @database_sync_to_async
@@ -342,5 +354,13 @@ class GameConsumer(AsyncWebsocketConsumer):
         cards = RoundResponseCard.objects.filter(round=round)
         
         serializer = RoundResponseCardSerializer(cards, many=True)
+        
+        return serializer.data
+    
+    # Transform a round to a serialized round
+    @sync_to_async
+    def get_current_round(self, round):
+        ''' Get the current round serialized '''
+        serializer = RoundSerializer(round)
         
         return serializer.data
