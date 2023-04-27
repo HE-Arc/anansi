@@ -31,6 +31,8 @@ onMounted(() => {
   card_owner.value = props.card.player_object.username;
   console.log(props.card);
   is_master.value = props.is_master;
+
+  console.log("Is master : " + is_master.value);
 });
 
 const onCardSelectedByMaster = () => {
@@ -53,7 +55,12 @@ const onCardSelectedByMaster = () => {
 
     <!-- Select button if is master -->
     <q-card-actions v-if="is_master">
-      <q-btn flat color="primary" label="Select" @click="onCardSelectedByMaster" />
+      <q-btn
+        color="secondary"
+        class="text-white"
+        label="Select"
+        @click="onCardSelectedByMaster"
+      />
     </q-card-actions>
   </q-card>
 </template>

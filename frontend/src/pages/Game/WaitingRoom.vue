@@ -85,8 +85,6 @@ const handlingGameFunctions: Dictionary<(data: any) => void> = {
   display_response_cards: (data: any) => {
     console.log(data);
 
-    isRoundOver.value = true;
-
     // Send to counter to 0
     card_sent_counter.value = 0;
     player_count.value = 0;
@@ -97,6 +95,8 @@ const handlingGameFunctions: Dictionary<(data: any) => void> = {
     current_round.value = data.round;
     console.log("current_round");
     console.log(current_round.value);
+
+    isRoundOver.value = true;
 
     $q.loading.hide();
   },
@@ -236,8 +236,10 @@ onMounted(() => {
       />
 
       <!-- print players in a list -->
-
-      <PlayerListComponent v-if="players.length > 0" :players="players" />
+      <PlayerListComponent
+        v-if="players.length > 0 && !isGameStarted"
+        :players="players"
+      />
 
       <!-- Display card sent counter and number of players-->
       <h2 v-if="isGameStarted && !isRoundOver">Cards sent</h2>
@@ -263,10 +265,10 @@ onMounted(() => {
       <!-- Display round_response_cards -->
       <EndOfRoundComponent
         class="col-12"
-        v-if="round_response_cards.length > 0 && isRoundOver"
+        v-if="isRoundOver"
         :cards="round_response_cards"
         :round="current_round"
-        @onSelect="chooseRoundWinner"
+        :username="username"
       />
     </div>
   </q-page>
