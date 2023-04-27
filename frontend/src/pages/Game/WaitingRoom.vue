@@ -175,12 +175,12 @@ const sendCard = (card) => {
   gameSocket.value.send(JSON.stringify(msg));
 };
 
-const chooseRoundWinner = (winner: string) => {
+const chooseRoundWinner = (card_id: string) => {
   $q.loading.show();
 
   const msg = {
     action: "choose_round_winner",
-    winner: winner,
+    card_id: card_id,
   };
   gameSocket.value.send(JSON.stringify(msg));
 };
@@ -269,6 +269,7 @@ onMounted(() => {
         :cards="round_response_cards"
         :round="current_round"
         :username="username"
+        @onSelect="chooseRoundWinner"
       />
     </div>
   </q-page>

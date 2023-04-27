@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, defineProps } from "vue";
+import { ref, onMounted, defineProps, defineEmits } from "vue";
 import RoundResponseCard from "./RoundResponseCard.vue";
 
 const props = defineProps({
@@ -13,6 +13,8 @@ const props = defineProps({
     default: "",
   },
 });
+
+const emits = defineEmits(["onSelect"]);
 
 const round = ref(null);
 const responseCards = ref([]);
@@ -40,6 +42,11 @@ onMounted(() => {
   console.log("Round master : ");
   console.log(round.value.master_object.username);
 });
+
+const onCardSelectedByMaster = (card_id) => {
+  console.log("Card selected by master : " + card_id);
+  emits("onSelect", card_id);
+};
 </script>
 
 <template>
@@ -54,6 +61,10 @@ onMounted(() => {
   <p v-if="is_master">You are the master of this round, please choose the best card.</p>
 
   <q-card v-for="card in responseCards" :key="card" class="col-4">
-    <RoundResponseCard :card="card" :is_master="is_master" />
+    <RoundResponseCard
+      :card="card"
+      :is_master="is_master"
+      @onSelect="onCardSelectedByMaster"
+    />
   </q-card>
 </template>

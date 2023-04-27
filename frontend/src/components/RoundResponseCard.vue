@@ -36,6 +36,7 @@ onMounted(() => {
 });
 
 const onCardSelectedByMaster = () => {
+  console.log("Card selected by master : " + card_id.value);
   emits("onSelect", card_id.value);
 };
 </script>
