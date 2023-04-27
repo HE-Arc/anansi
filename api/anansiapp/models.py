@@ -51,11 +51,11 @@ class FavouriteDeck(models.Model):
 class Game(models.Model):
     """ Game model (partie de jeu)
     """
-    creator = models.ForeignKey(
-        "GamePlayer", on_delete=models.CASCADE, related_name='creator', null=True)
+    # creator = models.ForeignKey(
+    #     "GamePlayer", on_delete=models.CASCADE, related_name='creator', null=True)
     name = models.CharField(max_length=100)
-    winner = models.ForeignKey(
-        "GamePlayer", on_delete=models.CASCADE, null=True, related_name='winner')
+    # winner = models.ForeignKey(
+    #     "GamePlayer", on_delete=models.CASCADE, null=True, related_name='winner')
 
     deck = models.ForeignKey(Deck, on_delete=models.CASCADE, null=True)
 
@@ -74,6 +74,9 @@ class GamePlayer(models.Model):
         'Game', related_name='game', on_delete=models.CASCADE)
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, null=True)
+    
+    is_game_creator = models.BooleanField(default=False)
+    is_game_winner = models.BooleanField(default=False)
 
     username = models.CharField(max_length=100)
     score = models.IntegerField(default=0)

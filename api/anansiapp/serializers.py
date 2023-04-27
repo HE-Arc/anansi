@@ -92,21 +92,21 @@ class ResponseCardSerializer(serializers.ModelSerializer):
 
 class GameSerializer(serializers.ModelSerializer):
     # GamePlayerSerializer(source='creator', read_only=True)
-    creator_object = serializers.SerializerMethodField()
+    # creator_object = serializers.SerializerMethodField()
     # GamePlayerSerializer(source='winner', read_only=True)
     deck_object = DeckModelSerializer(
         source='deck', read_only=True)
 
     class Meta:
         model = Game
-        fields = ['id', 'creator', 'name', 'deck', 'is_started',
-                  'game_code', 'creator_object', 'deck_object']
+        fields = ['id', 'name', 'deck', 'is_started',
+                  'game_code', 'deck_object']
 
-    def get_creator_object(self, obj):
-        if obj.creator:
-            return GamePlayerSerializer(obj.creator).data
-        else:
-            return None
+    # def get_creator_object(self, obj):
+    #     if obj.creator:
+    #         return GamePlayerSerializer(obj.creator).data
+    #     else:
+    #         return None
 
     # def get_winner_object(self, obj):
     #     if obj.winner:
@@ -152,7 +152,7 @@ class RoundResponseCardSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RoundResponseCard
-        fields = ['id', 'response_card', 'player'
+        fields = ['id', 'response_card', 'player',
                   'is_winner', 'response_card_object', 'player_object'] # , 'round_object' 'round',
 
 
