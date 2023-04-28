@@ -3,7 +3,6 @@ import random
 from .serializers import GamePlayerSerializer, GameSerializer, ResponseCardSerializer, RoundResponseCardSerializer, RoundSerializer
 from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import async_to_sync, sync_to_async
-import logging
 from .models import ClozeCard, Game, GamePlayer, ResponseCard, Round, RoundResponseCard
 from channels.db import database_sync_to_async
 
@@ -145,7 +144,7 @@ class GameConsumer(AsyncWebsocketConsumer):
             await self.channel_layer.group_send(
                 self.game_group_name,
                 {
-                    'type': 'generate_cards'
+                    'type': 'start_new_round'
                 }
             )
             
@@ -171,22 +170,15 @@ class GameConsumer(AsyncWebsocketConsumer):
             
             # Get the card from the database
             card = await database_sync_to_async(ResponseCard.objects.get)(id=card_id)
-            
-            # Get the round for the game, and the last round (with no winner)
-            current_round = await database_sync_to_async(Round.objects.get)(game=self.player.game)
-            
-            # Create a RoundResponseCard with the card and the player
-            await database_sync_to_async(RoundResponseCard.objects.create)(player=self.player, round=current_round, response_card=card)
-            
-            # Get the number of cards sent by the players
-            # Get the rounds for the game
-            rounds = await database_sync_to_async(Round.objects.filter)(game=self.player.game)
-            
+
             # Get the last round (last created)
             round = await database_sync_to_async(Round.objects.last)()
             
+            # Create a RoundResponseCard with the card and the player
+            await database_sync_to_async(RoundResponseCard.objects.create)(player=self.player, round=round, response_card=card)
+            
             # Get the round serialized using sync_to_async
-            ser_round = await self.get_current_round(round)
+            ser_round = await self.get_current_round_serialized(round)
             
             # Get the number of cards sent in the last round
             cards_played_in_round_count = await self.get_cards_played_in_round_count(round)
@@ -276,11 +268,11 @@ class GameConsumer(AsyncWebsocketConsumer):
             # Create a new round
             round = await database_sync_to_async(Round.objects.create)(game=game, master=master, cloze_card=cloze_card)
             
-            # Send a message to every player : pick a new card
+            # Start the round
             await self.channel_layer.group_send(
                 self.game_group_name,
                 {
-                    'type': 'generate_cards'
+                    'type': 'start_new_round'
                 }
             )
             
@@ -292,14 +284,14 @@ class GameConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=message)
 
     # Receive message from game group
-    async def generate_cards(self, event):
-        ''' Generate 7 random cards and send them to the players'''
-        # Get 7 random cards
+    async def start_new_round(self, event):
+        ''' Generate 6 random cards and send them to the players'''
+        # Get 6 random cards
         cards = await self.get_random_cards(6)
 
         # Send the cards to the player
         message = {
-            'action': 'game_starting',
+            'action': 'start_new_round',
             'cards_count': len(cards),
             'cards': cards
         }
@@ -308,7 +300,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def get_random_cards(self, number_of_cards):
-        ''' Get 7 random cards from the database '''
+        ''' Get N random cards from the database, where N is the number of cards to get '''
 
         # Get the game based on the player
         game = self.player.game
@@ -404,7 +396,7 @@ class GameConsumer(AsyncWebsocketConsumer):
     
     # Transform a round to a serialized round
     @sync_to_async
-    def get_current_round(self, round):
+    def get_current_round_serialized(self, round):
         ''' Get the current round serialized '''
         serializer = RoundSerializer(round)
         

@@ -81,10 +81,13 @@ const handlingGameFunctions: Dictionary<(data: any) => void> = {
     $q.loading.hide();
   },
 
-  game_starting: (data: any) => {
+  start_new_round: (data: any) => {
     console.log("game_starting");
     console.log(data);
 
+    // Update state variables
+    isCardSelectionOver.value = false;
+    isRoundOver.value = false;
     isGameStarted.value = true;
 
     // Display the received players_cards
