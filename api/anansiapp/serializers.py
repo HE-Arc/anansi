@@ -130,18 +130,18 @@ class RoundSerializer(serializers.ModelSerializer):
     master_object = GamePlayerSerializer(source='master', read_only=True)
     cloze_card_object = ClozeCardSerializer(
         source='cloze_card', read_only=True)
-    # round_response_card_winner_object = serializers.SerializerMethodField()
+    round_response_card_winner_object = serializers.SerializerMethodField()
 
     class Meta:
         model = Round
-        fields = ['id', 'game', 'master', 'cloze_card', 'round_number',
-                  'game_object', 'master_object', 'cloze_card_object']
+        fields = ['id', 'game', 'master', 'cloze_card', 'round_number', 'round_response_card_winner',
+                  'game_object', 'master_object', 'cloze_card_object', 'round_response_card_winner_object']
 
-    # def get_round_response_card_winner_object(self, obj):
-    #     if obj.round_response_card_winner:
-    #         return RoundResponseCardSerializer(obj.round_response_card_winner).data
-    #     else:
-    #         return None
+    def get_round_response_card_winner_object(self, obj):
+        if obj.round_response_card_winner:
+            return RoundResponseCardSerializer(obj.round_response_card_winner).data
+        else:
+            return None
 
 
 class RoundResponseCardSerializer(serializers.ModelSerializer):

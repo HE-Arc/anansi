@@ -25,8 +25,10 @@ const card_owner = ref("");
 const is_master = ref(false);
 
 onMounted(() => {
+  console.log("Card : ");
+  console.log(props.card);
   card_id.value = props.card.id;
-  card_text.value = props.card.text;
+  card_text.value = props.card.response_card_object.text;
   card_type.value = props.card.type;
   card_owner.value = props.card.player_object.username;
   console.log(props.card);

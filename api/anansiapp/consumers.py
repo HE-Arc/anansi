@@ -225,6 +225,38 @@ class GameConsumer(AsyncWebsocketConsumer):
                         'message': json.dumps(message),
                     }
                 )
+        elif action == "choose_round_winner": # The master has chosen a winner for the round
+            # Get the card id of the winner
+            card_id = data['card_id']
+            
+            # Get the card from the database
+            card = await database_sync_to_async(RoundResponseCard.objects.get)(id=card_id)
+            
+            # Get the round for the game, and the last round (with no winner)
+            current_round = await database_sync_to_async(Round.objects.last)()
+            
+            # Set the winner for the round
+            current_round.round_response_card_winner = card
+            
+            # Save the round
+            await database_sync_to_async(current_round.save)()
+            
+            # Get the winner card serialized
+            ser_card = await self.get_responsecard(card)
+            
+            # Send a message to every player, with the winner card
+            message = {
+                'action': 'display_round_winner',
+                'card': ser_card,
+            }
+            
+            await self.channel_layer.group_send(
+                self.game_group_name,
+                {
+                    'type': 'basic_message_receive',
+                    'message': json.dumps(message),
+                }
+            )
             
 
     # Receive message from game group
@@ -362,5 +394,13 @@ class GameConsumer(AsyncWebsocketConsumer):
     def get_current_round(self, round):
         ''' Get the current round serialized '''
         serializer = RoundSerializer(round)
+        
+        return serializer.data
+        
+    # Transform a ResponseCard to a serialized ResponseCard
+    @sync_to_async
+    def get_responsecard(self, responsecard):
+        ''' Get the ResponseCard serialized '''
+        serializer = RoundResponseCardSerializer(responsecard)
         
         return serializer.data

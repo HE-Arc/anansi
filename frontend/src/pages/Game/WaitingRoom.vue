@@ -24,7 +24,12 @@ const isCreator = ref(false);
 const players_cards = ref([]); // Cards owned by the player
 const round_response_cards = ref([]); // Cards sent by the players for a round
 const isGameStarted = ref(false);
-const isRoundOver = ref(false); // All the players have choosen their cards, and now the master must choose the best one
+const isCardSelectionOver = ref(false); // All the players have choosen their cards, and now the master must choose the best one
+const isRoundOver = ref(false); // The master has choosen the best card, and now the players must see the result
+
+const roundWinningCard = ref(null);
+const roundWinningPlayerUsername = ref("");
+
 const card_sent_counter = ref(0);
 const player_count = ref(0);
 const error_message = ref("");
@@ -96,13 +101,22 @@ const handlingGameFunctions: Dictionary<(data: any) => void> = {
     console.log("current_round");
     console.log(current_round.value);
 
-    isRoundOver.value = true;
+    isCardSelectionOver.value = true;
 
     $q.loading.hide();
   },
 
   display_round_winner: (data: any) => {
-    // TODO
+    console.log("display_round_winner");
+    console.log(data);
+
+    roundWinningCard.value = data.card;
+
+    roundWinningPlayerUsername.value = data.card.player_object.username;
+
+    isRoundOver.value = true;
+
+    $q.loading.hide();
   },
 
   display_game_winner: (data: any) => {
@@ -178,6 +192,8 @@ const sendCard = (card) => {
 const chooseRoundWinner = (card_id: string) => {
   $q.loading.show();
 
+  console.log("chooseRoundWinner " + card_id);
+
   const msg = {
     action: "choose_round_winner",
     card_id: card_id,
@@ -242,14 +258,17 @@ onMounted(() => {
       />
 
       <!-- Display card sent counter and number of players-->
-      <h2 v-if="isGameStarted && !isRoundOver">Cards sent</h2>
-      <h3 v-if="isGameStarted && !isRoundOver">
+      <h2 v-if="isGameStarted && !isCardSelectionOver">Cards sent</h2>
+      <h3 v-if="isGameStarted && !isCardSelectionOver">
         {{ card_sent_counter }} / {{ player_count }}
       </h3>
 
       <!-- Display players_cards -->
-      <h2 v-if="players_cards.length > 0 && !isRoundOver">Your cards</h2>
-      <div v-if="players_cards.length > 0 && !isRoundOver" class="row justify-evenly">
+      <h2 v-if="players_cards.length > 0 && !isCardSelectionOver">Your cards</h2>
+      <div
+        v-if="players_cards.length > 0 && !isCardSelectionOver"
+        class="row justify-evenly"
+      >
         <q-card v-for="card in players_cards" :key="card" class="col-12">
           <CardComponent
             :card="card"
@@ -265,12 +284,21 @@ onMounted(() => {
       <!-- Display round_response_cards -->
       <EndOfRoundComponent
         class="col-12"
-        v-if="isRoundOver"
+        v-if="isCardSelectionOver && !isRoundOver"
         :cards="round_response_cards"
         :round="current_round"
         :username="username"
         @onSelect="chooseRoundWinner"
       />
+
+      <div class="col-12" v-if="isRoundOver">
+        <h5>The following card wins the round :</h5>
+        <RoundResponseCard
+          :card="roundWinningCard"
+          v-if="isRoundOver"
+          :is_master="false"
+        />
+      </div>
     </div>
   </q-page>
 </template>
