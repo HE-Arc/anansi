@@ -1,6 +1,6 @@
 import json
 import random
-from .serializers import ResponseCardSerializer, RoundResponseCardSerializer, RoundSerializer
+from .serializers import GamePlayerSerializer, GameSerializer, ResponseCardSerializer, RoundResponseCardSerializer, RoundSerializer
 from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import async_to_sync, sync_to_async
 import logging
@@ -100,16 +100,19 @@ class GameConsumer(AsyncWebsocketConsumer):
                 # Add creator to the game, and update the game in database
                 self.player.is_game_creator = True
                 await database_sync_to_async(self.player.save)()
+                
+            # Get the game serialized
+            ser_game = await self.get_game(game)
 
             # Send message to all players in game
             players = await self.get_game_players(game)
-            players_names = [p.username async for p in players]
 
             game_creator = await self.get_game_creator(game)
 
             message = {
-                'action': 'update_players',
-                'players': players_names,
+                'action': 'game_joined_or_created',
+                'players': players,
+                'game': ser_game,
                 'creator': game_creator.username,
             }
 
@@ -348,11 +351,13 @@ class GameConsumer(AsyncWebsocketConsumer):
         
         return None
 
-    # Get game players
+    # Get game players serialized
     @database_sync_to_async
     def get_game_players(self, game):
         ''' Get the game players '''
-        return GamePlayer.objects.filter(game=game)
+        players = GamePlayer.objects.filter(game=game)
+        
+        return GamePlayerSerializer(players, many=True).data
     
     # Get card from id
     @database_sync_to_async
@@ -425,5 +430,13 @@ class GameConsumer(AsyncWebsocketConsumer):
     def get_responsecard(self, responsecard):
         ''' Get the ResponseCard serialized '''
         serializer = RoundResponseCardSerializer(responsecard)
+        
+        return serializer.data
+    
+    # Get the game serialized
+    @sync_to_async
+    def get_game(self, game):
+        ''' Get the game serialized '''
+        serializer = GameSerializer(game)
         
         return serializer.data

@@ -4,18 +4,21 @@ import { useAuthStore } from "src/stores/auth";
 import { useRoute } from "vue-router";
 import { Dictionary } from "express-serve-static-core";
 import { useQuasar } from "quasar";
+import { GameplayerStore } from "src/stores/gameplayerStore";
 
 import CardComponent from "src/components/CardComponent.vue";
 import RoundResponseCard from "src/components/RoundResponseCard.vue";
 import EndOfRoundComponent from "src/components/EndOfRoundComponent.vue";
 import PlayerListComponent from "src/components/PlayerListComponent.vue";
 
+const gameplayerStore = GameplayerStore();
+
 const $q = useQuasar();
 
 const authStore = useAuthStore();
 const route = useRoute();
 
-const username = authStore.getUsername;
+const username = ref(authStore.getUsername);
 const gameOwner = ref("");
 const players = ref([]);
 const gameSocket = ref(null);
@@ -37,6 +40,27 @@ const current_round = ref(null);
 
 // Dictionary of functions that handle the game
 const handlingGameFunctions: Dictionary<(data: any) => void> = {
+  game_joined_or_created: (data: any) => {
+    console.log("game_joined_or_created");
+    console.log(data);
+
+    // Set the players
+    players.value = data.players;
+
+    // Set the game
+    gameplayerStore.setGameId(data.game_id);
+
+    // Set the game owner
+    gameOwner.value = data.creator;
+
+    isCreator.value = data.creator == username.value;
+
+    // Set the gameplayer id
+    gameplayerStore.setGameplayerId(data.gameplayer_id);
+
+    $q.loading.hide();
+  },
+
   error: (data: any) => {
     console.log("error");
     console.log(data);
@@ -52,7 +76,7 @@ const handlingGameFunctions: Dictionary<(data: any) => void> = {
 
     gameOwner.value = data.creator;
 
-    isCreator.value = data.creator == username;
+    isCreator.value = data.creator == username.value;
 
     $q.loading.hide();
   },
@@ -149,7 +173,7 @@ const connectToGameSocket = () => {
 
     // IF action is in handlingGameFunctions
     if (action in handlingGameFunctions) {
-      // Call the function that handles the game
+      // Call the function that handles the action
       handlingGameFunctions[action](data);
     } else {
       console.log("Action " + action + " not found");
@@ -168,13 +192,18 @@ const connectToGameSocket = () => {
   };
 
   gameSocket.value.onopen = function () {
+    // If the user is not authentified
+    if (username.value == null || username.value == null || username.value == "") {
+      username.value = gameplayerStore.generateAnonUsername();
+    } else gameplayerStore.setUsername(username.value);
+
     const msg = {
       action: "create_or_join_game",
       game_name: room_id,
-      username: username,
+      username: username.value,
     };
 
-    console.log("open " + username);
+    console.log("GamePlayer username : " + username.value);
     gameSocket.value.send(JSON.stringify(msg));
   };
 };
