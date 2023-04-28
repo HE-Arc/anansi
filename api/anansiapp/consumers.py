@@ -295,47 +295,32 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def generate_cards(self, event):
         ''' Generate 7 random cards and send them to the players'''
         # Get 7 random cards
-        cards = await self.get_random_cards()
-
-        # TODO : Fix this shit
-        # cards_names = [(card.id, card.text) async for card in cards]
+        cards = await self.get_random_cards(6)
 
         # Send the cards to the player
         message = {
             'action': 'game_starting',
             'cards_count': len(cards),
-            'cards': cards  # cards_names, # TODO : Fix this shit
+            'cards': cards
         }
 
         await self.send(text_data=json.dumps(message))
 
     @database_sync_to_async
-    def get_random_cards(self):
+    def get_random_cards(self, number_of_cards):
         ''' Get 7 random cards from the database '''
 
         # Get the game based on the player
         game = self.player.game
 
         # Get the card deck (CardGame)
-        card_game = game.cardgame
+        card_game = game.cardgame # TODO : Get the card game from the game and use it
 
         # Get the cards (Card) from the card deck
-        responseCards = ResponseCard.objects.filter(
-            cardgame=1)
+        responseCards = ResponseCardSerializer(ResponseCard.objects.filter(cardgame=1), many=True).data
 
-        print(responseCards)
-
-        serializer = ResponseCardSerializer(responseCards, many=True)
-
-        # Select 7 random cards
-        # cards = responseCards  # random.sample(list(responseCards), 7)
-        cards = serializer.data
-
-        print(serializer.data)
-
-        # TODO : Be sure that the cards have not already been distributed to other players
-
-        return cards
+        # Return n random cards that have not already been distributed to other players
+        return random.sample(responseCards, number_of_cards)
 
     # Get game creator
     @database_sync_to_async
