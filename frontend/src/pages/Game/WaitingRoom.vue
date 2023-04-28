@@ -210,6 +210,15 @@ const startGame = () => {
   gameSocket.value.send(JSON.stringify(msg));
 };
 
+const nextRound = () => {
+  $q.loading.show();
+
+  const msg = {
+    action: "next_round",
+  };
+  gameSocket.value.send(JSON.stringify(msg));
+};
+
 onMounted(() => {
   connectToGameSocket();
 });
@@ -292,6 +301,20 @@ onMounted(() => {
       />
 
       <div class="col-12" v-if="isRoundOver">
+        <!-- Next round button is the player is the game owner -->
+        <q-btn
+          v-if="isCreator"
+          class="q-mt-sm col-12"
+          color="primary"
+          @click="
+            () => {
+              nextRound();
+            }
+          "
+          flat
+          label="Next round"
+        />
+
         <h5>The following card wins the round :</h5>
         <RoundResponseCard
           :card="roundWinningCard"

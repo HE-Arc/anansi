@@ -241,6 +241,9 @@ class GameConsumer(AsyncWebsocketConsumer):
             # Save the round
             await database_sync_to_async(current_round.save)()
             
+            # TODO : Increase winnir score
+            
+            
             # Get the winner card serialized
             ser_card = await self.get_responsecard(card)
             
@@ -255,6 +258,26 @@ class GameConsumer(AsyncWebsocketConsumer):
                 {
                     'type': 'basic_message_receive',
                     'message': json.dumps(message),
+                }
+            )
+        elif action == "next_round":
+            # Get the game
+            game = self.player.game
+            
+            # Select a random player as the master
+            master = await self.select_master(game)
+            
+            # Select a random cloze card
+            cloze_card = await self.select_cloze_card()
+            
+            # Create a new round
+            round = await database_sync_to_async(Round.objects.create)(game=game, master=master, cloze_card=cloze_card)
+            
+            # Send a message to every player : pick a new card
+            await self.channel_layer.group_send(
+                self.game_group_name,
+                {
+                    'type': 'generate_cards'
                 }
             )
             
