@@ -37,6 +37,7 @@ const card_sent_counter = ref(0);
 const player_count = ref(0);
 const error_message = ref("");
 const current_round = ref(null);
+const cloze_card = ref("");
 
 // Dictionary of functions that handle the game
 const handlingGameFunctions: Dictionary<(data: any) => void> = {
@@ -92,6 +93,8 @@ const handlingGameFunctions: Dictionary<(data: any) => void> = {
 
     // Display the received players_cards
     players_cards.value = data.cards;
+
+    cloze_card.value = data.cloze_card;
 
     $q.loading.hide();
   },
@@ -297,6 +300,14 @@ onMounted(() => {
         v-if="players.length > 0 && !isGameStarted"
         :players="players"
       />
+
+      <!-- Display the cloze card -->
+      <div v-if="cloze_card != null && isGameStarted && !isRoundOver">
+        <h5>Cloze card : </h5>
+        <q-card>
+          {{ cloze_card }}
+        </q-card>
+      </div>
 
       <!-- Display card sent counter and number of players-->
       <h2 v-if="isGameStarted && !isCardSelectionOver">Cards sent</h2>

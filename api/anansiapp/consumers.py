@@ -144,7 +144,8 @@ class GameConsumer(AsyncWebsocketConsumer):
             await self.channel_layer.group_send(
                 self.game_group_name,
                 {
-                    'type': 'start_new_round'
+                    'type': 'start_new_round',
+                    'cloze_card_text': cloze_card.text,
                 }
             )
             
@@ -272,7 +273,8 @@ class GameConsumer(AsyncWebsocketConsumer):
             await self.channel_layer.group_send(
                 self.game_group_name,
                 {
-                    'type': 'start_new_round'
+                    'type': 'start_new_round',
+                    'cloze_card_text': cloze_card.text,
                 }
             )
             
@@ -287,19 +289,20 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def start_new_round(self, event):
         ''' Generate 6 random cards and send them to the players'''
         # Get 6 random cards
-        cards = await self.get_random_cards(6)
-
+        cards = await self.get_random_response_cards(6)
+        
         # Send the cards to the player
         message = {
             'action': 'start_new_round',
             'cards_count': len(cards),
+            'cloze_card': event['cloze_card_text'],
             'cards': cards
         }
 
         await self.send(text_data=json.dumps(message))
 
     @database_sync_to_async
-    def get_random_cards(self, number_of_cards):
+    def get_random_response_cards(self, number_of_cards):
         ''' Get N random cards from the database, where N is the number of cards to get '''
 
         # Get the game based on the player
