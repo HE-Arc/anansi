@@ -320,7 +320,7 @@ onMounted(() => {
 
       <!-- Display the cloze card -->
       <div v-if="cloze_card != null && isGameStarted && !isRoundOver">
-        <h5>Cloze card : </h5>
+        <h5>Cloze card :</h5>
         <q-card>
           {{ cloze_card }}
         </q-card>

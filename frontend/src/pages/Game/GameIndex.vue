@@ -9,7 +9,14 @@
           </q-card-section>
           <q-card-section>
             <!-- Pseudo -->
-            <q-input v-model="username" label="Pseudo" filled class="q-my-sm" required />
+            <q-input
+              v-model="username"
+              label="Pseudo"
+              filled
+              class="q-my-sm"
+              required
+              :rules="[(val) => !!val || 'Pseudo is required']"
+            />
 
             <div class="row justify-between q-mt-lg">
               <!-- Join room button -->
