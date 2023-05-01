@@ -237,8 +237,14 @@ class GameConsumer(AsyncWebsocketConsumer):
             # Save the round
             await database_sync_to_async(current_round.save)()
             
-            # TODO : Increase winnir score
+            # Get the player who sent the card (the winner)
+            winner = await self.get_player_from_response_card(card)
             
+            # Increase the score of the player
+            winner.score += 1
+            
+            # Save the player
+            await database_sync_to_async(winner.save)()
             
             # Get the winner card serialized
             ser_card = await self.get_responsecard(card)
@@ -429,3 +435,9 @@ class GameConsumer(AsyncWebsocketConsumer):
     def get_last_round(self, game):
         ''' Get the last round of a game '''
         return Round.objects.filter(game=game).last()
+    
+    # Get the player who sent the response card
+    @sync_to_async
+    def get_player_from_response_card(self, response_card):
+        ''' Get the player who sent the response card '''
+        return response_card.player
