@@ -47,6 +47,9 @@ class FavouriteDeck(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        unique_together = ['user', 'deck']
+
 
 class Game(models.Model):
     """ Game model (partie de jeu)
@@ -60,7 +63,7 @@ class Game(models.Model):
     deck = models.ForeignKey(Deck, on_delete=models.CASCADE, null=True)
 
     game_code = models.CharField(max_length=100)
-    
+
     is_started = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -74,7 +77,7 @@ class GamePlayer(models.Model):
         'Game', related_name='game', on_delete=models.CASCADE)
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, null=True)
-    
+
     is_game_creator = models.BooleanField(default=False)
     is_game_winner = models.BooleanField(default=False)
 

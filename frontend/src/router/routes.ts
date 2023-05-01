@@ -18,6 +18,11 @@ const routes: RouteRecordRaw[] = [
     component: () => import('src/pages/Auth/RegisterPage.vue'),
   },
   {
+    path: '/favourites',
+    name: 'favourites',
+    component: () => import('src/pages/Deck/FavouritePage.vue'),
+  },
+  {
     path: '/mydecks/:id/cards/create',
     name: 'cards.create',
     props: true,
@@ -55,11 +60,6 @@ const routes: RouteRecordRaw[] = [
     name: 'decks.id',
     props: true,
     component: () => import('src/pages/Deck/DeckPage.vue')
-  },
-  {
-    path: '/favourites',
-    name: 'favourites',
-    component: () => import('src/pages/Favourite/FavouritePage.vue')
   },
   {
     path: '/game',

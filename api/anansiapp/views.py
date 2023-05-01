@@ -74,6 +74,8 @@ class FavouriteDeckViewSet(viewsets.ModelViewSet):
             reverse('user-detail', args=[request.user.id]))
         request.data['user'] = user_url
 
+        print(request.data)
+
         serializer = self.get_serializer(data=request.data)
 
         if serializer.is_valid():
@@ -87,7 +89,7 @@ class FavouriteDeckViewSet(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         print(kwargs)
         favourite = FavouriteDeck.objects.get(
-            user=self.request.user.id, cardgame=self.kwargs['pk'])
+            user=self.request.user.id, deck=self.kwargs['pk'])
 
         favourite.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

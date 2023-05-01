@@ -11,14 +11,14 @@ const authStore = useAuthStore();
 const router = useRouter();
 
 const searchText = ref("");
-const cardGames = ref([]);
-const displayedCardGames = ref([]);
+const decks = ref([]);
+const displayedDecks = ref([]);
 const favourites = ref([]);
 
 const fetchDecks = async () => {
   try {
     const response = await api.get("decks");
-    cardGames.value = response.data;
+    decks.value = response.data;
     search();
   } catch (error) {
     console.log(error);
@@ -33,21 +33,21 @@ const fetchFavourites = async () => {
   try {
     const response = await api.get("favourites");
     favourites.value = response.data;
-    //console.log("favourites : ", favourites.value);
+    console.log("favourites : ", favourites.value);
   } catch (error) {
     console.log(error);
   }
 };
 
-const isInFavorites = (cardGame) => {
-  return favourites.value.some((favourite) => favourite.cardgame == cardGame.url);
+const isInFavorites = (deck) => {
+  return favourites.value.some((favourite) => favourite.deck == deck.url);
 };
 
-const addToFavourites = async (cardgame) => {
+const addToFavourites = async (deck) => {
   //console.log(cardgame);
-  if (isInFavorites(cardgame)) {
+  if (isInFavorites(deck)) {
     try {
-      const response = await api.delete(`favourites/${cardgame.id}/`);
+      const response = await api.delete(`favourites/${deck.id}/`);
 
       $q.notify({
         message: "Card game removed from favourites",
@@ -65,7 +65,7 @@ const addToFavourites = async (cardgame) => {
     //console.log("addToFavourites", cardgame.id);
     try {
       const response = await api.post(`favourites/`, {
-        cardgame: cardgame.url,
+        deck: deck.url,
       });
 
       $q.notify({
@@ -89,8 +89,8 @@ const addToFavourites = async (cardgame) => {
 };
 
 const search = async () => {
-  displayedCardGames.value = cardGames.value.filter((cardGame) =>
-    cardGame.name.toLowerCase().includes(searchText.value.toLowerCase())
+  displayedDecks.value = decks.value.filter((deck) =>
+    deck.name.toLowerCase().includes(searchText.value.toLowerCase())
   );
 };
 
@@ -100,8 +100,8 @@ const openDeck = async (id) => {
 };
 
 onMounted(() => {
-  fetchDecks();
   fetchFavourites();
+  fetchDecks();
 });
 </script>
 
@@ -125,21 +125,21 @@ onMounted(() => {
       <!-- Liste des decks -->
       <div>
         <q-list>
-          <div v-for="(cardGame, index) in displayedCardGames" :key="index">
-            <q-item clickable @click="openDeck(cardGame.id)">
-              <q-item-section>
-                <q-item-label>{{ cardGame.name }}</q-item-label>
+          <div v-for="(deck, index) in displayedDecks" :key="index">
+            <q-item clickable>
+              <q-item-section clickable @click="openDeck(deck.id)">
+                <q-item-label>{{ deck.name }}</q-item-label>
                 <q-item-label caption lines="2">{{
-                  cardGame.user_object.username
+                  deck.user_object.username
                 }}</q-item-label>
               </q-item-section>
               <!-- Bouton favoris -->
               <q-item-section side>
                 <q-btn
                   class="q-mt-sm"
-                  :color="isInFavorites(cardGame) ? 'primary' : 'black'"
-                  @click="addToFavourites(cardGame)"
-                  :icon="isInFavorites(cardGame) ? 'favorite' : 'favorite_border'"
+                  :color="isInFavorites(deck) ? 'primary' : 'black'"
+                  @click="addToFavourites(deck)"
+                  :icon="isInFavorites(deck) ? 'favorite' : 'favorite_border'"
                   flat
                 />
               </q-item-section>

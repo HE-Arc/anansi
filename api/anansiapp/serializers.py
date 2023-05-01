@@ -58,7 +58,7 @@ class ComplexDeckSerializer(DeckSerializer):
 
 class FavouriteDeckSerializer(serializers.HyperlinkedModelSerializer):
     user_object = UserSerializer(source='user', read_only=True)
-    deck_object = DeckSerializer(source='deck', read_only=True)
+    deck_object = ComplexDeckSerializer(source='deck', read_only=True)
 
     class Meta:
         model = FavouriteDeck
@@ -153,7 +153,7 @@ class RoundResponseCardSerializer(serializers.ModelSerializer):
     class Meta:
         model = RoundResponseCard
         fields = ['id', 'response_card', 'player',
-                  'is_winner', 'response_card_object', 'player_object'] # , 'round_object' 'round',
+                  'is_winner', 'response_card_object', 'player_object']  # , 'round_object' 'round',
 
 
 class GamePlayerResponseCardSerializer(serializers.ModelSerializer):
