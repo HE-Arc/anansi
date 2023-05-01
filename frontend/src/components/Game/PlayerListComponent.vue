@@ -1,29 +1,62 @@
 <script setup>
-import { ref, onMounted, defineProps } from "vue";
+import { ref, onMounted, defineProps, watch } from "vue";
+import { GameplayerStore } from "src/stores/gameplayerStore";
 
 const props = defineProps({
   players: {
     default: [],
   },
+  gameOwner: {
+    default: 0,
+  },
 });
 
 const players = ref([]);
+const store = GameplayerStore();
 
 onMounted(() => {
   players.value = props.players;
+  sortByScore();
   console.log(players.value);
 });
+
+const sortByScore = () => {
+  players.value = players.value.sort((a, b) => {
+    return b.score - a.score;
+  });
+};
+
+// observe the players prop and update the local players ref
+// whenever the prop changes
+watch(
+  () => props.players,
+  (newPlayers) => {
+    players.value = newPlayers;
+    sortByScore();
+  }
+);
 </script>
 
 <template>
   <div class="col-12">
-    <h4 v-if="players.length > 0">Players in the game</h4>
+    <div class="text-h6 q-pa-md" v-if="props.players.length > 0">👤 Players</div>
+    <!--<h4 v-if="players.length > 0">Players in the game</h4>-->
     <q-list v-if="players.length > 0">
-      <q-item v-for="player in players" :key="player" clickable class="12">
-        <q-item-section>
-          - {{ player.username }} (score : {{ player.score }})</q-item-section
-        >
-      </q-item>
+      <div v-for="player in players" :key="player">
+        <q-item clickable class="12">
+          <q-item-section>
+            {{ (store.gameplayer_id, player.id) }}
+            <q-item-label
+              :class="store.gameplayer_id == player.id ? 'text-primary text-bold' : ''"
+              >{{ player.username }} {{ gameOwner == player.username ? "👑" : "" }}
+            </q-item-label>
+            <q-item-label caption>{{ player.score }} points</q-item-label>
+
+            <!--{{ player.username }} (score : {{ player.score }})-->
+          </q-item-section>
+        </q-item>
+        <q-separator spaced inset />
+      </div>
     </q-list>
   </div>
 </template>

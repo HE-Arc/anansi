@@ -316,6 +316,7 @@ onMounted(() => {
       <PlayerListComponent
         v-if="(players.length > 0 && !isGameStarted) || isGameOver"
         :players="players"
+        :gameOwner="gameOwner"
       />
 
       <!-- Display the cloze card -->
