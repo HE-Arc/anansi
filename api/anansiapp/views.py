@@ -15,6 +15,7 @@ from django.utils.decorators import method_decorator
 from rest_framework import status
 from django.urls import reverse
 from rest_framework import generics
+from rest_framework.decorators import action
 
 
 class SessionView(APIView):
@@ -132,26 +133,18 @@ class ResponseCardViewSet(viewsets.ModelViewSet):
     queryset = ResponseCard.objects.all()
     serializer_class = ResponseCardSerializer
 
-    def get_queryset(self):
-        # cardgame id is passed in the url
-        # get url parameter
-        params = self.request.query_params
-        print(params)
-
-        return self.queryset.filter(deck=self.request.query_params['deck'])
+    @action(detail=False, methods=['get'])
+    def get_responsecards(self, request):
+        return Response(self.queryset.filter(deck=self.request.query_params['deck']).values('id', 'deck', 'text', 'created_at', 'updated_at'))
 
 
 class ClozeCardViewSet(viewsets.ModelViewSet):
     queryset = ClozeCard.objects.all()
     serializer_class = ClozeCardSerializer
 
-    def get_queryset(self):
-        # cardgame id is passed in the url
-        # get url parameter
-        params = self.request.query_params
-        print(params)
-
-        return self.queryset.filter(deck=self.request.query_params['deck'])
+    @action(detail=False, methods=['get'])
+    def get_clozecards(self, request):
+        return Response(self.queryset.filter(deck=self.request.query_params['deck']).values('id', 'deck', 'text', 'gap_index', 'created_at', 'updated_at'))
 
 
 class GameViewSet(viewsets.ModelViewSet):

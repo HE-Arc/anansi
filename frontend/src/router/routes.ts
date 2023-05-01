@@ -24,6 +24,12 @@ const routes: RouteRecordRaw[] = [
     component: () => import('src/pages/MyDeck/CreateCardPage.vue')
   },
   {
+    path: '/mydecks/:id/cards/:cardType/:cardId/edit',
+    name: 'cards.edit',
+    props: true,
+    component: () => import('src/pages/MyDeck/EditCardPage.vue')
+  },
+  {
     path: '/mydecks',
     name: 'mydecks',
     component: () => import('src/pages/MyDeck/MyDecksPage.vue')

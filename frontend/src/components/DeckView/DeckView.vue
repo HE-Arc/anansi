@@ -35,7 +35,7 @@ const fetchDeck = async () => {
 };
 
 const fetchResponseCards = async () => {
-  const response = await api.get(`responsecards`, {
+  const response = await api.get(`responsecards/get_responsecards`, {
     params: {
       deck: props.id,
     },
@@ -44,12 +44,39 @@ const fetchResponseCards = async () => {
 };
 
 const fetchClozeCards = async () => {
-  const response = await api.get(`clozecards`, {
+  const response = await api.get(`clozecards/get_clozecards`, {
     params: {
       deck: props.id,
     },
   });
   clozeCards.value = response.data;
+};
+
+const deleteCardCallback = async (cardId, cardType) => {
+  let url = "clozecards/";
+  if (cardType === "response") {
+    url = "responsecards/";
+  }
+
+  try {
+    await api.delete(`${url}${cardId}/`);
+    //router.go(0);
+    $q.notify({
+      message: "Card deleted",
+      color: "positive",
+      icon: "check",
+    });
+
+    fetchClozeCards();
+    fetchResponseCards();
+  } catch (err) {
+    console.log(err);
+    $q.notify({
+      message: "Error deleting card",
+      color: "negative",
+      icon: "warning",
+    });
+  }
 };
 
 onMounted(() => {
@@ -82,7 +109,12 @@ onMounted(() => {
         :key="card.id"
         class="col-xs-6 q-pa-xs-sm col-sm-4 col-md-3 col-lg-2 q-pa-md-md"
       >
-        <DeckCard :card="card" :isDeckMine="props.isDeckMine" cardType="cloze"></DeckCard>
+        <DeckCard
+          :card="card"
+          :isDeckMine="props.isDeckMine"
+          cardType="cloze"
+          @delete-card="deleteCardCallback"
+        ></DeckCard>
       </div>
     </div>
 
@@ -101,6 +133,7 @@ onMounted(() => {
           :card="card"
           :isDeckMine="props.isDeckMine"
           cardType="response"
+          @delete-card="deleteCardCallback"
         ></DeckCard>
       </div>
     </div>

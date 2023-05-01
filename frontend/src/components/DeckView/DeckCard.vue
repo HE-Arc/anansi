@@ -1,5 +1,16 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, getCurrentInstance, defineEmits } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { useQuasar } from "quasar";
+
+const app = getCurrentInstance();
+const api = app.appContext.config.globalProperties.$api;
+const $q = useQuasar();
+
+const router = useRouter();
+const route = useRoute();
+
+const emit = defineEmits(["delete-card"]);
 
 const props = defineProps({
   isDeckMine: {
@@ -14,17 +25,12 @@ const props = defineProps({
 });
 
 const deleteCard = async (id) => {
-  //await fetch(`http://localhost:3000/clozecards/${id}`, {
-  //  method: "DELETE",
-  //});
-  //fetchClozeCards();
+  console.log(id);
+  emit("delete-card", id, props.cardType);
 };
 
-const editCard = async (id) => {
-  //await fetch(`http://localhost:3000/clozecards/${id}`, {
-  //  method: "PUT",
-  //});
-  //fetchClozeCards();
+const editCard = async (id, cardId) => {
+  router.push(`/mydecks/${id}/cards/${props.cardType}/${cardId}/edit`);
 };
 
 const addToDeck = async (id) => {
@@ -38,6 +44,10 @@ const clozeCardText = (text, index) => {
   const words = text.split(" ");
   return words.slice(0, index).join(" ") + " __________ " + words.slice(index).join(" ");
 };
+
+onMounted(() => {
+  console.log(props.card);
+});
 </script>
 
 <template>
@@ -70,7 +80,7 @@ const clozeCardText = (text, index) => {
           <q-btn
             class="q-px-xs"
             color="primary"
-            @click="() => deleteCard(card.id)"
+            @click="deleteCard(card.id)"
             icon="delete"
             flat
           />
@@ -78,7 +88,7 @@ const clozeCardText = (text, index) => {
           <q-btn
             class="q-px-xs"
             color="primary"
-            @click="() => editCard(card.id)"
+            @click="editCard(card.deck, card.id)"
             icon="edit"
             flat
           />
@@ -88,7 +98,7 @@ const clozeCardText = (text, index) => {
           <q-btn
             class="q-px-xs"
             color="primary"
-            @click="() => addToDeck(card.id)"
+            @click="addToDeck(card.id)"
             icon="add"
             flat
           />

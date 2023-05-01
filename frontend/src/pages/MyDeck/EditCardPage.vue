@@ -11,57 +11,70 @@ const $q = useQuasar();
 const router = useRouter();
 const route = useRoute();
 
-// radio buttons for card type
-const cardType = ref("response");
 const errors = ref([]);
+
+const card = ref({});
+const cardType = ref(route.params.cardType);
+const url = route.params.cardType === "response" ? "responsecards/" : "clozecards/";
 
 const textResponse = ref("");
 const text1 = ref("");
 const text2 = ref("");
 
-const card = ref({
-  deck: route.params.id,
-  type: cardType.value,
-  text: "",
-  gap_index: 0,
-});
+const fetchCard = async () => {
+  const response = await api.get(`${url}${route.params.cardId}`);
+  card.value = response.data;
+  console.log(card.value);
+  console.log(cardType.value);
 
-const createCard = async () => {
-  const url = cardType.value === "response" ? "responsecards/" : "clozecards/";
+  if (cardType.value === "response") {
+    textResponse.value = card.value.text;
+  } else {
+    removeSplitAndRemoveSpaces(card.value.text);
+    text1.value = card.value.text.split(" ").slice(0, card.value.gap_index).join(" ");
+    console.log(text1.value);
+    text2.value = card.value.text.split(" ").slice(card.value.gap_index).join(" ");
+    console.log(text2.value);
+  }
+};
+
+const removeSplitAndRemoveSpaces = (text) => {
+  text = text.split(" ");
+  text.forEach((word, index) => {
+    if (word === "") {
+      text.splice(index, 1);
+    }
+  });
+  let index = text.length;
+  text = text.join(" ");
+  return index;
+};
+
+const patchCard = async () => {
   if (cardType.value === "response") {
     card.value.text = textResponse.value;
     card.value.gap_index = null;
   } else {
     if (text1.value.length !== 0) {
-      text1.value = text1.value.split(" ");
-      text1.value.forEach((word, index) => {
-        if (word === "") {
-          text1.value.splice(index, 1);
-        }
-      });
-      card.value.gap_index = text1.value.length;
-      text1.value = text1.value.join(" ");
+      card.value.gap_index = removeSplitAndRemoveSpaces(text1.value);
     }
 
     if (text2.value.length !== 0) {
-      text2.value = text2.value.split(" ");
-      text2.value.forEach((word, index) => {
-        if (word === "") {
-          text2.value.splice(index, 1);
-        }
-      });
-      text2.value = text2.value.join(" ");
+      removeSplitAndRemoveSpaces(text2.value);
     }
+
     card.value.text = text1.value + " " + text2.value;
   }
 
   try {
-    const response = await api.post(url, card.value);
+    const response = await api.patch(`${url}${route.params.cardId}/`, card.value);
     console.log(response.data);
-    router.push({
-      name: "mydecks.id",
-      params: { id: route.params.id },
+    $q.notify({
+      message: "Card updated",
+      color: "positive",
+      icon: "check",
     });
+    router.push(`/mydecks/${route.params.id}`);
   } catch (error) {
     console.log(error);
     errors.value = [];
@@ -72,6 +85,10 @@ const createCard = async () => {
     }
   }
 };
+
+onMounted(() => {
+  fetchCard();
+});
 </script>
 
 <template>
@@ -88,20 +105,10 @@ const createCard = async () => {
       ></q-btn>
 
       <div class="col-12 col-md-6 col-lg-4 q-mx-xl">
-        <h1 class="q-mt-xs">New card</h1>
+        <h1 class="q-mt-xs">Update card</h1>
         <!-- Error banner -->
         <ErrorBanner :errors="errors" />
-        <form @submit.prevent="createCard">
-          <div>
-            <q-option-group
-              class="q-mt-sm"
-              v-model="cardType"
-              :options="[
-                { label: 'Response', value: 'response' },
-                { label: 'Question', value: 'question' },
-              ]"
-            />
-          </div>
+        <form @submit.prevent="patchCard">
           <div v-if="cardType === 'response'">
             <q-input
               class="q-mt-sm"
@@ -128,7 +135,16 @@ const createCard = async () => {
             <q-input class="q-mt-sm" v-model="text2" label="" type="text" lazy-rules />
           </div>
 
-          <q-btn class="q-mt-sm" color="primary" type="submit" label="Create" />
+          <q-btn class="q-mt-sm" color="primary" type="submit" label="Update" />
+          <!-- Cancel button -->
+          <q-btn
+            class="q-mt-sm"
+            flat
+            color="primary"
+            no-caps
+            label="Cancel"
+            @click="router.push(`/mydecks/${route.params.id}`)"
+          />
         </form>
       </div>
     </div>
