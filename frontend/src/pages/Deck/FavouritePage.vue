@@ -62,7 +62,7 @@ onMounted(() => {
         <q-list>
           <div v-for="(favourite, index) in favourites" :key="index">
             <q-item clickable>
-              <q-item-section clickable @click="openDeck(favourite.deck)">
+              <q-item-section clickable @click="openDeck(favourite.deck_object.id)">
                 <q-item-label>{{ favourite.deck_object.name }}</q-item-label>
                 <q-item-label caption lines="2">{{
                   favourite.deck_object.user_object.username
