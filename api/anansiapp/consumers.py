@@ -275,17 +275,41 @@ class GameConsumer(AsyncWebsocketConsumer):
             # Get the last round
             last_round = await self.get_last_round(game)
             
-            # Create a new round
-            round = await database_sync_to_async(Round.objects.create)(game=game, master=master, cloze_card=cloze_card, round_number=last_round.round_number+1)
-            
-            # Start the round
-            await self.channel_layer.group_send(
-                self.game_group_name,
-                {
-                    'type': 'start_new_round',
-                    'cloze_card_text': cloze_card.text,
+            # If the last round number is > 5, the game is finished
+            if last_round.round_number > 1:
+                # Get the winner
+                winner = await self.get_game_winner(game)
+                
+                winner.is_game_winner = True
+                
+                await database_sync_to_async(winner.save)()
+                
+                # Send a message to every player, with the winner
+                message = {
+                    'action': 'display_game_winner',
+                    'winner': winner.username,
                 }
-            )
+                
+                await self.channel_layer.group_send(
+                    self.game_group_name,
+                    {
+                        'type': 'basic_message_receive',
+                        'message': json.dumps(message),
+                    }
+                )
+                
+            else:
+                # Create a new round
+                round = await database_sync_to_async(Round.objects.create)(game=game, master=master, cloze_card=cloze_card, round_number=last_round.round_number+1)
+                
+                # Start the round
+                await self.channel_layer.group_send(
+                    self.game_group_name,
+                    {
+                        'type': 'start_new_round',
+                        'cloze_card_text': cloze_card.text,
+                    }
+                )
             
 
     # Receive message from game group
@@ -441,3 +465,19 @@ class GameConsumer(AsyncWebsocketConsumer):
     def get_player_from_response_card(self, response_card):
         ''' Get the player who sent the response card '''
         return response_card.player
+    
+    # Get the winner of the game
+    @sync_to_async
+    def get_game_winner(self, game):
+        ''' Get the winner of the game '''
+        # Get all the players in the game
+        players = GamePlayer.objects.filter(game=game)
+        
+        # Get the player who has the most points
+        winner = None
+        
+        for player in players:
+            if winner is None or player.points > winner.points:
+                winner = player
+                
+        return winner

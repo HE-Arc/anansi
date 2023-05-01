@@ -312,6 +312,10 @@ onMounted(() => {
         label="Start game"
       />
 
+      <!-- Display game winner if game is over -->
+      <h1 v-if="isGameOver">Game over</h1>
+      <h2 v-if="isGameOver">Winner: {{ gameWinnerName }}</h2>
+
       <!-- print players in a list -->
       <PlayerListComponent
         v-if="(players.length > 0 && !isGameStarted) || isGameOver"
@@ -361,7 +365,7 @@ onMounted(() => {
         @onSelect="chooseRoundWinner"
       />
 
-      <div class="col-12" v-if="isRoundOver">
+      <div class="col-12" v-if="isRoundOver && !isGameOver">
         <!-- Next round button is the player is the game owner -->
         <q-btn
           v-if="isCreator"
