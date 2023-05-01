@@ -273,29 +273,62 @@ onMounted(() => {
 </script>
 
 <template>
-  <q-page class="row justify-evenly content-start">
-    <div class="row justify-evenly align-center">
-      <!-- Display error message as a banner if not empty -->
-      <div v-if="error_message != ''" class="text-white bg-red">
-        <q-banner dense class="text-white bg-red">
-          {{ error_message }}
-        </q-banner>
-        <!-- Go back to main menu button -->
+  <q-page class="row justify-evenly content-start" style="height: 100%">
+    <!--<div class="row justify-evenly align-center" style="width: 100%">-->
+
+    <!-- Users list -->
+    <div class="col-3 q-pa-md">
+      <!-- print players in a list -->
+      <PlayerListComponent
+        v-if="(players.length > 0 && !isGameStarted) || isGameOver"
+        :players="players"
+        :gameOwner="gameOwner"
+      />
+
+      <h6 v-if="isCreator">Your are the game owner</h6>
+      <h6 v-if="!isCreator && username">Game owner: {{ gameOwner }}</h6>
+
+      <!-- Print infos about the game -->
+    </div>
+    <!-- Waiting state UI -->
+    <div v-if="!isGameStarted" class="col-9" style="height: 100%">
+      <q-card class="q-mt-sm" style="height: 100%">
+        <!-- Button create room -->
         <q-btn
-          class="q-mt-sm"
-          color="text-white"
-          @click="() => $router.push('/')"
-          flat
-          label="Go back to main menu"
+          v-if="isCreator && !isGameStarted"
+          class="q-mt-sm col-12"
+          color="primary"
+          @click="
+            () => {
+              startGame();
+            }
+          "
+          label="Start game"
         />
-      </div>
+      </q-card>
+    </div>
 
-      <!-- Pseudo -->
-      <h5 v-if="isCreator">Your are the game owner</h5>
-      <h5 v-if="!isCreator && username">Game owner: {{ gameOwner }}</h5>
-
-      <!-- Button create room -->
+    <!-- Display error message as a banner if not empty -->
+    <div v-if="error_message != ''" class="text-white bg-red">
+      <q-banner dense class="text-white bg-red">
+        {{ error_message }}
+      </q-banner>
+      <!-- Go back to main menu button -->
       <q-btn
+        class="q-mt-sm"
+        color="text-white"
+        @click="() => $router.push('/')"
+        flat
+        label="Go back to main menu"
+      />
+    </div>
+
+    <!-- Pseudo -->
+    <!--<h5 v-if="isCreator">Your are the game owner</h5>
+    <h5 v-if="!isCreator && username">Game owner: {{ gameOwner }}</h5>-->
+
+    <!-- Button create room -->
+    <!--<q-btn
         v-if="isCreator && !isGameStarted"
         class="q-mt-sm col-12"
         color="primary"
@@ -304,91 +337,86 @@ onMounted(() => {
             startGame();
           }
         "
-        flat
         label="Start game"
-      />
+      />-->
 
-      <!-- Display game winner if game is over -->
-      <h1 v-if="isGameOver">Game over</h1>
-      <h2 v-if="isGameOver">Winner: {{ gameWinnerName }}</h2>
+    <!-- Display game winner if game is over -->
+    <h1 v-if="isGameOver">Game over</h1>
+    <h2 v-if="isGameOver">Winner: {{ gameWinnerName }}</h2>
 
-      <!-- print players in a list -->
-      <PlayerListComponent
+    <!-- print players in a list -->
+    <!--<PlayerListComponent
         v-if="(players.length > 0 && !isGameStarted) || isGameOver"
         :players="players"
         :gameOwner="gameOwner"
-      />
+      />-->
 
-      <!-- Display the cloze card -->
-      <div v-if="cloze_card != null && isGameStarted && !isRoundOver">
-        <h5>Cloze card :</h5>
-        <q-card>
-          {{ cloze_card }}
-        </q-card>
-      </div>
+    <!-- Display the cloze card -->
+    <div v-if="cloze_card != null && isGameStarted && !isRoundOver">
+      <h5>Cloze card :</h5>
+      <q-card>
+        {{ cloze_card }}
+      </q-card>
+    </div>
 
-      <!-- Display the round number, over 6 -->
-      <h2 v-if="roundCounter > 0 && roundCounter <= 6 && !isRoundOver">
-        Round {{ roundCounter }} / 6
-      </h2>
+    <!-- Display the round number, over 6 -->
+    <h2 v-if="roundCounter > 0 && roundCounter <= 6 && !isRoundOver">
+      Round {{ roundCounter }} / 6
+    </h2>
 
-      <!-- Display card sent counter and number of players-->
-      <h2 v-if="isGameStarted && !isCardSelectionOver">Cards sent</h2>
-      <h3 v-if="isGameStarted && !isCardSelectionOver">
-        {{ card_sent_counter }} / {{ player_count }}
-      </h3>
+    <!-- Display card sent counter and number of players-->
+    <h2 v-if="isGameStarted && !isCardSelectionOver">Cards sent</h2>
+    <h3 v-if="isGameStarted && !isCardSelectionOver">
+      {{ card_sent_counter }} / {{ player_count }}
+    </h3>
 
-      <!-- Display players_cards -->
-      <h2 v-if="players_cards.length > 0 && !isCardSelectionOver">Your cards</h2>
-      <div
-        v-if="players_cards.length > 0 && !isCardSelectionOver"
-        class="row justify-evenly"
-      >
-        <q-card v-for="card in players_cards" :key="card" class="row">
-          <CardComponent
-            :card="card"
-            :can_select="!hasPlayerSelectedCard"
-            @onSelect="
-              () => {
-                sendCard(card);
-              }
-            "
-          />
-        </q-card>
-      </div>
-
-      <!-- Display round_response_cards -->
-      <EndOfRoundComponent
-        class="col-12"
-        v-if="isCardSelectionOver && !isRoundOver"
-        :cards="round_response_cards"
-        :round="current_round"
-        :username="username"
-        @onSelect="chooseRoundWinner"
-      />
-
-      <div class="col-12" v-if="isRoundOver && !isGameOver">
-        <!-- Next round button is the player is the game owner -->
-        <q-btn
-          v-if="isCreator"
-          class="q-mt-sm col-12"
-          color="primary"
-          @click="
+    <!-- Display players_cards -->
+    <h2 v-if="players_cards.length > 0 && !isCardSelectionOver">Your cards</h2>
+    <div
+      v-if="players_cards.length > 0 && !isCardSelectionOver"
+      class="row justify-evenly"
+    >
+      <q-card v-for="card in players_cards" :key="card" class="row">
+        <CardComponent
+          :card="card"
+          :can_select="!hasPlayerSelectedCard"
+          @onSelect="
             () => {
-              nextRound();
+              sendCard(card);
             }
           "
-          flat
-          label="Next round"
         />
-
-        <h5>The following card wins the round :</h5>
-        <RoundResponseCard
-          :card="roundWinningCard"
-          v-if="isRoundOver"
-          :is_master="false"
-        />
-      </div>
+      </q-card>
     </div>
+
+    <!-- Display round_response_cards -->
+    <EndOfRoundComponent
+      class="col-12"
+      v-if="isCardSelectionOver && !isRoundOver"
+      :cards="round_response_cards"
+      :round="current_round"
+      :username="username"
+      @onSelect="chooseRoundWinner"
+    />
+
+    <div class="col-12" v-if="isRoundOver && !isGameOver">
+      <!-- Next round button is the player is the game owner -->
+      <q-btn
+        v-if="isCreator"
+        class="q-mt-sm col-12"
+        color="primary"
+        @click="
+          () => {
+            nextRound();
+          }
+        "
+        flat
+        label="Next round"
+      />
+
+      <h5>The following card wins the round :</h5>
+      <RoundResponseCard :card="roundWinningCard" v-if="isRoundOver" :is_master="false" />
+    </div>
+    <!--</div>-->
   </q-page>
 </template>

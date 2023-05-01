@@ -39,11 +39,11 @@ watch(
 
 <template>
   <div class="col-12">
-    <div class="text-h6 q-pa-md" v-if="props.players.length > 0">👤 Players</div>
+    <div class="text-h6" v-if="props.players.length > 0">👤 Players</div>
     <!--<h4 v-if="players.length > 0">Players in the game</h4>-->
-    <q-list v-if="players.length > 0">
+    <q-list v-if="players.length > 0" class="q-ma-none q-pa-none">
       <div v-for="player in players" :key="player">
-        <q-item clickable class="12">
+        <q-item clickable class="q-px-xs">
           <q-item-section>
             {{ (store.gameplayer_id, player.id) }}
             <q-item-label
@@ -55,7 +55,7 @@ watch(
             <!--{{ player.username }} (score : {{ player.score }})-->
           </q-item-section>
         </q-item>
-        <q-separator spaced inset />
+        <q-separator spaced />
       </div>
     </q-list>
   </div>
