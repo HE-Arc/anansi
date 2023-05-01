@@ -275,8 +275,8 @@ class GameConsumer(AsyncWebsocketConsumer):
             # Get the last round
             last_round = await self.get_last_round(game)
             
-            # If the last round number is > 5, the game is finished
-            if last_round.round_number > 1:
+            # If the last round number is > 6, the game is finished
+            if last_round.round_number >= 5:
                 # Get the winner
                 winner = await self.get_game_winner(game)
                 

@@ -32,6 +32,8 @@ const isCardSelectionOver = ref(false); // All the players have choosen their ca
 const isRoundOver = ref(false); // The master has choosen the best card, and now the players must see the result
 const isGameOver = ref(false); // The game is over
 
+const roundCounter = ref(0);
+
 const roundWinningCard = ref(null);
 const roundWinningPlayerUsername = ref("");
 const gameWinnerName = ref("");
@@ -89,6 +91,8 @@ const handlingGameFunctions: Dictionary<(data: any) => void> = {
   start_new_round: (data: any) => {
     console.log("game_starting");
     console.log(data);
+
+    roundCounter.value += 1;
 
     // Update state variables
     isCardSelectionOver.value = false;
@@ -295,9 +299,9 @@ onMounted(() => {
       </div>
 
       <!-- Pseudo -->
-      <!-- <h1 v-if="username">Welcome {{ username }}</h1> -->
       <h5 v-if="isCreator">Your are the game owner</h5>
       <h5 v-if="!isCreator && username">Game owner: {{ gameOwner }}</h5>
+
       <!-- Button create room -->
       <q-btn
         v-if="isCreator && !isGameStarted"
@@ -329,6 +333,11 @@ onMounted(() => {
           {{ cloze_card }}
         </q-card>
       </div>
+
+      <!-- Display the round number, over 6 -->
+      <h2 v-if="roundCounter > 0 && roundCounter <= 6 && !isRoundOver">
+        Round {{ roundCounter }} / 6
+      </h2>
 
       <!-- Display card sent counter and number of players-->
       <h2 v-if="isGameStarted && !isCardSelectionOver">Cards sent</h2>
