@@ -4,7 +4,7 @@
     <q-toolbar class="bg-primary text-white">
       <q-btn flat round dense icon="menu" class="q-mr-sm" @click="toggleLeftDrawer" />
       <q-avatar square>
-        <img src="../assets/limite-limite-logo-white.png" />
+        <img src="../../assets/limite-limite-logo-white.png" />
       </q-avatar>
       <q-space />
       <q-btn flat round dense icon="account_circle" />
@@ -30,7 +30,7 @@
       <!-- Logo -->
       <q-item>
         <q-avatar square size="100px">
-          <img src="../assets/limite-limite-logo.png" />
+          <img src="../../assets/limite-limite-logo.png" />
         </q-avatar>
       </q-item>
 

@@ -10,7 +10,7 @@ const cardGames = ref([]);
 
 const fetchCardGames = async () => {
   try {
-    const response = await api.get("mydecks");
+    const response = await api.get("decks/get_my_decks"); //("mydecks");
     cardGames.value = response.data;
 
     cardGames.value.forEach((cardGame) => {
@@ -22,7 +22,8 @@ const fetchCardGames = async () => {
 };
 
 const putchCardGamePrivacy = async (id, lastPrivacy) => {
-  await api.patch(`mydecks/${id}/`, {
+  await api.patch(`decks/${id}/`, {
+    //(`mydecks/${id}/`, {
     privacy: lastPrivacy == "private" ? "public" : "private",
   });
   fetchCardGames();
@@ -34,14 +35,15 @@ const cancelEditCardGameName = (cardGame) => {
 };
 
 const putchCardGameName = async (id, name) => {
-  await api.patch(`mydecks/${id}/`, {
+  await api.patch(`decks/${id}/`, {
+    //`mydecks/${id}/`, {
     name: name,
   });
   fetchCardGames();
 };
 
 const deleteCardGame = async (id) => {
-  await api.delete(`mydecks/${id}/`);
+  await api.delete(`decks/${id}/`); //`mydecks/${id}/`);
   fetchCardGames();
 };
 

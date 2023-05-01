@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, getCurrentInstance } from "vue";
-import NavBar from "./components/NavBar.vue";
+import NavBar from "./components/General/NavBar.vue";
 import { useAuthStore } from "./stores/auth";
 
 const app = getCurrentInstance();
@@ -9,9 +9,7 @@ const authStore = useAuthStore();
 
 const getSession = async () => {
   const response = await api.get(`session`);
-  console.log(response.data);
   response.data.isAuthenticated ? authStore.login() : authStore.logout();
-  //console.log(authStore.isLoggedIn);
 };
 
 onMounted(() => {
