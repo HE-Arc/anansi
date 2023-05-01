@@ -1,70 +1,54 @@
-<script lang="ts">
-import { defineComponent, ref } from "vue";
+<script setup>
+import { defineComponent, ref, onMounted, getCurrentInstance } from "vue";
 import { useAuthStore } from "src/stores/auth";
 import { useQuasar } from "quasar";
 import ErrorBanner from "src/components/ErrorBanner.vue";
+import { useRoute, useRouter } from "vue-router";
 
-export default defineComponent({
-  name: "RegisterPage",
-  components: {
-    ErrorBanner,
-  },
-  data() {
-    return {
-      username: "",
-      email: "",
-      password: "",
-      password2: "",
-      errors: ref([]),
-    };
-  },
-  setup() {
-    const authStore = useAuthStore();
-    const $q = useQuasar();
+const app = getCurrentInstance();
+const api = app.appContext.config.globalProperties.$api;
+const $q = useQuasar();
+const authStore = useAuthStore();
+const router = useRouter();
+const route = useRoute();
 
-    return {
-      $q,
-      authStore,
-    };
-  },
-  methods: {
-    async register() {
-      try {
-        const response = await this.$api.post("register/", {
-          username: this.username,
-          email: this.email,
-          password: this.password,
-          password2: this.password2,
-        });
+const username = ref("");
+const email = ref("");
+const password = ref("");
+const password2 = ref("");
+const errors = ref([]);
 
-        console.log(response);
+const register = async () => {
+  try {
+    await api.post("register/", {
+      username: username,
+      email: email,
+      password: password,
+      password2: password2,
+    });
 
-        const responseLogin = await this.$api.post("login/", {
-          username: this.username,
-          password: this.password,
-        });
+    await api.post("login/", {
+      username: username,
+      password: password,
+    });
 
-        //console.log(responseLogin);
+    authStore.login();
 
-        this.authStore.login();
+    $q.notify({
+      message: "You have successfully registered and logged in!",
+      color: "positive",
+    });
 
-        this.$q.notify({
-          message: "You have successfully registered and logged in!",
-          color: "positive",
-        });
-
-        this.$router.push({ name: "home" });
-      } catch (error) {
-        this.errors = [];
-        for (var key in error.response.data) {
-          for (var key2 in error.response.data[key]) {
-            this.errors.push(key + " : " + error.response.data[key][key2]);
-          }
-        }
+    router.push({ name: "home" });
+  } catch (error) {
+    errors.value = [];
+    for (var key in error.response.data) {
+      for (var key2 in error.response.data[key]) {
+        errors.value.push(key + " : " + error.response.data[key][key2]);
       }
-    },
-  },
-});
+    }
+  }
+};
 </script>
 <template>
   <q-page class="row q-mx-xl">
