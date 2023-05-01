@@ -22,10 +22,12 @@ const options = [
 
 const createCardGame = async () => {
   try {
-    await api.post("mydecks/", {
+    const response = await api.post("mydecks/", {
       name: name,
       privacy: privacy.value,
     });
+
+    console.log(response.data);
 
     $q.notify({
       message: "Card game created",

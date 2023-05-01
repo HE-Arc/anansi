@@ -1,3 +1,58 @@
+<script setup>
+import { ref, onMounted, defineComponent, getCurrentInstance } from "vue";
+import { isProxy, toRaw } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { useQuasar } from "quasar";
+
+const app = getCurrentInstance();
+const api = app.appContext.config.globalProperties.$api;
+const $q = useQuasar();
+const router = useRouter();
+const route = useRoute();
+
+const cardGames = ref([]);
+
+const fetchCardGames = async () => {
+  try {
+    const response = await api.get("mydecks");
+    cardGames.value = response.data;
+
+    cardGames.value.forEach((cardGame) => {
+      cardGame.readonly = true;
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const putchCardGamePrivacy = async (id, lastPrivacy) => {
+  await this.$api.patch(`mydecks/${id}/`, {
+    privacy: lastPrivacy == "private" ? "public" : "private",
+  });
+  fetchCardGames();
+};
+
+const cancelEditCardGameName = (cardGame) => {
+  cardGame.name = cardGame.lastName;
+  cardGame.readonly = true;
+};
+
+const putchCardGameName = async (id, name) => {
+  await this.$api.patch(`mydecks/${id}/`, {
+    name: name,
+  });
+  fetchCardGames();
+};
+
+const deleteCardGame = async (id) => {
+  await this.$api.delete(`mydecks/${id}/`);
+  this.fetchCardGames();
+};
+
+onMounted(() => {
+  fetchCardGames();
+});
+</script>
 <template>
   <q-page class="row justify-evenly content-start">
     <div class="col-11 col-md-6 col-lg-4">
@@ -6,7 +61,7 @@
         <q-btn
           class="q-mt-sm"
           color="primary"
-          @click="() => $router.push({ name: 'mydecks.create' })"
+          @click="() => router.push({ name: 'mydecks.create' })"
           icon="add"
           flat
         />
@@ -36,6 +91,7 @@
                 flat
               />
             </q-item-section>
+            <!-- Edit -->
             <q-item-section side>
               <q-btn
                 v-if="cardGame.readonly == true"
@@ -50,6 +106,7 @@
                 icon="edit"
                 flat
               />
+              <!-- Save -->
               <q-btn-group v-else>
                 <q-btn
                   class="q-px-xs"
@@ -58,6 +115,7 @@
                   icon="check"
                   flat
                 />
+                <!-- Cancel -->
                 <q-btn
                   class="q-px-xs"
                   color="primary"
@@ -67,15 +125,17 @@
                 />
               </q-btn-group>
             </q-item-section>
+            <!-- Show -->
             <q-item-section side>
               <q-btn
                 class="q-mt-sm"
                 color="primary"
-                @click="() => $router.push({ name: 'mydecks.id' })"
+                @click="() => router.push({ name: 'mydecks.id' })"
                 icon="style"
                 flat
               />
             </q-item-section>
+            <!-- Delete -->
             <q-item-section side>
               <q-btn
                 class="q-px-xs"
@@ -91,61 +151,3 @@
     </div>
   </q-page>
 </template>
-
-<script>
-import { ref, onMounted, defineComponent } from "vue";
-import { isProxy, toRaw } from "vue";
-
-export default defineComponent({
-  name: "CardGamePage",
-  data() {
-    return {
-      cardGames: ref([]),
-    };
-  },
-  methods: {
-    async fetchCardGames() {
-      try {
-        await this.$api.get("mydecks").then((response) => {
-          this.cardGames = [];
-          response.data.forEach((cardGame) => {
-            this.cardGames.push({
-              id: cardGame.id,
-              name: cardGame.name,
-              privacy: cardGame.privacy,
-              user: cardGame.user,
-              user_object: cardGame.user_object,
-              readonly: true,
-            });
-          });
-        });
-      } catch (error) {
-        console.log(error);
-      }
-    },
-    async putchCardGamePrivacy(id, lastPrivacy) {
-      const response = await this.$api.patch(`mydecks/${id}/`, {
-        privacy: lastPrivacy == "private" ? "public" : "private",
-      });
-      this.fetchCardGames();
-    },
-    cancelEditCardGameName(cardGame) {
-      cardGame.name = cardGame.lastName;
-      cardGame.readonly = true;
-    },
-    async putchCardGameName(id, name) {
-      const response = await this.$api.patch(`mydecks/${id}/`, {
-        name: name,
-      });
-      this.fetchCardGames();
-    },
-    async deleteCardGame(id) {
-      const response = await this.$api.delete(`mydecks/${id}/`);
-      this.fetchCardGames();
-    },
-  },
-  async mounted() {
-    this.fetchCardGames();
-  },
-});
-</script>
