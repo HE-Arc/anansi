@@ -2,7 +2,7 @@
 import { ref, onMounted } from "vue";
 
 const props = defineProps({
-  isCardMine: {
+  isDeckMine: {
     default: false,
   },
   card: {
@@ -65,7 +65,7 @@ const clozeCardText = (text, index) => {
     <div class="col-12">
       <q-separator dark />
       <q-card-actions align="right" class="bg-white q-pa-xs">
-        <div v-if="isCardMine">
+        <div v-if="isDeckMine">
           <!-- delete button -->
           <q-btn
             class="q-px-xs"

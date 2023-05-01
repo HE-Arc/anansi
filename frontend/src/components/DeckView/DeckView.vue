@@ -74,6 +74,9 @@ onMounted(() => {
     <!-- Cloze cards -->
     <div v-if="tab == 'cloze'" class="row justify-start" style="align-items: stretch">
       <!--class="row justify-between">  "-->
+      <div v-if="clozeCards.length == 0" class="text-h6 text-center">
+        No cloze cards in this deck
+      </div>
       <div
         v-for="card in clozeCards"
         :key="card.id"
@@ -85,6 +88,9 @@ onMounted(() => {
 
     <!-- Response cards -->
     <div v-if="tab == 'response'" class="row justify-start" style="align-items: stretch">
+      <div v-if="responseCards.length == 0" class="text-h6 text-center">
+        No response cards in this deck
+      </div>
       <div
         v-for="card in responseCards"
         :key="card.id"

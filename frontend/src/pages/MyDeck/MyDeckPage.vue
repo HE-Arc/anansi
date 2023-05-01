@@ -34,6 +34,14 @@ onMounted(() => {
     <div class="col-xs-11">
       <div class="row justify-between q-px-none q-py-none q-my-none">
         <h1 class="q-my-none q-py-none">{{ deck.name }}</h1>
+        <!-- Create card -->
+        <q-btn
+          class="q-mt-sm"
+          color="primary"
+          icon="add"
+          flat
+          :to="{ name: 'cards.create' }"
+        />
       </div>
       <DeckView :id="route.params.id" :isDeckMine="true"></DeckView>
     </div>

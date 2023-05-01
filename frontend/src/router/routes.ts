@@ -18,6 +18,12 @@ const routes: RouteRecordRaw[] = [
     component: () => import('src/pages/Auth/RegisterPage.vue'),
   },
   {
+    path: '/mydecks/:id/cards/create',
+    name: 'cards.create',
+    props: true,
+    component: () => import('src/pages/MyDeck/CreateCardPage.vue')
+  },
+  {
     path: '/mydecks',
     name: 'mydecks',
     component: () => import('src/pages/MyDeck/MyDecksPage.vue')

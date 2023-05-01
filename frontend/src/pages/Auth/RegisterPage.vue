@@ -21,15 +21,15 @@ const errors = ref([]);
 const register = async () => {
   try {
     await api.post("register/", {
-      username: username,
-      email: email,
-      password: password,
-      password2: password2,
+      username: username.value,
+      email: email.value,
+      password: password.value,
+      password2: password2.value,
     });
 
     await api.post("login/", {
-      username: username,
-      password: password,
+      username: username.value,
+      password: password.value,
     });
 
     authStore.login();

@@ -1,5 +1,5 @@
 <script setup>
-import { defineComponent, ref, onMounted, getCurrentInstance } from "vue";
+import { ref, onMounted, getCurrentInstance } from "vue";
 import { useQuasar } from "quasar";
 import ErrorBanner from "src/components/ErrorBanner.vue";
 import { useRoute, useRouter } from "vue-router";
@@ -23,7 +23,7 @@ const options = [
 const createCardGame = async () => {
   try {
     const response = await api.post("mydecks/", {
-      name: name,
+      name: name.value,
       privacy: privacy.value,
     });
 
@@ -53,13 +53,13 @@ const createCardGame = async () => {
         class="q-ma-xs q-pa-xs"
         flat
         color="primary"
-        :to="{ name: 'mycardgames' }"
         no-caps
         icon="arrow_back"
+        @click="router.go(-1)"
       ></q-btn>
 
       <div class="col-12 col-md-6 col-lg-4 q-mx-xl">
-        <h1 class="q-mt-xs">New card game</h1>
+        <h1 class="q-mt-xs">New deck</h1>
 
         <!-- Error banner -->
         <ErrorBanner :errors="errors" />
