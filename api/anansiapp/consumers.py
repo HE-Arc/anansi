@@ -173,7 +173,7 @@ class GameConsumer(AsyncWebsocketConsumer):
             card = await database_sync_to_async(ResponseCard.objects.get)(id=card_id)
 
             # Get the last round (last created)
-            round = await database_sync_to_async(Round.objects.last)()
+            round = await self.get_last_round(self.player.game)
             
             # Create a RoundResponseCard with the card and the player
             await database_sync_to_async(RoundResponseCard.objects.create)(player=self.player, round=round, response_card=card)
@@ -229,7 +229,7 @@ class GameConsumer(AsyncWebsocketConsumer):
             card = await database_sync_to_async(RoundResponseCard.objects.get)(id=card_id)
             
             # Get the round for the game, and the last round (with no winner)
-            current_round = await database_sync_to_async(Round.objects.last)()
+            current_round = await self.get_last_round(self.player.game)
             
             # Set the winner for the round
             current_round.round_response_card_winner = card
@@ -266,8 +266,11 @@ class GameConsumer(AsyncWebsocketConsumer):
             # Select a random cloze card
             cloze_card = await self.select_cloze_card()
             
+            # Get the last round
+            last_round = await self.get_last_round(game)
+            
             # Create a new round
-            round = await database_sync_to_async(Round.objects.create)(game=game, master=master, cloze_card=cloze_card)
+            round = await database_sync_to_async(Round.objects.create)(game=game, master=master, cloze_card=cloze_card, round_number=last_round.round_number+1)
             
             # Start the round
             await self.channel_layer.group_send(
@@ -420,3 +423,9 @@ class GameConsumer(AsyncWebsocketConsumer):
         serializer = GameSerializer(game)
         
         return serializer.data
+
+    # Get the last round of a game
+    @sync_to_async
+    def get_last_round(self, game):
+        ''' Get the last round of a game '''
+        return Round.objects.filter(game=game).last()

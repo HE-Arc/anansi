@@ -29,9 +29,11 @@ const round_response_cards = ref([]); // Cards sent by the players for a round
 const isGameStarted = ref(false);
 const isCardSelectionOver = ref(false); // All the players have choosen their cards, and now the master must choose the best one
 const isRoundOver = ref(false); // The master has choosen the best card, and now the players must see the result
+const isGameOver = ref(false); // The game is over
 
 const roundWinningCard = ref(null);
 const roundWinningPlayerUsername = ref("");
+const gameWinnerName = ref("");
 
 const card_sent_counter = ref(0);
 const player_count = ref(0);
@@ -150,7 +152,14 @@ const handlingGameFunctions: Dictionary<(data: any) => void> = {
   },
 
   display_game_winner: (data: any) => {
-    // TODO
+    console.log("display_game_winner");
+    console.log(data);
+
+    gameWinnerName.value = data.winner;
+
+    isGameOver.value = true;
+
+    $q.loading.hide();
   },
 };
 
@@ -297,7 +306,7 @@ onMounted(() => {
 
       <!-- print players in a list -->
       <PlayerListComponent
-        v-if="players.length > 0 && !isGameStarted"
+        v-if="(players.length > 0 && !isGameStarted) || isGameOver"
         :players="players"
       />
 
