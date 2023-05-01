@@ -1,3 +1,48 @@
+<script setup>
+import { defineComponent, ref, onMounted, getCurrentInstance } from "vue";
+import { useQuasar } from "quasar";
+import ErrorBanner from "src/components/ErrorBanner.vue";
+import { useRoute, useRouter } from "vue-router";
+
+const app = getCurrentInstance();
+const api = app.appContext.config.globalProperties.$api;
+const $q = useQuasar();
+
+const router = useRouter();
+const route = useRoute();
+
+const name = ref("");
+const privacy = ref("private");
+const errors = ref([]);
+
+const options = [
+  { label: "Private", value: "private" },
+  { label: "Public", value: "public" },
+];
+
+const createCardGame = async () => {
+  try {
+    await api.post("mydecks/", {
+      name: name,
+      privacy: privacy.value,
+    });
+
+    $q.notify({
+      message: "Card game created",
+      color: "positive",
+    });
+
+    router.push({ name: "mydecks" });
+  } catch (error) {
+    errors.value = [];
+    for (var key in error.response.data) {
+      for (var key2 in error.response.data[key]) {
+        errors.value.push(key + " : " + error.response.data[key][key2]);
+      }
+    }
+  }
+};
+</script>
 <template>
   <q-page class="row justify-center">
     <div class="col-12">
@@ -17,23 +62,23 @@
         <!-- Error banner -->
         <ErrorBanner :errors="errors" />
 
-        <!-- Form -->
+        <!-- Formulaire de création de deck -->
         <form @submit.prevent="createCardGame">
-          <!-- Name -->
+          <!-- Nom -->
           <q-input
             v-model="name"
             label="Name"
             type="text"
             :rules="[(val) => !!val || 'Name is required']"
           />
-
-          <!-- Privacy -->
+          <!-- Visibilité -->
           <q-select
             v-model="privacy"
             label="Privacy"
             :options="options"
             :rules="[(val) => !!val || 'Privacy is required']"
           />
+          <!-- Bouton de création -->
           <q-btn
             type="submit"
             color="primary"
@@ -46,60 +91,3 @@
     </div>
   </q-page>
 </template>
-
-<script>
-import { defineComponent, ref } from "vue";
-import { useQuasar } from "quasar";
-import ErrorBanner from "src/components/ErrorBanner.vue";
-
-export default defineComponent({
-  name: "CreateCardGamePage",
-  components: {
-    ErrorBanner,
-  },
-  data() {
-    return {
-      errors: ref([]),
-    };
-  },
-  setup() {
-    const name = ref("");
-    const privacy = ref("");
-    const $q = useQuasar();
-
-    return {
-      options: [
-        { label: "Private", value: "private" },
-        { label: "Public", value: "public" },
-      ],
-      $q,
-      name,
-      privacy,
-    };
-  },
-  methods: {
-    async createCardGame() {
-      try {
-        const response = await this.$api.post("mydecks/", {
-          name: this.name,
-          privacy: this.privacy.value,
-        });
-
-        this.$q.notify({
-          message: "Card game created",
-          color: "positive",
-        });
-
-        this.$router.push({ name: "mydecks" });
-      } catch (error) {
-        this.errors = [];
-        for (var key in error.response.data) {
-          for (var key2 in error.response.data[key]) {
-            this.errors.push(key + " : " + error.response.data[key][key2]);
-          }
-        }
-      }
-    },
-  },
-});
-</script>

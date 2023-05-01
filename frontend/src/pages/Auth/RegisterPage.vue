@@ -55,31 +55,37 @@ const register = async () => {
     <div class="col-12 col-md-6 col-lg-4">
       <h1>Register</h1>
       <ErrorBanner :errors="errors" />
+      <!-- Formulaire d'inscription -->
       <form @submit.prevent="register">
+        <!-- Nom d'utilisateur -->
         <q-input
           v-model="username"
           label="Username"
           type="text"
           :rules="[(val) => !!val || 'Username is required']"
         />
+        <!-- Email -->
         <q-input
           v-model="email"
           label="Email"
           type="email"
           :rules="[(val) => !!val || 'Email is required']"
         />
+        <!-- Mot de passe -->
         <q-input
           v-model="password"
           label="Password"
           type="password"
           :rules="[(val) => !!val || 'Password is required']"
         />
+        <!-- Confirmation du mot de passe -->
         <q-input
           v-model="password2"
           label="Confirm Password"
           type="password"
           :rules="[(val) => !!val || 'Password is required']"
         />
+        <!-- Bouton d'inscription -->
         <q-btn
           type="submit"
           color="primary"
@@ -88,6 +94,7 @@ const register = async () => {
           class="full-width q-my-md"
         />
       </form>
+      <!-- Lien vers la page de connexion -->
       <p class="text-blue-grey-4 q-pa-md">
         Have an account ?
         <q-btn

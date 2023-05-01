@@ -43,19 +43,23 @@ const login = async () => {
     <div class="col-12 col-md-6 col-lg-4">
       <h1>Login</h1>
       <ErrorBanner :errors="errors" />
+      <!-- Formulaire de connexion -->
       <form @submit.prevent="login">
+        <!-- Nom d'utilisateur -->
         <q-input
           v-model="username"
           label="Username"
           type="text"
           :rules="[(val) => !!val || 'Username is required']"
         />
+        <!-- Mot de passe -->
         <q-input
           v-model="password"
           label="Password"
           type="password"
           :rules="[(val) => !!val || 'Password is required']"
         />
+        <!-- Bouton de connexion -->
         <q-btn
           type="submit"
           color="primary"
@@ -64,6 +68,7 @@ const login = async () => {
           class="full-width q-my-md"
         />
       </form>
+      <!-- Lien vers la page d'inscription -->
       <p class="text-blue-grey-4 q-pa-md">
         Doesn't have an account ?
         <q-btn

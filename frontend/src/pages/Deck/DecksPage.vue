@@ -108,6 +108,7 @@ onMounted(() => {
 <template>
   <q-page class="row justify-center">
     <div class="col-12">
+      <!-- Barre de recherche -->
       <q-input
         rounded
         outlined
@@ -121,17 +122,18 @@ onMounted(() => {
         </template>
       </q-input>
 
+      <!-- Liste des decks -->
       <div>
         <q-list>
           <div v-for="(cardGame, index) in displayedCardGames" :key="index">
             <q-item clickable @click="openDeck(cardGame.id)">
               <q-item-section>
-                <!-- Cardgame name with add to favourites button-->
                 <q-item-label>{{ cardGame.name }}</q-item-label>
                 <q-item-label caption lines="2">{{
                   cardGame.user_object.username
                 }}</q-item-label>
               </q-item-section>
+              <!-- Bouton favoris -->
               <q-item-section side>
                 <q-btn
                   class="q-mt-sm"
