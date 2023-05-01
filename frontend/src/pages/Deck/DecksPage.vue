@@ -1,21 +1,23 @@
-<script setup lang="ts">
-//import axios from "axios";
-//import api from "axios";
+<script setup>
 import { ref, onMounted, getCurrentInstance } from "vue";
 import { useQuasar } from "quasar";
+import { useAuthStore } from "src/stores/auth";
+import { useRoute, useRouter } from "vue-router";
 
-const cardGames = ref([]);
-const displayedCardGames = ref([]);
-const favourites = ref([]);
 const app = getCurrentInstance();
 const api = app.appContext.config.globalProperties.$api;
 const $q = useQuasar();
-const searchText = ref("");
-//const api = inject("api");
+const authStore = useAuthStore();
+const router = useRouter();
 
-const fetchCardGames = async () => {
+const searchText = ref("");
+const cardGames = ref([]);
+const displayedCardGames = ref([]);
+const favourites = ref([]);
+
+const fetchDecks = async () => {
   try {
-    const response = await api.get("cardgames");
+    const response = await api.get("decks");
     cardGames.value = response.data;
     search();
   } catch (error) {
@@ -24,6 +26,10 @@ const fetchCardGames = async () => {
 };
 
 const fetchFavourites = async () => {
+  if (!authStore.isLoggedIn) {
+    return;
+  }
+
   try {
     const response = await api.get("favourites");
     favourites.value = response.data;
@@ -75,7 +81,7 @@ const addToFavourites = async (cardgame) => {
       });
     }
   }
-  fetchCardGames();
+  fetchDecks();
   fetchFavourites();
 
   //const response = await this.$api.post(`cardgames/${id}/favourites/`);
@@ -83,22 +89,18 @@ const addToFavourites = async (cardgame) => {
 };
 
 const search = async () => {
-  console.log("search", searchText.value);
-
-  // print cardGames only if name contains searchText
   displayedCardGames.value = cardGames.value.filter((cardGame) =>
-    // make search not case sensitive
     cardGame.name.toLowerCase().includes(searchText.value.toLowerCase())
   );
 };
 
-const openCardGame = async (id) => {
-  console.log("openCardGame", id);
-  //this.$router.push({ name: "cardgames.open" });
+const openDeck = async (id) => {
+  router.push({ name: "decks.id", params: { id: id } });
+  //this.$router.push({ name: "decks.id", params: { id: id } });
 };
 
 onMounted(() => {
-  fetchCardGames();
+  fetchDecks();
   fetchFavourites();
 });
 </script>
@@ -106,7 +108,14 @@ onMounted(() => {
 <template>
   <q-page class="row justify-center">
     <div class="col-12">
-      <q-input rounded outlined v-model="searchText" label="search" @keyup.enter="search">
+      <q-input
+        rounded
+        outlined
+        v-model="searchText"
+        label="search"
+        @keyup.enter="search"
+        class="q-ma-sm q-mt-md"
+      >
         <template v-slot:prepend>
           <q-icon name="search" />
         </template>
@@ -115,7 +124,7 @@ onMounted(() => {
       <div>
         <q-list>
           <div v-for="(cardGame, index) in displayedCardGames" :key="index">
-            <q-item clickable @click="openCardGame(cardGame.id)">
+            <q-item clickable @click="openDeck(cardGame.id)">
               <q-item-section>
                 <!-- Cardgame name with add to favourites button-->
                 <q-item-label>{{ cardGame.name }}</q-item-label>

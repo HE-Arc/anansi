@@ -1,3 +1,71 @@
+<script lang="ts">
+import { defineComponent, ref } from "vue";
+import { useAuthStore } from "src/stores/auth";
+import { useQuasar } from "quasar";
+import ErrorBanner from "src/components/ErrorBanner.vue";
+
+export default defineComponent({
+  name: "RegisterPage",
+  components: {
+    ErrorBanner,
+  },
+  data() {
+    return {
+      username: "",
+      email: "",
+      password: "",
+      password2: "",
+      errors: ref([]),
+    };
+  },
+  setup() {
+    const authStore = useAuthStore();
+    const $q = useQuasar();
+
+    return {
+      $q,
+      authStore,
+    };
+  },
+  methods: {
+    async register() {
+      try {
+        const response = await this.$api.post("register/", {
+          username: this.username,
+          email: this.email,
+          password: this.password,
+          password2: this.password2,
+        });
+
+        console.log(response);
+
+        const responseLogin = await this.$api.post("login/", {
+          username: this.username,
+          password: this.password,
+        });
+
+        //console.log(responseLogin);
+
+        this.authStore.login();
+
+        this.$q.notify({
+          message: "You have successfully registered and logged in!",
+          color: "positive",
+        });
+
+        this.$router.push({ name: "home" });
+      } catch (error) {
+        this.errors = [];
+        for (var key in error.response.data) {
+          for (var key2 in error.response.data[key]) {
+            this.errors.push(key + " : " + error.response.data[key][key2]);
+          }
+        }
+      }
+    },
+  },
+});
+</script>
 <template>
   <q-page class="row q-mx-xl">
     <div class="col-12 col-md-6 col-lg-4">
@@ -50,72 +118,3 @@
     </div>
   </q-page>
 </template>
-
-<script lang="ts">
-import { defineComponent, ref } from "vue";
-import { useAuthStore } from "src/stores/auth";
-import { useQuasar } from "quasar";
-import ErrorBanner from "src/components/ErrorBanner.vue";
-
-export default defineComponent({
-  name: "RegisterPage",
-  components: {
-    ErrorBanner,
-  },
-  data() {
-    return {
-      username: "",
-      email: "",
-      password: "",
-      password2: "",
-      errors: ref([]),
-    };
-  },
-  setup() {
-    const authStore = useAuthStore();
-    const $q = useQuasar();
-
-    return {
-      $q,
-      authStore,
-    };
-  },
-  methods: {
-    async register() {
-      try {
-        const response = await this.$api.post("register/", {
-          username: this.username,
-          email: this.email,
-          password: this.password,
-          password2: this.password2,
-        });
-
-        console.log(response);
-
-        const responseLogin = await this.$api.post("login/", {
-          username: this.username,
-          password: this.password,
-        });
-
-        console.log(responseLogin);
-
-        this.authStore.login();
-
-        this.$q.notify({
-          message: "You have successfully registered and logged in!",
-          color: "positive",
-        });
-
-        this.$router.push({ name: "home" });
-      } catch (error) {
-        this.errors = [];
-        for (var key in error.response.data) {
-          for (var key2 in error.response.data[key]) {
-            this.errors.push(key + " : " + error.response.data[key][key2]);
-          }
-        }
-      }
-    },
-  },
-});
-</script>

@@ -80,7 +80,7 @@ export default defineComponent({
   methods: {
     async createCardGame() {
       try {
-        const response = await this.$api.post("cardgames/", {
+        const response = await this.$api.post("mydecks/", {
           name: this.name,
           privacy: this.privacy.value,
         });
@@ -90,7 +90,7 @@ export default defineComponent({
           color: "positive",
         });
 
-        this.$router.push({ name: "mycardgames" });
+        this.$router.push({ name: "mydecks" });
       } catch (error) {
         this.errors = [];
         for (var key in error.response.data) {

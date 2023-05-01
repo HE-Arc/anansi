@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CardGame, ClozeCard, ResponseCard, FavouriteCardGame, Game, GamePlayer, Round, RoundResponseCard, GamePlayerResponseCard
+from .models import Deck, ClozeCard, ResponseCard, FavouriteDeck, Game, GamePlayer, Round, RoundResponseCard, GamePlayerResponseCard
 from django.contrib.auth.models import User
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
@@ -17,7 +17,7 @@ class UserModelSerializer(serializers.ModelSerializer):
         fields = ['username', 'email', 'password']
 
 
-class RegisterSerializer(serializers.ModelSerializer):
+class RegisterSerializer(serializers.HyperlinkedModelSerializer):
     email = serializers.EmailField(required=True)
     password = serializers.CharField(
         write_only=True, validators=[validate_password])
@@ -25,7 +25,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password', 'password2']
+        fields = ['url', 'username', 'email', 'password', 'password2']
 
     def validate(self, attrs):
         if attrs['password'] != attrs['password2']:
@@ -42,43 +42,52 @@ class RegisterSerializer(serializers.ModelSerializer):
             return serializers.ValidationError(self.errors)
 
 
-class CardGameSerializer(serializers.HyperlinkedModelSerializer):
+class DeckSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = CardGame
+        model = Deck
         fields = ['url', 'id', 'user', 'name', 'privacy']
 
 
-class ComplexCardGameSerializer(CardGameSerializer):
+class ComplexDeckSerializer(DeckSerializer):
     user_object = UserSerializer(source='user', read_only=True)
 
     class Meta:
-        model = CardGame
-        fields = CardGameSerializer.Meta.fields + ['user_object']
+        model = Deck
+        fields = DeckSerializer.Meta.fields + ['user_object']
 
 
-class CardGameModelSerializer(serializers.ModelSerializer):
+class FavouriteDeckSerializer(serializers.HyperlinkedModelSerializer):
+    user_object = UserSerializer(source='user', read_only=True)
+    deck_object = DeckSerializer(source='deck', read_only=True)
+
     class Meta:
-        model = CardGame
+        model = FavouriteDeck
+        fields = ['id', 'user', 'deck', 'user_object', 'deck_object']
+
+
+class DeckModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Deck
         fields = ['id', 'user', 'name', 'privacy']
 
 
 class ClozeCardSerializer(serializers.ModelSerializer):
-    cardgame_object = CardGameModelSerializer(
-        source='cardgame', read_only=True)
+    deck_object = DeckModelSerializer(
+        source='deck', read_only=True)
 
     class Meta:
         model = ClozeCard
-        fields = ['id', 'cardgame', 'text',
-                  'gap_index', 'cardgame_object']
+        fields = ['id', 'deck', 'text',
+                  'gap_index', 'deck_object']
 
 
 class ResponseCardSerializer(serializers.ModelSerializer):
-    cardgame_object = CardGameModelSerializer(
-        source='cardgame', read_only=True)
+    deck_object = DeckModelSerializer(
+        source='deck', read_only=True)
 
     class Meta:
         model = ResponseCard
-        fields = ['id', 'cardgame', 'text', 'cardgame_object']
+        fields = ['id', 'deck', 'text', 'deck_object']
 
 
 class GameSerializer(serializers.ModelSerializer):
@@ -86,13 +95,13 @@ class GameSerializer(serializers.ModelSerializer):
     creator_object = serializers.SerializerMethodField()
     # GamePlayerSerializer(source='winner', read_only=True)
     winner_object = serializers.SerializerMethodField()
-    cardgame_object = CardGameModelSerializer(
-        source='cardgame', read_only=True)
+    deck_object = DeckModelSerializer(
+        source='deck', read_only=True)
 
     class Meta:
         model = Game
-        fields = ['id', 'creator', 'name', 'winner', 'cardgame',
-                  'game_code', 'creator_object', 'winner_object', 'cardgame_object']
+        fields = ['id', 'creator', 'name', 'winner', 'deck',
+                  'game_code', 'creator_object', 'winner_object', 'deck_object']
 
     def get_creator_object(self, obj):
         if obj.creator:

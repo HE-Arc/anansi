@@ -18,14 +18,36 @@ const routes: RouteRecordRaw[] = [
     component: () => import('src/pages/Auth/RegisterPage.vue'),
   },
   {
-    path: '/mycardgames',
-    name: 'mycardgames',
-    component: () => import('src/pages/CardGame/CardGamePage.vue')
+    path: '/mydecks',
+    name: 'mydecks',
+    component: () => import('src/pages/MyDeck/MyDecksPage.vue')
   },
   {
-    path: '/mycardgames/create',
-    name: 'cardgames.create',
-    component: () => import('src/pages/CardGame/CreateCardGamePage.vue')
+    path: '/mydecks/create',
+    name: 'mydecks.create',
+    component: () => import('src/pages/MyDeck/CreateDeckPage.vue')
+  },
+  {
+    path: '/mydecks/:id',
+    name: 'mydecks.id',
+    props: true,
+    component: () => import('src/pages/MyDeck/MyDeckPage.vue')
+  },
+  {
+    path: '/decks',
+    name: 'decks',
+    component: () => import('src/pages/Deck/DecksPage.vue')
+  },
+  {
+    path: '/decks/:id',
+    name: 'decks.id',
+    props: true,
+    component: () => import('src/pages/Deck/DeckPage.vue')
+  },
+  {
+    path: '/favourites',
+    name: 'favourites',
+    component: () => import('src/pages/Favourite/FavouritePage.vue')
   },
   {
     path: '/game',
@@ -38,11 +60,6 @@ const routes: RouteRecordRaw[] = [
     props: true,
     component: () => import('src/pages/Game/WaitingRoom.vue')
 
-  },
-  {
-    path: '/mycardgames/open',
-    name: 'cardgames.open',
-    component: () => import('src/pages/CardGame/CardPage.vue')
   },
   // Always leave this as last one,
   // but you can also remove it

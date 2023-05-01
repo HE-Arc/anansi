@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.contrib.auth.models import User
-from anansiapp.models import CardGame, ClozeCard, ResponseCard, FavouriteCardGame, Game, GamePlayer
+from anansiapp.models import Deck, ClozeCard, ResponseCard, FavouriteDeck, Game, GamePlayer
 from django_seed import Seed
 
 # Create the seed data
@@ -14,7 +14,7 @@ seeder.add_entity(User, 10, {
 
 inserted_pks = seeder.execute()
 
-seeder.add_entity(CardGame, 10, {
+seeder.add_entity(Deck, 10, {
     'user': lambda x: User.objects.get(pk=1),
     'name': lambda x: seeder.faker.sentence(nb_words=3, variable_nb_words=True, ext_word_list=None),
     'privacy': lambda x: seeder.faker.random_element(elements=('public', 'private')),
@@ -23,7 +23,7 @@ seeder.add_entity(CardGame, 10, {
 inserted_pks = seeder.execute()
 
 seeder.add_entity(ClozeCard, 10, {
-    'cardgame': lambda x: CardGame.objects.get(pk=1),
+    'cardgame': lambda x: Deck.objects.get(pk=1),
     'text': lambda x: seeder.faker.sentence(nb_words=3, variable_nb_words=True, ext_word_list=None),
     'gap_index': lambda x: seeder.faker.random_int(min=0, max=10),
 })
@@ -31,7 +31,7 @@ seeder.add_entity(ClozeCard, 10, {
 inserted_pks = seeder.execute()
 
 seeder.add_entity(ResponseCard, 10, {
-    'cardgame': lambda x: CardGame.objects.get(pk=1),
+    'cardgame': lambda x: Deck.objects.get(pk=1),
     'text': lambda x: seeder.faker.sentence(nb_words=3, variable_nb_words=True, ext_word_list=None),
 })
 

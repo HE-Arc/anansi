@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import viewsets
-from .models import CardGame, ClozeCard, Game, GamePlayer, GamePlayerResponseCard, ResponseCard, Round, RoundResponseCard
-from .serializers import CardGameSerializer, ClozeCardSerializer, ComplexCardGameSerializer, GamePlayerResponseCardSerializer, GamePlayerSerializer, GameSerializer, ResponseCardSerializer, RoundResponseCardSerializer, RoundSerializer, UserSerializer, RegisterSerializer
+from .models import Deck, ClozeCard, Game, GamePlayer, GamePlayerResponseCard, ResponseCard, Round, RoundResponseCard, FavouriteDeck
+from .serializers import DeckSerializer, ClozeCardSerializer, ComplexDeckSerializer, GamePlayerResponseCardSerializer, GamePlayerSerializer, GameSerializer, ResponseCardSerializer, RoundResponseCardSerializer, RoundSerializer, UserSerializer, RegisterSerializer, FavouriteDeckSerializer
 from django.contrib.auth import authenticate, login, logout
 from django.http import JsonResponse
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
@@ -18,7 +18,7 @@ from rest_framework import generics
 
 
 class SessionView(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get(self, request):
         if request.user.is_authenticated:
@@ -35,9 +35,9 @@ class LoginView(APIView):
         user = authenticate(username=username, password=password)
         if user is not None:
             login(request, user)
-            return Response({'success': 'Login Successful'})
+            return Response(status=status.HTTP_200_OK)
 
-        return Response({'error': 'Wrong Credentials'})
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class LogoutView(APIView):
@@ -59,11 +59,55 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = UserSerializer
 
 
-class CardGameViewSet(viewsets.ModelViewSet):
-    # permission_classes = [IsAuthenticated]
+class FavouriteDeckViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
 
-    queryset = CardGame.objects.all()
-    serializer_class = ComplexCardGameSerializer
+    queryset = FavouriteDeck.objects.all()
+    serializer_class = FavouriteDeckSerializer
+
+    def get_queryset(self):
+        return self.queryset.filter(user=self.request.user)
+
+    def create(self, request, *args, **kwargs):
+        user_url = request.build_absolute_uri(
+            reverse('user-detail', args=[request.user.id]))
+        request.data['user'] = user_url
+
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            print(serializer.errors)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def destroy(self, request, *args, **kwargs):
+        print(kwargs)
+        favourite = FavouriteDeck.objects.get(
+            user=self.request.user.id, cardgame=self.kwargs['pk'])
+
+        favourite.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class DeckViewSet(viewsets.ModelViewSet):
+    queryset = Deck.objects.all()
+    serializer_class = ComplexDeckSerializer
+
+    def get_queryset(self):
+        if self.request.user.is_authenticated:
+            return self.queryset.filter(privacy='public') | self.queryset.filter(user=self.request.user)
+        else:
+            return self.queryset.filter(privacy='public')
+
+
+class MyDeckViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+
+    queryset = Deck.objects.all()
+    serializer_class = ComplexDeckSerializer
 
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user)
@@ -88,10 +132,26 @@ class ResponseCardViewSet(viewsets.ModelViewSet):
     queryset = ResponseCard.objects.all()
     serializer_class = ResponseCardSerializer
 
+    def get_queryset(self):
+        # cardgame id is passed in the url
+        # get url parameter
+        params = self.request.query_params
+        print(params)
+
+        return self.queryset.filter(deck=self.request.query_params['deck'])
+
 
 class ClozeCardViewSet(viewsets.ModelViewSet):
     queryset = ClozeCard.objects.all()
     serializer_class = ClozeCardSerializer
+
+    def get_queryset(self):
+        # cardgame id is passed in the url
+        # get url parameter
+        params = self.request.query_params
+        print(params)
+
+        return self.queryset.filter(deck=self.request.query_params['deck'])
 
 
 class GameViewSet(viewsets.ModelViewSet):

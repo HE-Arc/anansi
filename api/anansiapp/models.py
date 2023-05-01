@@ -6,8 +6,8 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 
-class CardGame(models.Model):
-    """ CardGame model (jeu de cartes)
+class Deck(models.Model):
+    """ Deck model (jeu de cartes)
     """
     user = models.ForeignKey(
         User, on_delete=models.CASCADE)
@@ -21,8 +21,8 @@ class CardGame(models.Model):
 class ClozeCard(models.Model):
     """ ClozeCard model (carte à trou)
     """
-    cardgame = models.ForeignKey(
-        CardGame, on_delete=models.CASCADE)
+    deck = models.ForeignKey(
+        Deck, on_delete=models.CASCADE)
     text = models.CharField(max_length=100, blank=False)
     gap_index = models.IntegerField(blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -32,18 +32,18 @@ class ClozeCard(models.Model):
 class ResponseCard(models.Model):
     """ ResponseCard model (carte à réponse)
     """
-    cardgame = models.ForeignKey(
-        CardGame, on_delete=models.CASCADE)
+    deck = models.ForeignKey(
+        Deck, on_delete=models.CASCADE)
     text = models.CharField(max_length=100, blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
 
-class FavouriteCardGame(models.Model):
-    """ FavouriteCardGame model (jeu de cartes favoris d'un utilisateur)
+class FavouriteDeck(models.Model):
+    """ FavouriteDeck model (jeu de cartes favoris d'un utilisateur)
     """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    cardgame = models.ForeignKey(CardGame, on_delete=models.CASCADE)
+    deck = models.ForeignKey(Deck, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -57,7 +57,7 @@ class Game(models.Model):
     winner = models.ForeignKey(
         "GamePlayer", on_delete=models.CASCADE, null=True, related_name='winner')
 
-    cardgame = models.ForeignKey(CardGame, on_delete=models.CASCADE, null=True)
+    deck = models.ForeignKey(Deck, on_delete=models.CASCADE, null=True)
 
     game_code = models.CharField(max_length=100)
 
