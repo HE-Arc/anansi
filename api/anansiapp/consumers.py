@@ -104,18 +104,27 @@ class GameConsumer(AsyncWebsocketConsumer):
             # Get the game serialized
             ser_game = await self.get_game(game)
 
-            # Send message to all players in game
+            # Send game informations to the joining player
             players = await self.get_game_players(game)
 
             game_creator = await self.get_game_creator(game)
 
             message = {
                 'action': 'game_joined_or_created',
-                'players': players,
+                'gameplayer_id': self.player.id,
                 'game': ser_game,
-                'creator': game_creator.username,
             }
 
+            # Send the message and wait for it to be sent before continuing
+            await self.send(text_data=json.dumps(message))
+            
+            # Update the players list for other players
+            message = {
+                'action': 'update_players',
+                'players': players,
+                'creator': game_creator.username,
+            }
+            
             await self.channel_layer.group_send(
                 self.game_group_name,
                 {

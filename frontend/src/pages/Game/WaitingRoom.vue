@@ -7,9 +7,9 @@ import { useQuasar } from "quasar";
 import { GameplayerStore } from "src/stores/gameplayerStore";
 
 import CardComponent from "src/components/Game/CardComponent.vue";
-import RoundResponseCard from "src/components/RoundResponseCard.vue";
-import EndOfRoundComponent from "src/components/EndOfRoundComponent.vue";
-import PlayerListComponent from "src/components/PlayerListComponent.vue";
+import RoundResponseCard from "src/components/Game/RoundResponseCard.vue";
+import EndOfRoundComponent from "src/components/Game/EndOfRoundComponent.vue";
+import PlayerListComponent from "src/components/Game/PlayerListComponent.vue";
 
 const gameplayerStore = GameplayerStore();
 
@@ -50,16 +50,8 @@ const handlingGameFunctions: Dictionary<(data: any) => void> = {
     console.log("game_joined_or_created");
     console.log(data);
 
-    // Set the players
-    players.value = data.players;
-
     // Set the game
     gameplayerStore.setGameId(data.game_id);
-
-    // Set the game owner
-    gameOwner.value = data.creator;
-
-    isCreator.value = data.creator == username.value;
 
     // Set the gameplayer id
     gameplayerStore.setGameplayerId(data.gameplayer_id);
