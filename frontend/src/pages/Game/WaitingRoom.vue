@@ -10,6 +10,7 @@ import CardComponent from "src/components/Game/CardComponent.vue";
 import RoundResponseCard from "src/components/Game/RoundResponseCard.vue";
 import EndOfRoundComponent from "src/components/Game/EndOfRoundComponent.vue";
 import PlayerListComponent from "src/components/Game/PlayerListComponent.vue";
+import DecksList from "src/components/Game/DecksList.vue";
 
 const gameplayerStore = GameplayerStore();
 
@@ -287,55 +288,9 @@ onMounted(() => {
         :gameOwnerId="gameOwnerId"
       />
 
-      <h6 v-if="isCreator">Your are the game owner</h6>
-      <h6 v-if="!isCreator && username">Game owner: {{ gameOwner.username }}</h6>
+      <DecksList />
 
-      <!-- Print infos about the game -->
-    </div>
-    <!-- Waiting state UI -->
-    <div v-if="!isGameStarted" class="col-9 q-pa-sm">
-      <q-card class="q-mt-sm q-pa-md">
-        <q-card-section class="text-center row justify-center items-center">
-          <h6 class="q-my-lg col-12">Waiting for players to join...</h6>
-          <p class="col-12">Copy and send code to invite your friends !</p>
-
-          <!-- link with copy button -->
-          <q-input
-            v-if="gameOwner.game_object"
-            id="game-link"
-            class="q-ma-lg col-4"
-            v-model="gameOwner.game_object.name"
-            outlined
-            readonly
-            dense
-            color="blue"
-            text-color="blue"
-            label-color="blue"
-            style="color: blue; border-color: blue; text-color: blue"
-          />
-
-          <!-- Button create room -->
-          <q-btn
-            v-if="isCreator && !isGameStarted"
-            class="q-ma-lg col-8"
-            color="primary"
-            @click="
-              () => {
-                startGame();
-              }
-            "
-            label="Start game"
-          />
-        </q-card-section>
-      </q-card>
-    </div>
-
-    <!-- Display error message as a banner if not empty -->
-    <div v-if="error_message != ''" class="text-white bg-red">
-      <q-banner dense class="text-white bg-red">
-        {{ error_message }}
-      </q-banner>
-      <!-- Go back to main menu button -->
+      <!-- Button create room -->
       <q-btn
         class="q-mt-sm"
         color="text-white"

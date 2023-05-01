@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, getCurrentInstance } from "vue";
+import { ref, onMounted, getCurrentInstance, defineEmits } from "vue";
 import { useQuasar } from "quasar";
 import { useAuthStore } from "src/stores/auth";
 import { useRouter } from "vue-router";
@@ -11,8 +11,11 @@ const authStore = useAuthStore();
 const router = useRouter();
 
 const searchText = ref("");
+const favoriteOnly = ref(false);
 const decks = ref([]);
 const displayedDecks = ref([]);
+
+const emit = defineEmits(["onSelectDeck"]);
 
 const fetchDecks = async () => {
   try {
@@ -28,6 +31,13 @@ const search = async () => {
   displayedDecks.value = decks.value.filter((deck) =>
     deck.name.toLowerCase().includes(searchText.value.toLowerCase())
   );
+
+  // Filter by favorite
+  // TODO : find a way to do it in the previous filter
+};
+
+const onClick = (deckId) => {
+  emit("onSelectDeck", deckId);
 };
 
 onMounted(() => {
@@ -52,12 +62,20 @@ onMounted(() => {
       </template>
     </q-input>
 
+    <!-- Filtrer par favoris -->
+    <q-toggle
+      v-model="favoriteOnly"
+      label="Favorites"
+      color="primary"
+      class="q-ma-sm"
+    />
+
     <!-- Liste des decks -->
     <div>
       <q-list>
         <div v-for="(deck, index) in displayedDecks" :key="index">
           <q-item clickable>
-            <q-item-section clickable @click="openDeck(deck.id)">
+            <q-item-section clickable @click="onClick(deck.id)">
               <q-item-label>{{ deck.name }}</q-item-label>
               <q-item-label caption lines="2">{{
                 deck.user_object.username
