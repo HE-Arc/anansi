@@ -23,7 +23,7 @@ seeder.add_entity(Deck, 10, {
 inserted_pks = seeder.execute()
 
 seeder.add_entity(ClozeCard, 10, {
-    'cardgame': lambda x: Deck.objects.get(pk=1),
+    'deck': lambda x: Deck.objects.get(pk=1),
     'text': lambda x: seeder.faker.sentence(nb_words=3, variable_nb_words=True, ext_word_list=None),
     'gap_index': lambda x: seeder.faker.random_int(min=0, max=10),
 })
@@ -31,7 +31,7 @@ seeder.add_entity(ClozeCard, 10, {
 inserted_pks = seeder.execute()
 
 seeder.add_entity(ResponseCard, 10, {
-    'cardgame': lambda x: Deck.objects.get(pk=1),
+    'deck': lambda x: Deck.objects.get(pk=1),
     'text': lambda x: seeder.faker.sentence(nb_words=3, variable_nb_words=True, ext_word_list=None),
 })
 

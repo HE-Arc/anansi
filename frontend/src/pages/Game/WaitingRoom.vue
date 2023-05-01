@@ -6,7 +6,7 @@ import { Dictionary } from "express-serve-static-core";
 import { useQuasar } from "quasar";
 import { GameplayerStore } from "src/stores/gameplayerStore";
 
-import CardComponent from "src/components/CardComponent.vue";
+import CardComponent from "src/components/Game/CardComponent.vue";
 import RoundResponseCard from "src/components/RoundResponseCard.vue";
 import EndOfRoundComponent from "src/components/EndOfRoundComponent.vue";
 import PlayerListComponent from "src/components/PlayerListComponent.vue";
@@ -18,7 +18,7 @@ const $q = useQuasar();
 const authStore = useAuthStore();
 const route = useRoute();
 
-const username = ref(authStore.getUsername);
+const username = ref(authStore.username);
 const gameOwner = ref("");
 const players = ref([]);
 const gameSocket = ref(null);

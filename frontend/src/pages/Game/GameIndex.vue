@@ -79,7 +79,7 @@ export default defineComponent({
       }
 
       // save username in local storage
-      useAuthStore().setUsername(this.username);
+      useAuthStore().username = this.username;
 
       this.$router.push({
         name: "game.id",

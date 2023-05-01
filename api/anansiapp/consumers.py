@@ -308,11 +308,11 @@ class GameConsumer(AsyncWebsocketConsumer):
         # Get the game based on the player
         game = self.player.game
 
-        # Get the card deck (CardGame)
-        card_game = game.cardgame # TODO : Get the card game from the game and use it
+        # Get the card deck (deck)
+        card_game = game.deck # TODO : Get the card game from the game and use it
 
         # Get the cards (Card) from the card deck
-        responseCards = ResponseCardSerializer(ResponseCard.objects.filter(cardgame=1), many=True).data
+        responseCards = ResponseCardSerializer(ResponseCard.objects.filter(deck=1), many=True).data
 
         # Return n random cards that have not already been distributed to other players
         return random.sample(responseCards, number_of_cards)
