@@ -22,7 +22,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         await self.accept()
 
     async def disconnect(self, close_code):
-        if self.player_name and self.player:
+        if self.player and self.player.username:
             game = self.player.game
 
             game_creator = await self.get_game_creator(game)
@@ -31,26 +31,27 @@ class GameConsumer(AsyncWebsocketConsumer):
             await database_sync_to_async(self.player.delete)()
 
             # Get player from the game
-            players = await self.get_game_players(game)
-            players_names = [p.username async for p in players]
+            players_number = await self.get_game_players_number(self.player.game)
 
             # If there is no player, delete the room
-            if len(players) == 0:
+            if players_number == 0:
                 await database_sync_to_async(game.delete)()
 
             else:  # If there are still players in the room
 
                 # If the leaving player is the creator
-                if self.player_name == game_creator.username:
+                if self.player.username == game_creator.username:
                     # update the creator (change to the first player in the list)
                     game_creator = await sync_to_async(GamePlayer.objects.get)(game=game)
                     game.creator = game_creator
                     await sync_to_async(game.save)()
 
+                players = await self.get_game_players(game)
+                
                 # update the players list for other players
                 message = {
                     'action': 'update_players',
-                    'players': players_names,
+                    'players': players,
                     'creator': game_creator.username,
                 }
 
@@ -86,7 +87,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                 await self.send(text_data=json.dumps(message))
                 
                 # Close the connection cleanly, with a normal close frame, and a message indicating why the connection is closing.
-                await self.close(code = 1000, reason = 'The game has already started.') 
+                await self.close(code=1000)
                 return
 
             # Get player name, if not provided, use Anonymous
