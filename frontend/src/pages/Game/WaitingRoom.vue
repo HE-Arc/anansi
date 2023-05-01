@@ -20,6 +20,7 @@ const route = useRoute();
 
 const username = ref(authStore.username);
 const gameOwner = ref("");
+const gameOwnerId = ref(0);
 const players = ref([]);
 const gameSocket = ref(null);
 
@@ -74,6 +75,7 @@ const handlingGameFunctions: Dictionary<(data: any) => void> = {
     players.value = data.players;
 
     gameOwner.value = data.creator;
+    gameOwnerId.value = data.creator.id;
 
     isCreator.value = data.creator.id == gameplayerStore.gameplayer_id;
 
@@ -282,29 +284,49 @@ onMounted(() => {
       <PlayerListComponent
         v-if="(players.length > 0 && !isGameStarted) || isGameOver"
         :players="players"
-        :gameOwner="gameOwner"
+        :gameOwnerId="gameOwnerId"
       />
 
       <h6 v-if="isCreator">Your are the game owner</h6>
-      <h6 v-if="!isCreator && username">Game owner: {{ gameOwner }}</h6>
+      <h6 v-if="!isCreator && username">Game owner: {{ gameOwner.username }}</h6>
 
       <!-- Print infos about the game -->
     </div>
     <!-- Waiting state UI -->
-    <div v-if="!isGameStarted" class="col-9" style="height: 100%">
-      <q-card class="q-mt-sm" style="height: 100%">
-        <!-- Button create room -->
-        <q-btn
-          v-if="isCreator && !isGameStarted"
-          class="q-mt-sm col-12"
-          color="primary"
-          @click="
-            () => {
-              startGame();
-            }
-          "
-          label="Start game"
-        />
+    <div v-if="!isGameStarted" class="col-9 q-pa-sm">
+      <q-card class="q-mt-sm q-pa-md">
+        <q-card-section class="text-center row justify-center items-center">
+          <h6 class="q-my-lg col-12">Waiting for players to join...</h6>
+          <p class="col-12">Copy and send code to invite your friends !</p>
+
+          <!-- link with copy button -->
+          <q-input
+            v-if="gameOwner.game_object"
+            id="game-link"
+            class="q-ma-lg col-4"
+            v-model="gameOwner.game_object.name"
+            outlined
+            readonly
+            dense
+            color="blue"
+            text-color="blue"
+            label-color="blue"
+            style="color: blue; border-color: blue; text-color: blue"
+          />
+
+          <!-- Button create room -->
+          <q-btn
+            v-if="isCreator && !isGameStarted"
+            class="q-ma-lg col-8"
+            color="primary"
+            @click="
+              () => {
+                startGame();
+              }
+            "
+            label="Start game"
+          />
+        </q-card-section>
       </q-card>
     </div>
 

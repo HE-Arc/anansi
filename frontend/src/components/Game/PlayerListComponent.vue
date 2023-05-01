@@ -6,7 +6,7 @@ const props = defineProps({
   players: {
     default: [],
   },
-  gameOwner: {
+  gameOwnerId: {
     default: 0,
   },
 });
@@ -45,10 +45,9 @@ watch(
       <div v-for="player in players" :key="player">
         <q-item clickable class="q-px-xs">
           <q-item-section>
-            {{ (store.gameplayer_id, player.id) }}
             <q-item-label
               :class="store.gameplayer_id == player.id ? 'text-primary text-bold' : ''"
-              >{{ player.username }} {{ gameOwner == player.username ? "👑" : "" }}
+              >{{ player.username }} {{ props.gameOwnerId == player.id ? "👑" : "" }}
             </q-item-label>
             <q-item-label caption>{{ player.score }} points</q-item-label>
 
