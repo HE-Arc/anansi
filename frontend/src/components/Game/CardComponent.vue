@@ -7,6 +7,9 @@ const props = defineProps({
   card: {
     default: null,
   },
+  can_select: {
+    default: false,
+  },
   width: {
     default: 200,
   },
@@ -17,9 +20,11 @@ const props = defineProps({
 
 const card_text = ref("");
 const card_type = ref("");
+const card_selected = ref(false);
 
 const emitCardSelected = () => {
   console.log("Card selected");
+  card_selected.value = true;
   emits("onSelect", props.card);
 };
 
@@ -31,14 +36,15 @@ onMounted(() => {
 
 <template>
   <q-card
-    class="my-card"
-    style="width: {{ width }}px; height: {{ height }}px; background-color: red;"
+    class="my-card col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2"
+    :style="{ width: width + 'px', height: height + 'px', background: card_selected ? 'green' : 'red' }"
   >
     <!-- Display card text, and change color based on the type -->
     <q-card-section class="text-h6 text-white" :class="card_type">
       {{ card_text }}
 
       <q-btn
+        v-if="can_select"
         style="background: blue; color: white"
         label="Choose"
         @click="emitCardSelected"

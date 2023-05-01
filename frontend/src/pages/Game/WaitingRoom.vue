@@ -27,6 +27,7 @@ const isCreator = ref(false);
 const players_cards = ref([]); // Cards owned by the player
 const round_response_cards = ref([]); // Cards sent by the players for a round
 const isGameStarted = ref(false);
+const hasPlayerSelectedCard = ref(false); // The player has selected a card
 const isCardSelectionOver = ref(false); // All the players have choosen their cards, and now the master must choose the best one
 const isRoundOver = ref(false); // The master has choosen the best card, and now the players must see the result
 const isGameOver = ref(false); // The game is over
@@ -72,6 +73,7 @@ const handlingGameFunctions: Dictionary<(data: any) => void> = {
 
     $q.loading.hide();
   },
+
   update_players: (data: any) => {
     console.log("update_players");
     console.log(data);
@@ -147,6 +149,7 @@ const handlingGameFunctions: Dictionary<(data: any) => void> = {
     roundWinningPlayerUsername.value = data.card.player_object.username;
 
     isRoundOver.value = true;
+    hasPlayerSelectedCard.value = false;
 
     $q.loading.hide();
   },
@@ -226,10 +229,15 @@ const connectToGameSocket = () => {
 const sendCard = (card) => {
   // $q.loading.show();
 
+  console.log("sendCard " + card.id);
+
+  hasPlayerSelectedCard.value = true;
+
   const msg = {
     action: "send_card",
     card_id: card.id,
   };
+
   gameSocket.value.send(JSON.stringify(msg));
 };
 
@@ -330,9 +338,10 @@ onMounted(() => {
         v-if="players_cards.length > 0 && !isCardSelectionOver"
         class="row justify-evenly"
       >
-        <q-card v-for="card in players_cards" :key="card" class="col-12">
+        <q-card v-for="card in players_cards" :key="card" class="row">
           <CardComponent
             :card="card"
+            :can_select="!hasPlayerSelectedCard"
             @onSelect="
               () => {
                 sendCard(card);
