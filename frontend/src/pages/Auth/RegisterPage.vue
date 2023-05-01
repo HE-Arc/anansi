@@ -2,7 +2,7 @@
 import { ref, getCurrentInstance } from "vue";
 import { useAuthStore } from "src/stores/auth";
 import { useQuasar } from "quasar";
-import ErrorBanner from "src/components/General/ErrorBanner.vue";
+import ErrorBanner from "src/components/ErrorBanner.vue";
 import { useRoute, useRouter } from "vue-router";
 
 const app = getCurrentInstance();

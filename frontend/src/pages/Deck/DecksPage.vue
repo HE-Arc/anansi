@@ -17,7 +17,7 @@ const favourites = ref([]);
 
 const fetchDecks = async () => {
   try {
-    const response = await api.get("decks/get_public_decks");
+    const response = await api.get("decks");
     decks.value = response.data;
     search();
   } catch (error) {
@@ -78,8 +78,8 @@ const addToFavourites = async (deck) => {
       });
     }
   }
-  fetchFavourites();
   fetchDecks();
+  fetchFavourites();
 };
 
 const search = async () => {

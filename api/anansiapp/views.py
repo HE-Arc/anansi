@@ -19,6 +19,8 @@ from rest_framework.decorators import action
 
 
 class SessionView(APIView):
+    # permission_classes = [IsAuthenticated]
+
     def get(self, request):
         if request.user.is_authenticated:
             return Response({'isAuthenticated': True})
@@ -97,32 +99,11 @@ class DeckViewSet(viewsets.ModelViewSet):
     queryset = Deck.objects.all()
     serializer_class = ComplexDeckSerializer
 
-    @action(detail=False, methods=['get'])
-    def get_my_decks(self, request):
-        return Response(self.queryset.filter(user=self.request.user).values('id', 'name', 'privacy', 'user', 'created_at', 'updated_at'))
-
-    @action(detail=False, methods=['get'])
-    def get_public_decks(self, request):
-        if self.request.user.is_authenticated:
-            queryset = self.queryset.filter(
-                privacy='public').exclude(user=self.request.user)
-            # .values('id', 'name', 'privacy', 'user', 'created_at', 'updated_at')
-            # serializer
-
-        else:
-            # .values('id', 'name', 'privacy', 'user', 'created_at', 'updated_at')
-            queryset = self.queryset.filter(privacy='public')
-
-        serializer = ComplexDeckSerializer(queryset, many=True, context={
-            'request': request
-        })
-        return Response(serializer.data)
-
-    """def get_queryset(self):
+    def get_queryset(self):
         if self.request.user.is_authenticated:
             return self.queryset.filter(privacy='public') | self.queryset.filter(user=self.request.user)
         else:
-            return self.queryset.filter(privacy='public')"""
+            return self.queryset.filter(privacy='public')
 
 
 class MyDeckViewSet(viewsets.ModelViewSet):

@@ -1,17 +1,40 @@
 <template>
   <q-page class="row justify-evenly content-start">
-    <div class="col-11 col-md-6 col-lg-4">
-      <div class="row justify-evenly align-center">
-        <!-- Pseudo -->
-        <q-input v-model="username" label="Pseudo" filled class="q-my-sm" required />
-        <!-- Join room button -->
-        <q-btn
-          class="q-mt-sm"
-          color="primary"
-          flat
-          label="Join room"
-          @click="dialog = true"
-        />
+    <div class="col-12">
+      <div class="row justify-center align-center">
+        <q-card class="q-mt-md col-11 col-md-6 col-lg-4 q-pa-md q-mt-md-xl q-pb-lg">
+          <q-card-section>
+            <!-- Title -->
+            <div class="text-h6">🎮 Join or create a room</div>
+          </q-card-section>
+          <q-card-section>
+            <!-- Pseudo -->
+            <q-input v-model="username" label="Pseudo" filled class="q-my-sm" required />
+
+            <div class="row justify-between q-mt-lg">
+              <!-- Join room button -->
+              <q-btn
+                class="col-5 q-pa-sm"
+                color="primary"
+                label="Join room"
+                @click="dialog = true"
+              />
+
+              <!-- Create room button -->
+              <q-btn
+                class="col-5 q-pa-sm"
+                color="primary"
+                @click="
+                  () => {
+                    this.generateGameId();
+                    this.goToGameWaitingRoom();
+                  }
+                "
+                label="Create room"
+              />
+            </div>
+          </q-card-section>
+        </q-card>
         <!-- Popup to enter room id -->
         <q-dialog v-model="dialog" persistent>
           <q-card>
@@ -33,19 +56,6 @@
             </q-card-actions>
           </q-card>
         </q-dialog>
-        <!-- Create room button -->
-        <q-btn
-          class="q-mt-sm"
-          color="primary"
-          @click="
-            () => {
-              this.generateGameId();
-              this.goToGameWaitingRoom();
-            }
-          "
-          flat
-          label="Create room"
-        />
       </div>
     </div>
   </q-page>

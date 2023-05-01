@@ -9,7 +9,9 @@ const authStore = useAuthStore();
 
 const getSession = async () => {
   const response = await api.get(`session`);
+  console.log(response.data);
   response.data.isAuthenticated ? authStore.login() : authStore.logout();
+  //console.log(authStore.isLoggedIn);
 };
 
 onMounted(() => {

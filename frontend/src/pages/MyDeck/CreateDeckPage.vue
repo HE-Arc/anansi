@@ -1,7 +1,7 @@
 <script setup>
 import { ref, getCurrentInstance } from "vue";
 import { useQuasar } from "quasar";
-import ErrorBanner from "src/components/General/ErrorBanner.vue";
+import ErrorBanner from "src/components/ErrorBanner.vue";
 import { useRouter } from "vue-router";
 
 const app = getCurrentInstance();
