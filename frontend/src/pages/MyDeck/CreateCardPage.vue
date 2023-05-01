@@ -3,6 +3,7 @@ import { ref, onMounted, getCurrentInstance } from "vue";
 import { useQuasar } from "quasar";
 import ErrorBanner from "src/components/ErrorBanner.vue";
 import { useRoute, useRouter } from "vue-router";
+import { useToolsStore } from "src/stores/tools";
 
 const app = getCurrentInstance();
 const api = app.appContext.config.globalProperties.$api;
@@ -33,24 +34,26 @@ const createCard = async () => {
     card.value.gap_index = null;
   } else {
     if (text1.value.length !== 0) {
-      text1.value = text1.value.split(" ");
+      /*text1.value = text1.value.split(" ");
       text1.value.forEach((word, index) => {
         if (word === "") {
           text1.value.splice(index, 1);
         }
       });
       card.value.gap_index = text1.value.length;
-      text1.value = text1.value.join(" ");
+      text1.value = text1.value.join(" ");*/
+      card.value.gap_index = useToolsStore().rmExcessSpaces(text1.value);
     }
 
     if (text2.value.length !== 0) {
-      text2.value = text2.value.split(" ");
+      /*text2.value = text2.value.split(" ");
       text2.value.forEach((word, index) => {
         if (word === "") {
           text2.value.splice(index, 1);
         }
       });
-      text2.value = text2.value.join(" ");
+      text2.value = text2.value.join(" ");*/
+      useToolsStore().rmExcessSpaces(text2.value);
     }
     card.value.text = text1.value + " " + text2.value;
   }

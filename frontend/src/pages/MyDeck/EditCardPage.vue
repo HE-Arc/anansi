@@ -4,6 +4,8 @@ import { useQuasar } from "quasar";
 import ErrorBanner from "src/components/ErrorBanner.vue";
 import { useRoute, useRouter } from "vue-router";
 
+import { useToolsStore } from "src/stores/tools";
+
 const app = getCurrentInstance();
 const api = app.appContext.config.globalProperties.$api;
 const $q = useQuasar();
@@ -30,7 +32,8 @@ const fetchCard = async () => {
   if (cardType.value === "response") {
     textResponse.value = card.value.text;
   } else {
-    removeSplitAndRemoveSpaces(card.value.text);
+    useToolsStore().rmExcessSpaces(card.value.text);
+    //removeNotNecessarySpaces(card.value.text);
     text1.value = card.value.text.split(" ").slice(0, card.value.gap_index).join(" ");
     console.log(text1.value);
     text2.value = card.value.text.split(" ").slice(card.value.gap_index).join(" ");
@@ -38,7 +41,7 @@ const fetchCard = async () => {
   }
 };
 
-const removeSplitAndRemoveSpaces = (text) => {
+const removeNotNecessarySpaces = (text) => {
   text = text.split(" ");
   text.forEach((word, index) => {
     if (word === "") {
@@ -56,11 +59,13 @@ const patchCard = async () => {
     card.value.gap_index = null;
   } else {
     if (text1.value.length !== 0) {
-      card.value.gap_index = removeSplitAndRemoveSpaces(text1.value);
+      card.value.gap_index = useToolsStore().rmExcessSpaces(text1.value); //removeNotNecessarySpaces(text1.value);
+      //otNecessary(text1.value);
     }
 
     if (text2.value.length !== 0) {
-      removeSplitAndRemoveSpaces(text2.value);
+      useToolsStore().rmExcessSpaces(text2.value); //removeNotNecessarySpaces(text2.value);
+      //otNecessary(text2.value);
     }
 
     card.value.text = text1.value + " " + text2.value;
