@@ -108,6 +108,8 @@ class GameConsumer(AsyncWebsocketConsumer):
             players = await self.get_game_players(game)
 
             game_creator = await self.get_game_creator(game)
+            
+            game_creator_ser = await self.get_player_serialized(game_creator)
 
             message = {
                 'action': 'game_joined_or_created',
@@ -122,7 +124,7 @@ class GameConsumer(AsyncWebsocketConsumer):
             message = {
                 'action': 'update_players',
                 'players': players,
-                'creator': game_creator.username,
+                'creator': game_creator_ser,
             }
             
             await self.channel_layer.group_send(
@@ -373,6 +375,12 @@ class GameConsumer(AsyncWebsocketConsumer):
                 return player
         
         return None
+    
+    # Get the game creator serialized
+    @database_sync_to_async
+    def get_player_serialized(self, player):
+        ''' Get the game creator serialized '''
+        return GamePlayerSerializer(player).data
 
     # Get game players serialized
     @database_sync_to_async

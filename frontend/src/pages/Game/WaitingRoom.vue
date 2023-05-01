@@ -75,7 +75,7 @@ const handlingGameFunctions: Dictionary<(data: any) => void> = {
 
     gameOwner.value = data.creator;
 
-    isCreator.value = data.creator == username.value;
+    isCreator.value = data.creator.id == gameplayerStore.gameplayer_id;
 
     $q.loading.hide();
   },
