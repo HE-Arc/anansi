@@ -30,8 +30,6 @@ const tab = ref("cloze");
 const fetchDeck = async () => {
   const response = await api.get(`decks/${props.id}`);
   deck.value = response.data;
-  console.log(deck.value);
-  //deck.value = await response.json();
 };
 
 const fetchResponseCards = async () => {
@@ -60,7 +58,6 @@ const deleteCardCallback = async (cardId, cardType) => {
 
   try {
     await api.delete(`${url}${cardId}/`);
-    //router.go(0);
     $q.notify({
       message: "Card deleted",
       color: "positive",

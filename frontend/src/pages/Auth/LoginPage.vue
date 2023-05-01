@@ -1,16 +1,15 @@
 <script setup>
-import { onMounted, getCurrentInstance, ref } from "vue";
+import { getCurrentInstance, ref } from "vue";
 import { useAuthStore } from "src/stores/auth";
 import { useQuasar } from "quasar";
-import { useRoute, useRouter } from "vue-router";
-import ErrorBanner from "src/components/ErrorBanner.vue";
+import { useRouter } from "vue-router";
+import ErrorBanner from "src/components/General/ErrorBanner.vue";
 
 const app = getCurrentInstance();
 const api = app.appContext.config.globalProperties.$api;
 const $q = useQuasar();
 const authStore = useAuthStore();
 const router = useRouter();
-const route = useRoute();
 
 const username = ref("");
 const password = ref("");
@@ -18,12 +17,13 @@ const errors = ref([]);
 
 const login = async () => {
   try {
-    const response = await api.post("login/", {
+    await api.post("login/", {
       username: username.value,
       password: password.value,
     });
 
-    authStore.isLoggedIn = true;
+    authStore.login();
+    //authStore.isLoggedIn = true;
 
     $q.notify({
       message: "Login successful",

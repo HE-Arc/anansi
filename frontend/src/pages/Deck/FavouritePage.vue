@@ -2,7 +2,7 @@
 import { ref, onMounted, getCurrentInstance } from "vue";
 import { useQuasar } from "quasar";
 import { useAuthStore } from "src/stores/auth";
-import { useRoute, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 
 const app = getCurrentInstance();
 const api = app.appContext.config.globalProperties.$api;
@@ -20,7 +20,6 @@ const fetchFavourites = async () => {
   try {
     const response = await api.get("favourites");
     favourites.value = response.data;
-    console.log("favourites : ", favourites.value);
   } catch (error) {
     console.log(error);
   }
@@ -28,12 +27,11 @@ const fetchFavourites = async () => {
 
 const openDeck = async (id) => {
   router.push({ name: "decks.id", params: { id: id } });
-  //this.$router.push({ name: "decks.id", params: { id: id } });
 };
 
 const removeFromFavourites = async (cardgame) => {
   try {
-    const response = await api.delete(`favourites/${cardgame.id}/`);
+    await api.delete(`favourites/${cardgame.id}/`);
 
     $q.notify({
       message: "Card game removed from favourites",
@@ -58,8 +56,10 @@ onMounted(() => {
   <q-page class="row justify-center">
     <div class="col-12">
       <div>
+        <!-- Message si aucun favoris -->
         <p v-if="favourites.length == 0">You have no favourite card games yet.</p>
         <q-list>
+          <!-- Liste des favoris -->
           <div v-for="(favourite, index) in favourites" :key="index">
             <q-item clickable>
               <q-item-section clickable @click="openDeck(favourite.deck_object.id)">

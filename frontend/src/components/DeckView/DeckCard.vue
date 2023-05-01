@@ -25,7 +25,6 @@ const props = defineProps({
 });
 
 const deleteCard = async (id) => {
-  console.log(id);
   emit("delete-card", id, props.cardType);
 };
 
@@ -44,10 +43,6 @@ const clozeCardText = (text, index) => {
   const words = text.split(" ");
   return words.slice(0, index).join(" ") + " __________ " + words.slice(index).join(" ");
 };
-
-onMounted(() => {
-  console.log(props.card);
-});
 </script>
 
 <template>

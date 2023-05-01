@@ -1,5 +1,5 @@
 <script setup>
-import { defineComponent, ref, onMounted, getCurrentInstance } from "vue";
+import { ref, getCurrentInstance } from "vue";
 import { useAuthStore } from "src/stores/auth";
 import { useQuasar } from "quasar";
 import ErrorBanner from "src/components/ErrorBanner.vue";
@@ -10,7 +10,6 @@ const api = app.appContext.config.globalProperties.$api;
 const $q = useQuasar();
 const authStore = useAuthStore();
 const router = useRouter();
-const route = useRoute();
 
 const username = ref("");
 const email = ref("");

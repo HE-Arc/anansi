@@ -1,13 +1,10 @@
 <script setup>
 import { ref, onMounted, getCurrentInstance } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import { useQuasar } from "quasar";
+import { useRouter } from "vue-router";
 
 const app = getCurrentInstance();
 const api = app.appContext.config.globalProperties.$api;
-const $q = useQuasar();
 const router = useRouter();
-const route = useRoute();
 
 const cardGames = ref([]);
 
@@ -15,8 +12,6 @@ const fetchCardGames = async () => {
   try {
     const response = await api.get("mydecks");
     cardGames.value = response.data;
-
-    console.log("cardgames value", cardGames.value);
 
     cardGames.value.forEach((cardGame) => {
       cardGame.readonly = true;

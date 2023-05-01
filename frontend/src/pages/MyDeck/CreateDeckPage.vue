@@ -1,15 +1,13 @@
 <script setup>
-import { ref, onMounted, getCurrentInstance } from "vue";
+import { ref, getCurrentInstance } from "vue";
 import { useQuasar } from "quasar";
 import ErrorBanner from "src/components/ErrorBanner.vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 
 const app = getCurrentInstance();
 const api = app.appContext.config.globalProperties.$api;
 const $q = useQuasar();
-
 const router = useRouter();
-const route = useRoute();
 
 const name = ref("");
 const privacy = ref("private");
@@ -22,12 +20,10 @@ const options = [
 
 const createCardGame = async () => {
   try {
-    const response = await api.post("mydecks/", {
+    await api.post("mydecks/", {
       name: name.value,
       privacy: privacy.value,
     });
-
-    console.log(response.data);
 
     $q.notify({
       message: "Card game created",

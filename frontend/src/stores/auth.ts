@@ -3,7 +3,7 @@ import { ref } from 'vue';
 
 export const useAuthStore = defineStore('auth', () => {
   const isLoggedIn = ref(false);
-  const username = ref("");
+  const username = ref('');
 
   function login() {
     isLoggedIn.value = true;
@@ -14,25 +14,4 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   return { isLoggedIn, username, login, logout };
-
-  /*id: "auth",
-  state: () => ({
-    isLoggedIn: false,
-    username: "",
-  }),
-  getters: {
-    get: (state) => state.isLoggedIn,
-    getUsername: (state) => state.username,
-  },
-  actions: {
-    login() {
-      this.isLoggedIn = true;
-    },
-    logout() {
-      this.isLoggedIn = false;
-    },
-    setUsername(username: string) {
-      this.username = username;
-    }
-  },*/
 });

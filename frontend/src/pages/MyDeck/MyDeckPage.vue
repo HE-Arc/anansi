@@ -1,15 +1,10 @@
 <script setup>
-import { useQuasar } from "quasar";
 import DeckView from "src/components/DeckView/DeckView.vue";
 import { ref, onMounted, getCurrentInstance } from "vue";
-import { useAuthStore } from "src/stores/auth";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 
 const app = getCurrentInstance();
 const api = app.appContext.config.globalProperties.$api;
-const $q = useQuasar();
-const authStore = useAuthStore();
-const router = useRouter();
 const route = useRoute();
 
 const deck = ref({});
@@ -18,7 +13,6 @@ const fetchDeck = async () => {
   try {
     const response = await api.get(`mydecks/${route.params.id}`);
     deck.value = response.data;
-    console.log(deck.value);
   } catch (error) {
     console.log(error);
   }

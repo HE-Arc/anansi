@@ -33,24 +33,11 @@ const fetchCard = async () => {
     textResponse.value = card.value.text;
   } else {
     useToolsStore().rmExcessSpaces(card.value.text);
-    //removeNotNecessarySpaces(card.value.text);
     text1.value = card.value.text.split(" ").slice(0, card.value.gap_index).join(" ");
     console.log(text1.value);
     text2.value = card.value.text.split(" ").slice(card.value.gap_index).join(" ");
     console.log(text2.value);
   }
-};
-
-const removeNotNecessarySpaces = (text) => {
-  text = text.split(" ");
-  text.forEach((word, index) => {
-    if (word === "") {
-      text.splice(index, 1);
-    }
-  });
-  let index = text.length;
-  text = text.join(" ");
-  return index;
 };
 
 const patchCard = async () => {
@@ -59,21 +46,19 @@ const patchCard = async () => {
     card.value.gap_index = null;
   } else {
     if (text1.value.length !== 0) {
-      card.value.gap_index = useToolsStore().rmExcessSpaces(text1.value); //removeNotNecessarySpaces(text1.value);
-      //otNecessary(text1.value);
+      card.value.gap_index = useToolsStore().rmExcessSpaces(text1.value);
     }
 
     if (text2.value.length !== 0) {
-      useToolsStore().rmExcessSpaces(text2.value); //removeNotNecessarySpaces(text2.value);
-      //otNecessary(text2.value);
+      useToolsStore().rmExcessSpaces(text2.value);
     }
 
     card.value.text = text1.value + " " + text2.value;
   }
 
   try {
-    const response = await api.patch(`${url}${route.params.cardId}/`, card.value);
-    console.log(response.data);
+    await api.patch(`${url}${route.params.cardId}/`, card.value);
+
     $q.notify({
       message: "Card updated",
       color: "positive",

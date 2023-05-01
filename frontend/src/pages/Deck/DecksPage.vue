@@ -2,7 +2,7 @@
 import { ref, onMounted, getCurrentInstance } from "vue";
 import { useQuasar } from "quasar";
 import { useAuthStore } from "src/stores/auth";
-import { useRoute, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 
 const app = getCurrentInstance();
 const api = app.appContext.config.globalProperties.$api;
@@ -33,7 +33,6 @@ const fetchFavourites = async () => {
   try {
     const response = await api.get("favourites");
     favourites.value = response.data;
-    console.log("favourites : ", favourites.value);
   } catch (error) {
     console.log(error);
   }
@@ -44,10 +43,9 @@ const isInFavorites = (deck) => {
 };
 
 const addToFavourites = async (deck) => {
-  //console.log(cardgame);
   if (isInFavorites(deck)) {
     try {
-      const response = await api.delete(`favourites/${deck.id}/`);
+      await api.delete(`favourites/${deck.id}/`);
 
       $q.notify({
         message: "Card game removed from favourites",
@@ -62,9 +60,8 @@ const addToFavourites = async (deck) => {
       });
     }
   } else {
-    //console.log("addToFavourites", cardgame.id);
     try {
-      const response = await api.post(`favourites/`, {
+      await api.post(`favourites/`, {
         deck: deck.url,
       });
 
@@ -83,9 +80,6 @@ const addToFavourites = async (deck) => {
   }
   fetchDecks();
   fetchFavourites();
-
-  //const response = await this.$api.post(`cardgames/${id}/favourites/`);
-  //fetchCardGames();
 };
 
 const search = async () => {
@@ -96,7 +90,6 @@ const search = async () => {
 
 const openDeck = async (id) => {
   router.push({ name: "decks.id", params: { id: id } });
-  //this.$router.push({ name: "decks.id", params: { id: id } });
 };
 
 onMounted(() => {
