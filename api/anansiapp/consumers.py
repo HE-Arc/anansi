@@ -158,7 +158,7 @@ class GameConsumer(AsyncWebsocketConsumer):
             master = await self.select_master(game)
             
             # Select a cloze card
-            cloze_card = await self.select_cloze_card()
+            cloze_card = await self.select_cloze_card(deck)
             
             # Create a new round
             round = await database_sync_to_async(Round.objects.create)(game=game, master=master, cloze_card=cloze_card, round_number=0) 
@@ -298,7 +298,7 @@ class GameConsumer(AsyncWebsocketConsumer):
             # Get the last round
             last_round = await self.get_last_round(game)
             
-            # If the last round number is > 6, the game is finished
+            # If the last round number is > 5, the game is finished
             if last_round.round_number >= 5:
                 # Get the winner
                 winner = await self.get_game_winner(game)
@@ -365,10 +365,10 @@ class GameConsumer(AsyncWebsocketConsumer):
         game = self.player.game
 
         # Get the card deck (deck)
-        card_game = game.deck # TODO : Get the card game from the game and use it
+        deck = game.deck
 
         # Get the cards (Card) from the card deck
-        responseCards = ResponseCardSerializer(ResponseCard.objects.filter(deck=1), many=True).data
+        responseCards = ResponseCardSerializer(ResponseCard.objects.filter(deck=deck), many=True).data
 
         # Return n random cards that have not already been distributed to other players
         return random.sample(responseCards, number_of_cards)
@@ -433,11 +433,10 @@ class GameConsumer(AsyncWebsocketConsumer):
     
     # Select a cloze card
     @database_sync_to_async
-    def select_cloze_card(self):
-        ''' Select a random cloze card '''
-        # Get the cloze cards
-        # TODO : Select a cloze card from the selected card deck
-        cloze_cards = ClozeCard.objects.all()
+    def select_cloze_card(self, deck):
+        ''' Select a random cloze card from the deck '''
+        # Get the cloze cards from the deck
+        cloze_cards =  ClozeCard.objects.filter(deck=deck)
         
         # Select a random cloze card
         cloze_card = random.choice(cloze_cards)

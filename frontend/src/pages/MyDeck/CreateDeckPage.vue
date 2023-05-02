@@ -1,7 +1,7 @@
 <script setup>
 import { ref, getCurrentInstance } from "vue";
 import { useQuasar } from "quasar";
-import ErrorBanner from "src/components/ErrorBanner.vue";
+import ErrorBanner from "src/components/General/ErrorBanner.vue";
 import { useRouter } from "vue-router";
 
 const app = getCurrentInstance();
@@ -9,20 +9,20 @@ const api = app.appContext.config.globalProperties.$api;
 const $q = useQuasar();
 const router = useRouter();
 
-const name = ref("");
-const privacy = ref("private");
-const errors = ref([]);
-
 const options = [
   { label: "Private", value: "private" },
   { label: "Public", value: "public" },
 ];
 
+const name = ref("");
+const privacy = ref(options[0]);
+const errors = ref([]);
+
 const createCardGame = async () => {
   try {
     await api.post("mydecks/", {
       name: name.value,
-      privacy: privacy.value,
+      privacy: privacy.value.value,
     });
 
     $q.notify({

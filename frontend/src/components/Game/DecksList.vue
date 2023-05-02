@@ -19,6 +19,30 @@ const selectedDeckId = ref(null);
 
 const emit = defineEmits(["onSelectDeck"]);
 
+const removeEmptyDeck = async () => {
+  let notEmptyDecks = [];
+
+  // Foreach deck, get the response card from the api
+  for (let i = 0; i < decks.value.length; i++) {
+    const deck_id = decks.value[i].id;
+
+    const response = await api.get(`responsecards/get_responsecards`, {
+      params: {
+        deck: deck_id,
+      },
+    });
+
+    console.log("Response cards for deck " + deck_id);
+    console.log(response.data);
+
+    if (response.data.length > 0) {
+      notEmptyDecks.push(decks.value[i]);
+    }
+  }
+
+  return notEmptyDecks;
+};
+
 const fetchDecks = async () => {
   try {
     if (favoriteOnly.value) {
@@ -30,10 +54,19 @@ const fetchDecks = async () => {
 
       // Get the decks from the favourites (deck_object)
       decks.value = response.data.map((favourite) => favourite.deck_object);
+
+      console.log("Decks");
+      console.log(response.data);
     } else {
       const response = await api.get("decks");
+
+      console.log("Decks");
+      console.log(response.data);
       decks.value = response.data;
     }
+
+    // Remove empty decks
+    decks.value = await removeEmptyDeck();
 
     search();
   } catch (error) {
