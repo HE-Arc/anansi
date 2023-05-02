@@ -34,7 +34,7 @@ const isCardSelectionOver = ref(false); // All the players have choosen their ca
 const isRoundOver = ref(false); // The master has choosen the best card, and now the players must see the result
 const isGameOver = ref(false); // The game is over
 
-const selectedDeck = ref(null); // The deck selected by the creator of the game to play with
+const selectedDeckId = ref(null); // The deck selected by the creator of the game to play with
 
 const roundCounter = ref(0);
 
@@ -254,19 +254,34 @@ const chooseRoundWinner = (card_id: string) => {
   gameSocket.value.send(JSON.stringify(msg));
 };
 
-const startGame = () => {
-  $q.loading.show();
+const onDeckSelected = (deck_id) => {
+  console.log("onDeckSelected");
+  console.log(deck_id);
 
+  selectedDeckId.value = deck_id;
+};
+
+const startGame = () => {
   const msg = {
     action: "start_game",
   };
 
   // Add the selected deck if not null
-  if (selectedDeck.value != null) {
-    msg["deck_id"] = selectedDeck.value.id;
-  }
+  if (selectedDeckId.value != null) {
+    $q.loading.show();
 
-  gameSocket.value.send(JSON.stringify(msg));
+    console.log("startGame : " + selectedDeckId.value);
+
+    msg["deck_id"] = selectedDeckId.value;
+
+    gameSocket.value.send(JSON.stringify(msg));
+  } else {
+    // Pop up error message
+    $q.notify({
+      message: "A deck must be selected to start the game",
+      color: "red",
+    });
+  }
 };
 
 const nextRound = () => {
@@ -297,7 +312,7 @@ onMounted(() => {
         :gameOwnerId="gameOwnerId"
       />
 
-      <DecksList />
+      <DecksList @on-select-deck="onDeckSelected" />
 
       <!-- Button create room -->
       <q-btn

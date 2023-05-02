@@ -15,6 +15,8 @@ const favoriteOnly = ref(false);
 const decks = ref([]);
 const displayedDecks = ref([]);
 
+const selectedDeckId = ref(null);
+
 const emit = defineEmits(["onSelectDeck"]);
 
 const fetchDecks = async () => {
@@ -50,6 +52,8 @@ const search = async () => {
 };
 
 const onClick = (deckId) => {
+  selectedDeckId.value = deckId;
+
   emit("onSelectDeck", deckId);
 };
 
@@ -89,7 +93,7 @@ onMounted(() => {
     <div>
       <q-list>
         <div v-for="(deck, index) in displayedDecks" :key="index">
-          <q-item clickable>
+          <q-item clickable :active="selectedDeckId == deck.id">
             <q-item-section clickable @click="onClick(deck.id)">
               <q-item-label>{{ deck.name }}</q-item-label>
               <q-item-label caption lines="2">{{
@@ -97,9 +101,9 @@ onMounted(() => {
               }}</q-item-label>
             </q-item-section>
             <!-- Bouton add -->
-            <q-item-section side>
+            <!-- <q-item-section side>
               <q-btn class="q-mt-sm" color="primary" @click="() => {}" icon="add" flat />
-            </q-item-section>
+            </q-item-section> -->
           </q-item>
           <q-separator spaced inset />
         </div>

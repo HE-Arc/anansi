@@ -3,7 +3,7 @@ import random
 from .serializers import GamePlayerSerializer, GameSerializer, ResponseCardSerializer, RoundResponseCardSerializer, RoundSerializer
 from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import async_to_sync, sync_to_async
-from .models import ClozeCard, Game, GamePlayer, ResponseCard, Round, RoundResponseCard
+from .models import ClozeCard, Deck, Game, GamePlayer, ResponseCard, Round, RoundResponseCard
 from channels.db import database_sync_to_async
 
 
@@ -140,6 +140,17 @@ class GameConsumer(AsyncWebsocketConsumer):
             game = self.player.game
             
             game.is_started = True
+            
+            await database_sync_to_async(game.save)()
+            
+            # Get the deck id from the request
+            deck_id = data['deck_id']
+            
+            # Fetch the deck from the database
+            deck = await database_sync_to_async(Deck.objects.get)(id=deck_id)
+            
+            # Update the game deck
+            game.deck = deck
             
             await database_sync_to_async(game.save)()
             
