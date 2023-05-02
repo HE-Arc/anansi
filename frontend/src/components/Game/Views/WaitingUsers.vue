@@ -16,12 +16,24 @@ const props = defineProps({
 
 <template>
   <q-card>
-    <!-- Display round -->
-    <h1>Round {{ roundCounter }} / 6</h1>
-    <!-- Display message -->
-    <p>Waiting users to choose cards...</p>
+    <q-card-section
+      class="text-center row justify-center items-center q-pb-none q-mb-none"
+    >
+      <!-- Display round number -->
+      <text class="text-h6">Round {{ roundCounter }} / 6</text>
+    </q-card-section>
+    <q-card-section
+      class="text-center row justify-center items-center q-pb-none q-mb-none"
+    >
+      <!-- Display message -->
+      <p>Waiting users to choose cards...</p>
+    </q-card-section>
 
-    <!-- Display card received -->
-    <p>{{ cardSentCounter }} / {{ playerCount }} cards received</p>
+    <q-card-section
+      class="text-center row justify-center items-center q-pb-none q-mb-none"
+    >
+      <!-- Display card received -->
+      <p>{{ cardSentCounter }} / {{ playerCount }} cards received</p>
+    </q-card-section>
   </q-card>
 </template>

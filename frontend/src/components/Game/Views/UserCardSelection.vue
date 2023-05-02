@@ -27,47 +27,61 @@ const props = defineProps({
 </script>
 
 <template>
-  <q-card>
-    <q-card-section>
-      <!-- Display round number -->
-      <h1>Round {{ roundCounter }} / 6</h1>
-    </q-card-section>
+  <q-card class="column justify-evenly">
+    <div>
+      <q-card-section
+        class="text-center row justify-center items-center q-pb-none q-mb-none"
+      >
+        <!-- Display round number -->
+        <text class="text-h6">Round {{ roundCounter }} / 6</text>
+      </q-card-section>
 
-    <q-card-section>
-      <!-- Display Cloze card with (empty) response card -->
-      <ClozeCard :card="clozeCard" class="col-6" />
-      <ResponseCard v-if="selectedCard !== null" :card="selectedCard" class="col-6" />
-      <EmptyCard v-else class="col-6" />
-    </q-card-section>
+      <q-card-section class="q-my-none q-py-xs">
+        <!-- Display Cloze card with (empty) response card -->
+        <div class="row">
+          <ClozeCard :card="clozeCard" class="col-5" />
+          <ResponseCard
+            v-if="selectedCard !== null"
+            :card="selectedCard"
+            class="col-5 q-ma-md"
+          />
+          <EmptyCard v-else class="col-5" />
+        </div>
+      </q-card-section>
+    </div>
+    <div>
+      <!-- Display user response cards -->
+      <q-card-section class="col-12 q-my-none q-py-xs">
+        <div class="row justify-start" style="align-items: stretch">
+          <div v-for="card in playersCards" :key="card" class="col-4 q-pa-xs">
+            <ResponseCard
+              :card="card"
+              :action="true"
+              :defaultStyle="false"
+              @onSelect="
+                () => {
+                  emit('onSelect', card);
+                }
+              "
+            />
+          </div>
+        </div>
+      </q-card-section>
 
-    <!-- Display user response cards -->
-    <q-card-section>
-      <ResponseCard
-        v-for="card in playersCards"
-        :key="card"
-        :card="card"
-        :action="true"
-        @onSelect="
-          () => {
-            emit('onSelect', card);
-          }
-        "
-      />
-    </q-card-section>
-
-    <!-- Display validate button -->
-    <q-card-section>
-      <q-btn
-        class="q-ma-lg col-8"
-        color="primary"
-        @click="
-          () => {
-            emit('onSend', selectedCard);
-          }
-        "
-        label="Validate card"
-        :disable="!hasPlayerSelectedCard"
-      />
-    </q-card-section>
+      <!-- Display validate button -->
+      <q-card-section class="row q-my-none q-py-xs justify-center">
+        <q-btn
+          class="q-ma-lg col-8"
+          color="primary"
+          @click="
+            () => {
+              emit('onSend', selectedCard);
+            }
+          "
+          label="Validate card"
+          :disable="!hasPlayerSelectedCard"
+        />
+      </q-card-section>
+    </div>
   </q-card>
 </template>

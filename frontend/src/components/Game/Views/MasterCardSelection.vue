@@ -26,57 +26,70 @@ const props = defineProps({
 </script>
 
 <template>
-  <q-card>
-    <!-- Display round number -->
-    <q-card-section>
-      <h1>Round {{ roundCounter }} / 6</h1>
-    </q-card-section>
+  <q-card class="column justify-evenly">
+    <div>
+      <!-- Display round number -->
+      <q-card-section
+        class="text-center row justify-center items-center q-pb-none q-mb-none"
+      >
+        <text class="text-h6">Round {{ roundCounter }} / 6</text>
+      </q-card-section>
 
-    <!-- Display Cloze card with (empty) response card -->
-    <q-card-section>
       <!-- Display Cloze card with (empty) response card -->
-      <ClozeCard :card="clozeCard" class="col-6" />
-      <ResponseCard
-        v-if="selectedCard !== null"
-        :card="selectedCard"
-        class="col-6"
-        :masterSelection="true"
-      />
-      <EmptyCard v-else class="col-6" />
-    </q-card-section>
+      <q-card-section class="q-my-none q-py-xs">
+        <!-- Display Cloze card with (empty) response card -->
+        <div class="row">
+          <ClozeCard :card="clozeCard" class="col-5" />
+          <ResponseCard
+            v-if="selectedCard !== null"
+            :card="selectedCard"
+            class="col-5 q-ma-md"
+            :masterSelection="true"
+          />
+          <EmptyCard v-else class="col-5" />
+        </div>
+        <!-- Display message -->
+      </q-card-section>
+      <q-card-section class="row justify-center">
+        <p class="col-12">
+          You are the master of this round, please choose the best card
+        </p>
+      </q-card-section>
+    </div>
+    <div>
+      <!-- Display user response cards -->
+      <q-card-section class="col-12 q-my-none q-py-xs">
+        <div class="row justify-center" style="align-items: stretch">
+          <div v-for="card in responseCards" :key="card" class="col-4 q-pa-xs">
+            <ResponseCard
+              :card="card"
+              :action="true"
+              :masterSelection="true"
+              :defaultStyle="false"
+              @onSelect="
+                () => {
+                  emit('onSelect', card);
+                }
+              "
+            />
+          </div>
+        </div>
+      </q-card-section>
 
-    <!-- Display message -->
-    <p>You are the master of this round, please choose the best card.</p>
-
-    <!-- Display user response cards -->
-    <q-card-section>
-      <ResponseCard
-        v-for="card in responseCards"
-        :key="card"
-        :card="card"
-        :action="true"
-        :masterSelection="true"
-        @onSelect="
-          () => {
-            emit('onSelect', card);
-          }
-        "
-      />
-    </q-card-section>
-
-    <!-- Display validate button -->
-    <q-card-section>
-      <q-btn
-        class="q-ma-lg col-8"
-        color="primary"
-        @click="
-          () => {
-            emit('onSend', selectedCard.id);
-          }
-        "
-        label="Validate card"
-        :disable="!hasPlayerSelectedCard"
-      />
-    </q-card-section>
+      <!-- Display validate button -->
+      <q-card-section class="row q-my-none q-py-xs justify-center">
+        <q-btn
+          class="q-ma-lg col-8"
+          color="primary"
+          @click="
+            () => {
+              emit('onSend', selectedCard.id);
+            }
+          "
+          label="Validate card"
+          :disable="!hasPlayerSelectedCard"
+        />
+      </q-card-section>
+    </div>
   </q-card>
 </template>

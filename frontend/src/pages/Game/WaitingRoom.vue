@@ -39,6 +39,7 @@ const players_cards = ref([]); // Cards owned by the player
 const round_response_cards = ref([]); // Cards sent by the players for a round
 const isGameStarted = ref(false);
 const hasPlayerSelectedCard = ref(false); // The player has selected a card
+const hasPlayerSentCard = ref(false); // The player has sent a card
 const hasMasterSelectedCard = ref(false); // The master has selected a card
 const isCardSelectionOver = ref(false); // All the players have choosen their cards, and now the master must choose the best one
 const isRoundOver = ref(false); // The master has choosen the best card, and now the players must see the result
@@ -86,7 +87,7 @@ const WAITING_USER_CARD_SELECTION = computed(() => {
     isGameStarted.value &&
     !isRoundOver.value &&
     !isCardSelectionOver.value &&
-    (hasPlayerSelectedCard.value || isMaster.value)
+    (hasPlayerSentCard.value || isMaster.value)
   );
 });
 
@@ -210,6 +211,7 @@ const handlingGameFunctions: Dictionary<(data: any) => void> = {
 
     isRoundOver.value = true;
     hasPlayerSelectedCard.value = false;
+    hasPlayerSentCard.value = false;
     selectedCard.value = null;
     hasMasterSelectedCard.value = false;
     masterSelectedCard.value = null;
@@ -295,6 +297,7 @@ const sendCard = (card) => {
   console.log("sendCard " + card.id);
 
   hasPlayerSelectedCard.value = true;
+  hasPlayerSentCard.value = true;
 
   const msg = {
     action: "send_card",
@@ -437,6 +440,44 @@ const cardSelected = (card) => {
       />
       <GameResult v-if="GAME_RESULT" :winner="gameWinnerName" />
     </div>
+    <div class="col-9">
+      <q-card class="q-mt-sm q-pa-md">
+        <!-- Card selection UI -->
+        <div>
+          <!-- Next round -->
+          <div v-if="isRoundOver && !isGameOver">
+            <div class="col-12" v-if="isRoundOver && !isGameOver">
+              <!-- Next round button is the player is the game owner -->
+              <q-btn
+                v-if="isCreator"
+                class="q-mt-sm col-12"
+                color="primary"
+                @click="
+                  () => {
+                    nextRound();
+                  }
+                "
+                flat
+                label="Next round"
+              />
+
+              <h5>The following card wins the round :</h5>
+              <RoundResponseCard
+                :card="roundWinningCard"
+                v-if="isRoundOver"
+                :is_master="false"
+              />
+            </div>
+          </div>
+
+          <!-- Game over -->
+          <!--<div v-if="isGameOver">
+            <h1 v-if="isGameOver">Game over</h1>
+            <h2 v-if="isGameOver">Winner: {{ gameWinnerName }}</h2>
+          </div>-->
+        </div>
+      </q-card>
+    </div>
 
     <!-- Display error message as a banner if not empty -->
     <div v-if="error_message != ''" class="text-white bg-red">
@@ -452,11 +493,5 @@ const cardSelected = (card) => {
         label="Go back to main menu"
       />
     </div>
-
-    <!-- Display card sent counter and number of players-->
-    <h2 v-if="isGameStarted && !isCardSelectionOver">Cards sent</h2>
-    <h3 v-if="isGameStarted && !isCardSelectionOver">
-      {{ card_sent_counter }} / {{ player_count }}
-    </h3>
   </q-page>
 </template>
