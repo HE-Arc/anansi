@@ -35,7 +35,7 @@ function onStartGame() {
       <q-input
         :label="inputText"
         id="game-link"
-        class="q-ma-lg col-4"
+        class="q-ma-lg col-8"
         outlined
         readonly
         dense

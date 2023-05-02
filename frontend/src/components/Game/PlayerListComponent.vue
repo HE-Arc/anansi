@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, defineProps, watch } from "vue";
+import { ref, onMounted, defineProps, watch, computed } from "vue";
 import { GameplayerStore } from "src/stores/gameplayerStore";
 
 const props = defineProps({
@@ -12,10 +12,17 @@ const props = defineProps({
   masterId: {
     default: null,
   },
+  displayMobile: {
+    default: false,
+  },
 });
 
 const players = ref([]);
 const store = GameplayerStore();
+
+const colSize = computed(() => {
+  return 12 / players.value.length;
+});
 
 onMounted(() => {
   players.value = props.players;
@@ -42,9 +49,8 @@ watch(
 </script>
 
 <template>
-  <div class="col-12">
+  <div class="col-12" v-if="!displayMobile">
     <div class="text-h6" v-if="props.players.length > 0">👤 Players</div>
-    <!--<h4 v-if="players.length > 0">Players in the game</h4>-->
     <q-list v-if="players.length > 0" class="q-ma-none q-pa-none">
       <div v-for="player in players" :key="player">
         <q-item clickable class="q-px-xs">
@@ -60,5 +66,19 @@ watch(
         <q-separator spaced />
       </div>
     </q-list>
+  </div>
+  <div v-else class="row">
+    <div v-for="player in players" :key="player">
+      <div :class="'col-' + colSize + ' q-pa-sm'">
+        <q-item-section>
+          <q-item-label
+            :class="store.gameplayer_id == player.id ? 'text-primary text-bold' : ''"
+            >{{ player.username }} {{ props.gameOwnerId == player.id ? "👑" : "" }}
+            {{ props.masterId == player.id ? "👔" : "" }}
+          </q-item-label>
+          <q-item-label caption>{{ player.score }} points</q-item-label>
+        </q-item-section>
+      </div>
+    </div>
   </div>
 </template>

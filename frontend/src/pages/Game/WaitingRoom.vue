@@ -375,19 +375,20 @@ const cardSelected = (card) => {
 <template>
   <q-page class="row justify-evenly content-start" style="height: 100%">
     <!-- Users list -->
-    <div class="col-3 q-pa-md">
+    <div class="col-12 col-lg-3 q-pa-md">
       <!-- print players in a list --><!--&& !isGameStarted-->
       <PlayerListComponent
         v-if="players.length > 0 || isGameOver"
         :players="players"
         :gameOwnerId="gameOwnerId"
         :masterId="masterId"
+        :displayMobile="$q.screen.lt.lg"
       />
       <DecksList @on-select-deck="onDeckSelected" />
       <!--<h6 v-if="isCreator">Your are the game owner</h6>
       <h6 v-if="!isCreator && username">Game owner: {{ gameOwner.username }}</h6>-->
     </div>
-    <div class="col-9">
+    <div class="col-12 col-lg-9 q-px-sm">
       <WaitingRoom
         v-if="WAITING_ROOM"
         :gameOwner="gameOwner"
@@ -436,7 +437,6 @@ const cardSelected = (card) => {
       />
       <GameResult v-if="GAME_RESULT" :winner="gameWinnerName" />
     </div>
-
 
     <!-- Display error message as a banner if not empty -->
     <div v-if="error_message != ''" class="text-white bg-red">
