@@ -391,7 +391,7 @@ const cardSelected = (card) => {
       <!--<h6 v-if="isCreator">Your are the game owner</h6>
       <h6 v-if="!isCreator && username">Game owner: {{ gameOwner.username }}</h6>-->
     </div>
-    <div class="col-12 col-lg-9 q-px-sm">
+    <div class="col-12 col-lg-9 q-px-sm q-my-md-md">
       <WaitingRoom
         v-if="WAITING_ROOM"
         :gameOwner="gameOwner"
