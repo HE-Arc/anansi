@@ -54,9 +54,9 @@ onMounted(() => {
 });
 </script>
 <template>
-  <q-page class="row justify-evenly content-start">
-    <div class="col-11 col-md-6 col-lg-4">
-      <div class="row justify-evenly align-center">
+  <q-page class="row justify-center content-start">
+    <div class="col-10 col-md-5 col-sm-6 col-lg-4">
+      <div class="row justify-around align-center">
         <h1 class="q-my-sm">My decks</h1>
         <!-- Create deck -->
         <q-btn
@@ -65,87 +65,95 @@ onMounted(() => {
           icon="add"
           flat
           :to="{ name: 'mydecks.create' }"
+          size="lg"
         />
       </div>
     </div>
 
-    <!-- If no card games, display message -->
-    <div v-if="cardGames.length == 0" class="col-11">
-      <h4>There is no deck</h4>
-    </div>
-    <div v-else>
-      <div class="col-10 col-md-6 col-lg-4">
-        <!-- Display card games -->
-        <q-list separator>
-          <q-item
-            clickable
-            v-for="cardGame in cardGames"
-            :key="cardGame.id"
-            @click="
-              () => router.push({ name: 'mydecks.id', params: { id: cardGame.id } })
-            "
-          >
-            <q-input
-              v-model="cardGame.name"
-              :readonly="cardGame.readonly"
-              :class="{ editable: !cardGame.readonly }"
-            />
-            <!-- Privacy -->
-            <q-item-section side>
-              <q-btn
-                class="q-px-xs"
-                :color="cardGame.privacy == 'private' ? 'primary' : 'grey-8'"
-                @click="() => putchCardGamePrivacy(cardGame.id, cardGame.privacy)"
-                icon="lock"
-                flat
-              />
-            </q-item-section>
-            <!-- Edit -->
-            <q-item-section side>
-              <q-btn
-                v-if="cardGame.readonly == true"
-                class="q-px-xs"
-                color="primary"
-                @click="
-                  () => {
-                    cardGame.readonly = false;
-                    cardGame.lastName = cardGame.name;
-                  }
-                "
-                icon="edit"
-                flat
-              />
-              <!-- Save -->
-              <q-btn-group v-else>
-                <q-btn
-                  class="q-px-xs"
-                  color="primary"
-                  @click="() => putchCardGameName(cardGame.id, cardGame.name)"
-                  icon="check"
-                  flat
-                />
-                <!-- Cancel -->
-                <q-btn
-                  class="q-px-xs"
-                  color="primary"
-                  @click="() => cancelEditCardGameName(cardGame)"
-                  icon="close"
-                  flat
-                />
-              </q-btn-group>
-            </q-item-section>
-            <!-- Delete -->
-            <q-item-section side>
-              <q-btn
-                class="q-px-xs"
-                color="primary"
-                @click="() => deleteCardGame(cardGame.id)"
-                icon="delete"
-                flat
-              />
-            </q-item-section>
-          </q-item>
-        </q-list>
+    <div class="col-12">
+      <div class="row justify-center content-start">
+        <!-- If no card games, display message -->
+        <div v-if="cardGames.length == 0" class="col-11">
+          <h4>There is no deck</h4>
+        </div>
+        <div v-else>
+          <div class="col-10 col-md-6 col-lg-4">
+            <!-- Display card games -->
+            <q-list separator>
+              <q-item v-for="cardGame in cardGames" :key="cardGame.id">
+                <q-item-section
+                  clickable
+                  @click="
+                    () => {
+                      if (cardGame.readonly !== true) return;
+                      router.push({ name: 'mydecks.id', params: { id: cardGame.id } });
+                    }
+                  "
+                >
+                  <q-input
+                    v-model="cardGame.name"
+                    :readonly="cardGame.readonly"
+                    :class="{ editable: !cardGame.readonly }"
+                  />
+                </q-item-section>
+                <!-- Privacy -->
+                <q-item-section side>
+                  <q-btn
+                    class="q-px-xs"
+                    :color="cardGame.privacy == 'private' ? 'primary' : 'grey-8'"
+                    @click="() => putchCardGamePrivacy(cardGame.id, cardGame.privacy)"
+                    icon="lock"
+                    flat
+                  />
+                </q-item-section>
+                <!-- Edit -->
+                <q-item-section side>
+                  <q-btn
+                    v-if="cardGame.readonly == true"
+                    class="q-px-xs"
+                    color="primary"
+                    @click="
+                      () => {
+                        cardGame.readonly = false;
+                        cardGame.lastName = cardGame.name;
+                      }
+                    "
+                    icon="edit"
+                    flat
+                  />
+                  <!-- Save -->
+                  <q-btn-group v-else>
+                    <q-btn
+                      class="q-px-xs"
+                      color="primary"
+                      @click="() => putchCardGameName(cardGame.id, cardGame.name)"
+                      icon="check"
+                      flat
+                    />
+                    <!-- Cancel -->
+                    <q-btn
+                      class="q-px-xs"
+                      color="primary"
+                      @click="() => cancelEditCardGameName(cardGame)"
+                      icon="close"
+                      flat
+                    />
+                  </q-btn-group>
+                </q-item-section>
+                <!-- Delete -->
+                <q-item-section side>
+                  <q-btn
+                    class="q-px-xs"
+                    color="primary"
+                    @click="() => deleteCardGame(cardGame.id)"
+                    icon="delete"
+                    flat
+                  />
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </div>
+        </div>
       </div>
     </div>
   </q-page>

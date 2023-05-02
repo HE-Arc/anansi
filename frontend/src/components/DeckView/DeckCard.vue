@@ -69,7 +69,7 @@ const clozeCardText = (text, index) => {
     </div>
     <div class="col-12">
       <q-separator dark />
-      <q-card-actions align="right" class="bg-white q-pa-xs">
+      <q-card-actions align="right" class="bg-white q-pa-xs" v-if="isDeckMine">
         <div v-if="isDeckMine">
           <!-- delete button -->
           <q-btn
@@ -88,8 +88,7 @@ const clozeCardText = (text, index) => {
             flat
           />
         </div>
-        <div v-else>
-          <!-- add to deck button -->
+        <!--<div v-else>
           <q-btn
             class="q-px-xs"
             color="primary"
@@ -97,7 +96,7 @@ const clozeCardText = (text, index) => {
             icon="add"
             flat
           />
-        </div>
+        </div>-->
       </q-card-actions>
     </div>
   </q-card>

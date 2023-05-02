@@ -35,6 +35,7 @@ onMounted(() => {
           icon="add"
           flat
           :to="{ name: 'cards.create' }"
+          size="lg"
         />
       </div>
       <DeckView :id="route.params.id" :isDeckMine="true"></DeckView>

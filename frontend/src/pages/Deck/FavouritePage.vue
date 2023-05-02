@@ -56,6 +56,7 @@ onMounted(() => {
   <q-page class="row justify-center">
     <div class="col-12">
       <div>
+        <h1 class="q-py-none q-my-none q-px-md">Favourites</h1>
         <!-- Message si aucun favoris -->
         <p v-if="favourites.length == 0">You have no favourite card games yet.</p>
         <q-list>

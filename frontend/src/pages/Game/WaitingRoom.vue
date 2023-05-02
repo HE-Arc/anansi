@@ -1,5 +1,5 @@
-<script lang="ts" setup>
-import { ref, onMounted } from "vue";
+<script setup lang="ts">
+import { ref, onMounted, computed } from "vue";
 import { useAuthStore } from "src/stores/auth";
 import { useRoute } from "vue-router";
 import { Dictionary } from "express-serve-static-core";
@@ -10,13 +10,22 @@ import CardComponent from "src/components/Game/CardComponent.vue";
 import RoundResponseCard from "src/components/Game/RoundResponseCard.vue";
 import EndOfRoundComponent from "src/components/Game/EndOfRoundComponent.vue";
 import PlayerListComponent from "src/components/Game/PlayerListComponent.vue";
+
+import ClozeCard from "src/components/Game/Components/Cards/ClozeCard.vue";
+import EmptyCard from "src/components/Game/Components/Cards/EmptyCard.vue";
+
+import WaitingRoom from "src/components/Game/Views/WaitingRoom.vue";
+import UserCardSelection from "src/components/Game/Views/UserCardSelection.vue";
+import WaitingUsers from "src/components/Game/Views/WaitingUsers.vue";
+import MasterCardSelection from "src/components/Game/Views/MasterCardSelection.vue";
+import WaitingMaster from "src/components/Game/Views/WaitingMaster.vue";
+import RoundResult from "src/components/Game/Views/RoundResult.vue";
+import GameResult from "src/components/Game/Views/GameResult.vue";
 import DecksList from "src/components/Game/DecksList.vue";
 
 const gameplayerStore = GameplayerStore();
-
-const $q = useQuasar();
-
 const authStore = useAuthStore();
+const $q = useQuasar();
 const route = useRoute();
 
 const username = ref(authStore.username);
@@ -30,9 +39,12 @@ const players_cards = ref([]); // Cards owned by the player
 const round_response_cards = ref([]); // Cards sent by the players for a round
 const isGameStarted = ref(false);
 const hasPlayerSelectedCard = ref(false); // The player has selected a card
+const hasMasterSelectedCard = ref(false); // The master has selected a card
 const isCardSelectionOver = ref(false); // All the players have choosen their cards, and now the master must choose the best one
 const isRoundOver = ref(false); // The master has choosen the best card, and now the players must see the result
 const isGameOver = ref(false); // The game is over
+const isMaster = ref(false); // The player is the master for the current round
+const masterId = ref(0); // The id of the master for the current round
 
 const selectedDeckId = ref(null); // The deck selected by the creator of the game to play with
 
@@ -47,6 +59,48 @@ const player_count = ref(0);
 const error_message = ref("");
 const current_round = ref(null);
 const cloze_card = ref("");
+const cloze_card_ = ref({});
+
+const selectedCard = ref(null);
+const masterSelectedCard = ref(null);
+
+const WAITING_ROOM = computed(() => {
+  return !isGameStarted.value;
+});
+
+const USER_CARD_SELECTION = computed(() => {
+  return (
+    isGameStarted.value &&
+    !isRoundOver.value &&
+    !isCardSelectionOver.value &&
+    !isMaster.value
+  );
+});
+
+const MASTER_CARD_SELECTION = computed(() => {
+  return isCardSelectionOver.value && !isRoundOver.value && isMaster.value;
+});
+
+const WAITING_USER_CARD_SELECTION = computed(() => {
+  return (
+    isGameStarted.value &&
+    !isRoundOver.value &&
+    !isCardSelectionOver.value &&
+    (hasPlayerSelectedCard.value || isMaster.value)
+  );
+});
+
+const WAITING_MASTER_CARD_SELECTION = computed(() => {
+  return isCardSelectionOver.value && !isRoundOver.value && !isMaster.value;
+});
+
+const ROUND_RESULT = computed(() => {
+  return isRoundOver.value && !isGameOver.value;
+});
+
+const GAME_RESULT = computed(() => {
+  return isGameOver.value;
+});
 
 // Dictionary of functions that handle the game
 const handlingGameFunctions: Dictionary<(data: any) => void> = {
@@ -58,6 +112,7 @@ const handlingGameFunctions: Dictionary<(data: any) => void> = {
     gameplayerStore.setGameId(data.game_id);
 
     // Set the gameplayer id
+    console.log("gameplayer_id : " + data.gameplayer_id);
     gameplayerStore.setGameplayerId(data.gameplayer_id);
 
     $q.loading.hide();
@@ -95,11 +150,14 @@ const handlingGameFunctions: Dictionary<(data: any) => void> = {
     isCardSelectionOver.value = false;
     isRoundOver.value = false;
     isGameStarted.value = true;
+    masterId.value = data.master.id;
+    isMaster.value = data.master.id == gameplayerStore.gameplayer_id;
 
     // Display the received players_cards
     players_cards.value = data.cards;
 
     cloze_card.value = data.cloze_card;
+    cloze_card_.value = data.cloze_card_;
 
     $q.loading.hide();
   },
@@ -133,6 +191,7 @@ const handlingGameFunctions: Dictionary<(data: any) => void> = {
     round_response_cards.value = data.cards;
 
     current_round.value = data.round;
+    //isMaster.value = data.master_object.id == gameplayerStore.gameplayer_id;
     console.log("current_round");
     console.log(current_round.value);
 
@@ -151,6 +210,9 @@ const handlingGameFunctions: Dictionary<(data: any) => void> = {
 
     isRoundOver.value = true;
     hasPlayerSelectedCard.value = false;
+    selectedCard.value = null;
+    hasMasterSelectedCard.value = false;
+    masterSelectedCard.value = null;
 
     $q.loading.hide();
   },
@@ -297,24 +359,91 @@ const nextRound = () => {
 onMounted(() => {
   connectToGameSocket();
 });
+
+const masterCardSelected = (card) => {
+  masterSelectedCard.value = card;
+  hasMasterSelectedCard.value = true;
+  console.log("masterCardSelected");
+};
+
+const cardSelected = (card) => {
+  selectedCard.value = card;
+  hasPlayerSelectedCard.value = true;
+};
 </script>
 
 <template>
   <q-page class="row justify-evenly content-start" style="height: 100%">
-    <!--<div class="row justify-evenly align-center" style="width: 100%">-->
-
     <!-- Users list -->
     <div class="col-3 q-pa-md">
-      <!-- print players in a list -->
+      <!-- print players in a list --><!--&& !isGameStarted-->
       <PlayerListComponent
-        v-if="(players.length > 0 && !isGameStarted) || isGameOver"
+        v-if="players.length > 0 || isGameOver"
         :players="players"
         :gameOwnerId="gameOwnerId"
+        :masterId="masterId"
       />
-
       <DecksList @on-select-deck="onDeckSelected" />
+      <!--<h6 v-if="isCreator">Your are the game owner</h6>
+      <h6 v-if="!isCreator && username">Game owner: {{ gameOwner.username }}</h6>-->
+    </div>
+    <div class="col-9">
+      <WaitingRoom
+        v-if="WAITING_ROOM"
+        :gameOwner="gameOwner"
+        :isCreator="isCreator"
+        @start-game="startGame"
+      />
+      <UserCardSelection
+        v-if="USER_CARD_SELECTION"
+        :roundCounter="roundCounter"
+        :clozeCard="cloze_card_"
+        :selectedCard="selectedCard"
+        :playersCards="players_cards"
+        :hasPlayerSelectedCard="hasPlayerSelectedCard"
+        @onSelect="cardSelected"
+        @onSend="sendCard"
+      />
+      <WaitingUsers
+        v-if="WAITING_USER_CARD_SELECTION"
+        :roundCounter="roundCounter"
+        :playerCount="player_count - 1"
+        :cardSentCounter="card_sent_counter"
+      />
+      <MasterCardSelection
+        v-if="MASTER_CARD_SELECTION"
+        :roundCounter="roundCounter"
+        :clozeCard="cloze_card_"
+        :selectedCard="masterSelectedCard"
+        :responseCards="round_response_cards"
+        :hasPlayerSelectedCard="hasMasterSelectedCard"
+        @onSelect="masterCardSelected"
+        @onSend="chooseRoundWinner"
+      />
+      <WaitingMaster
+        v-if="WAITING_MASTER_CARD_SELECTION"
+        :roundCounter="roundCounter"
+        :clozeCard="cloze_card_"
+        :responseCards="round_response_cards"
+      />
+      <RoundResult
+        v-if="ROUND_RESULT"
+        :roundCounter="roundCounter"
+        :clozeCard="cloze_card_"
+        :winningCard="roundWinningCard"
+        :isCreator="isCreator"
+        @nextRound="nextRound"
+      />
+      <GameResult v-if="GAME_RESULT" :winner="gameWinnerName" />
+    </div>
 
-      <!-- Button create room -->
+
+    <!-- Display error message as a banner if not empty -->
+    <div v-if="error_message != ''" class="text-white bg-red">
+      <q-banner dense class="text-white bg-red">
+        {{ error_message }}
+      </q-banner>
+      <!-- Go back to main menu button -->
       <q-btn
         class="q-mt-sm"
         color="text-white"
@@ -324,100 +453,10 @@ onMounted(() => {
       />
     </div>
 
-    <!-- Pseudo -->
-    <!--<h5 v-if="isCreator">Your are the game owner</h5>
-    <h5 v-if="!isCreator && username">Game owner: {{ gameOwner }}</h5>-->
-
-    <!-- Button create room -->
-    <!--<q-btn
-        v-if="isCreator && !isGameStarted"
-        class="q-mt-sm col-12"
-        color="primary"
-        @click="
-          () => {
-            startGame();
-          }
-        "
-        label="Start game"
-      />-->
-
-    <!-- Display game winner if game is over -->
-    <h1 v-if="isGameOver">Game over</h1>
-    <h2 v-if="isGameOver">Winner: {{ gameWinnerName }}</h2>
-
-    <!-- print players in a list -->
-    <!--<PlayerListComponent
-        v-if="(players.length > 0 && !isGameStarted) || isGameOver"
-        :players="players"
-        :gameOwner="gameOwner"
-      />-->
-
-    <!-- Display the cloze card -->
-    <div v-if="cloze_card != null && isGameStarted && !isRoundOver">
-      <h5>Cloze card :</h5>
-      <q-card>
-        {{ cloze_card }}
-      </q-card>
-    </div>
-
-    <!-- Display the round number, over 6 -->
-    <h2 v-if="roundCounter > 0 && roundCounter <= 6 && !isRoundOver">
-      Round {{ roundCounter }} / 6
-    </h2>
-
     <!-- Display card sent counter and number of players-->
     <h2 v-if="isGameStarted && !isCardSelectionOver">Cards sent</h2>
     <h3 v-if="isGameStarted && !isCardSelectionOver">
       {{ card_sent_counter }} / {{ player_count }}
     </h3>
-
-    <!-- Display players_cards -->
-    <h2 v-if="players_cards.length > 0 && !isCardSelectionOver">Your cards</h2>
-    <div
-      v-if="players_cards.length > 0 && !isCardSelectionOver"
-      class="row justify-evenly"
-    >
-      <q-card v-for="card in players_cards" :key="card" class="row">
-        <CardComponent
-          :card="card"
-          :can_select="!hasPlayerSelectedCard"
-          @onSelect="
-            () => {
-              sendCard(card);
-            }
-          "
-        />
-      </q-card>
-    </div>
-
-    <!-- Display round_response_cards -->
-    <EndOfRoundComponent
-      class="col-12"
-      v-if="isCardSelectionOver && !isRoundOver"
-      :cards="round_response_cards"
-      :round="current_round"
-      :username="username"
-      @onSelect="chooseRoundWinner"
-    />
-
-    <div class="col-12" v-if="isRoundOver && !isGameOver">
-      <!-- Next round button is the player is the game owner -->
-      <q-btn
-        v-if="isCreator"
-        class="q-mt-sm col-12"
-        color="primary"
-        @click="
-          () => {
-            nextRound();
-          }
-        "
-        flat
-        label="Next round"
-      />
-
-      <h5>The following card wins the round :</h5>
-      <RoundResponseCard :card="roundWinningCard" v-if="isRoundOver" :is_master="false" />
-    </div>
-    <!--</div>-->
   </q-page>
 </template>

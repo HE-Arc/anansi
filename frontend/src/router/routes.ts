@@ -1,12 +1,12 @@
 import { RouteRecordRaw } from 'vue-router';
 
 const routes: RouteRecordRaw[] = [
-  {
+  /*{
     path: '/',
     name: 'home',
     alias: ['/home', '/index'],
     component: () => import('pages/IndexPage.vue'),
-  },
+  },*/
   {
     path: '/login',
     name: 'login',
@@ -64,6 +64,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/game',
     name: 'game',
+    alias: ['/', '/home', '/index'],
     component: () => import('src/pages/Game/GameIndex.vue')
   },
   {

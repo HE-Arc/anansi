@@ -7,7 +7,10 @@ const props = defineProps({
     default: [],
   },
   gameOwnerId: {
-    default: 0,
+    default: null,
+  },
+  masterId: {
+    default: null,
   },
 });
 
@@ -17,7 +20,8 @@ const store = GameplayerStore();
 onMounted(() => {
   players.value = props.players;
   sortByScore();
-  console.log(players.value);
+  console.log("PlayerList : ", props.masterId, props.gameOwnerId);
+  //console.log(players.value);
 });
 
 const sortByScore = () => {
@@ -48,10 +52,9 @@ watch(
             <q-item-label
               :class="store.gameplayer_id == player.id ? 'text-primary text-bold' : ''"
               >{{ player.username }} {{ props.gameOwnerId == player.id ? "👑" : "" }}
+              {{ props.masterId == player.id ? "👔" : "" }}
             </q-item-label>
             <q-item-label caption>{{ player.score }} points</q-item-label>
-
-            <!--{{ player.username }} (score : {{ player.score }})-->
           </q-item-section>
         </q-item>
         <q-separator spaced />

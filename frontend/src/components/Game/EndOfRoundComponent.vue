@@ -12,6 +12,9 @@ const props = defineProps({
   username: {
     default: "",
   },
+  id: {
+    default: null,
+  },
 });
 
 const emits = defineEmits(["onSelect"]);
@@ -29,7 +32,9 @@ onMounted(() => {
   round.value = props.round;
   responseCards.value = props.cards;
   username.value = props.username;
-  is_master.value = props.round.master_object.username == props.username;
+  //is_master.value = props.round.master_object.username == props.username;
+  console.log("Round master : ", props.round.master_object, props.id);
+  is_master.value = props.round.master_object.id == props.id;
   round.value = props.round;
 
   master_name.value = props.round.master_object.username;

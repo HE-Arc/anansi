@@ -43,10 +43,10 @@ const createCardGame = async () => {
 </script>
 <template>
   <q-page class="row justify-center">
-    <div class="col-12">
+    <div class="col-lg-5 col-md-8 col-sm-12 col-12 q-mx-lg-xl q-px-xl q-mt-md">
       <!-- Back button -->
       <q-btn
-        class="q-ma-xs q-pa-xs"
+        class="q-ma-none q-pa-none"
         flat
         color="primary"
         no-caps
@@ -54,37 +54,39 @@ const createCardGame = async () => {
         @click="router.go(-1)"
       ></q-btn>
 
-      <div class="col-12 col-md-6 col-lg-4 q-mx-xl">
-        <h1 class="q-mt-xs">New deck</h1>
+      <div class="row justify-center">
+        <div class="col-12">
+          <h1 class="q-mt-none">New deck</h1>
 
-        <!-- Error banner -->
-        <ErrorBanner :errors="errors" />
+          <!-- Error banner -->
+          <ErrorBanner :errors="errors" />
 
-        <!-- Formulaire de création de deck -->
-        <form @submit.prevent="createCardGame">
-          <!-- Nom -->
-          <q-input
-            v-model="name"
-            label="Name"
-            type="text"
-            :rules="[(val) => !!val || 'Name is required']"
-          />
-          <!-- Visibilité -->
-          <q-select
-            v-model="privacy"
-            label="Privacy"
-            :options="options"
-            :rules="[(val) => !!val || 'Privacy is required']"
-          />
-          <!-- Bouton de création -->
-          <q-btn
-            type="submit"
-            color="primary"
-            label="Create"
-            no-caps
-            class="full-width q-my-md"
-          />
-        </form>
+          <!-- Formulaire de création de deck -->
+          <form @submit.prevent="createCardGame">
+            <!-- Nom -->
+            <q-input
+              v-model="name"
+              label="Name"
+              type="text"
+              :rules="[(val) => !!val || 'Name is required']"
+            />
+            <!-- Visibilité -->
+            <q-select
+              v-model="privacy"
+              label="Privacy"
+              :options="options"
+              :rules="[(val) => !!val || 'Privacy is required']"
+            />
+            <!-- Bouton de création -->
+            <q-btn
+              type="submit"
+              color="primary"
+              label="Create"
+              no-caps
+              class="full-width q-my-md"
+            />
+          </form>
+        </div>
       </div>
     </div>
   </q-page>

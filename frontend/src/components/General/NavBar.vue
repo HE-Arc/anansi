@@ -101,11 +101,11 @@ const logout = async () => {
 const filteredLinksList = ref([]);
 
 const linksList = [
-  {
+  /*{
     title: "Home",
     link: "home",
     icon: "home",
-  },
+  },*/
   {
     title: "Play",
     link: "game",
@@ -128,11 +128,11 @@ const linksList = [
     icon: "dashboard",
     authRequired: true,
   },
-  {
+  /*{
     title: "About",
     link: "about",
     icon: "info",
-  },
+  },*/
   {
     title: "Login",
     link: "login",

@@ -37,7 +37,11 @@ onMounted(() => {
 <template>
   <q-card
     class="my-card col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2"
-    :style="{ width: width + 'px', height: height + 'px', background: card_selected ? 'green' : 'red' }"
+    :style="{
+      width: width + 'px',
+      height: height + 'px',
+      background: card_selected ? 'green' : 'red',
+    }"
   >
     <!-- Display card text, and change color based on the type -->
     <q-card-section class="text-h6 text-white" :class="card_type">

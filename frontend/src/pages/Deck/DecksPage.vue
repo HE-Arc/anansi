@@ -83,6 +83,9 @@ const addToFavourites = async (deck) => {
 };
 
 const search = async () => {
+  if (decks.value.length == 0) {
+    return;
+  }
   displayedDecks.value = decks.value.filter((deck) =>
     deck.name.toLowerCase().includes(searchText.value.toLowerCase())
   );
