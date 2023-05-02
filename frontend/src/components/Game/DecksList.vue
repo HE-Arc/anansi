@@ -19,8 +19,20 @@ const emit = defineEmits(["onSelectDeck"]);
 
 const fetchDecks = async () => {
   try {
-    const response = await api.get("decks");
-    decks.value = response.data;
+    if (favoriteOnly.value) {
+      if (!authStore.isLoggedIn) {
+        return;
+      }
+
+      const response = await api.get("favourites");
+
+      // Get the decks from the favourites (deck_object)
+      decks.value = response.data.map((favourite) => favourite.deck_object);
+    } else {
+      const response = await api.get("decks");
+      decks.value = response.data;
+    }
+
     search();
   } catch (error) {
     console.log(error);
@@ -28,12 +40,13 @@ const fetchDecks = async () => {
 };
 
 const search = async () => {
-  displayedDecks.value = decks.value.filter((deck) =>
-    deck.name.toLowerCase().includes(searchText.value.toLowerCase())
-  );
-
-  // Filter by favorite
-  // TODO : find a way to do it in the previous filter
+  if (searchText.value != null && searchText.value != "") {
+    displayedDecks.value = decks.value.filter((deck) =>
+      deck.name.toLowerCase().includes(searchText.value.toLowerCase())
+    );
+  } else {
+    displayedDecks.value = decks.value;
+  }
 };
 
 const onClick = (deckId) => {
@@ -64,7 +77,9 @@ onMounted(() => {
 
     <!-- Filtrer par favoris -->
     <q-toggle
+      v-if="authStore.isLoggedIn"
       v-model="favoriteOnly"
+      @click="fetchDecks"
       label="Favorites"
       color="primary"
       class="q-ma-sm"
@@ -87,6 +102,15 @@ onMounted(() => {
             </q-item-section>
           </q-item>
           <q-separator spaced inset />
+        </div>
+
+        <!-- If no decks found, display message -->
+        <div v-if="displayedDecks.length == 0">
+          <q-item>
+            <q-item-section>
+              <q-item-label>No decks found</q-item-label>
+            </q-item-section>
+          </q-item>
         </div>
       </q-list>
     </div>

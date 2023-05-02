@@ -34,6 +34,8 @@ const isCardSelectionOver = ref(false); // All the players have choosen their ca
 const isRoundOver = ref(false); // The master has choosen the best card, and now the players must see the result
 const isGameOver = ref(false); // The game is over
 
+const selectedDeck = ref(null); // The deck selected by the creator of the game to play with
+
 const roundCounter = ref(0);
 
 const roundWinningCard = ref(null);
@@ -258,6 +260,12 @@ const startGame = () => {
   const msg = {
     action: "start_game",
   };
+
+  // Add the selected deck if not null
+  if (selectedDeck.value != null) {
+    msg["deck_id"] = selectedDeck.value.id;
+  }
+
   gameSocket.value.send(JSON.stringify(msg));
 };
 
@@ -267,6 +275,7 @@ const nextRound = () => {
   const msg = {
     action: "next_round",
   };
+
   gameSocket.value.send(JSON.stringify(msg));
 };
 
