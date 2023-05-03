@@ -23,7 +23,7 @@ class ClozeCard(models.Model):
     """
     deck = models.ForeignKey(
         Deck, on_delete=models.CASCADE)
-    text = models.CharField(max_length=100, blank=False)
+    text = models.CharField(max_length=200, blank=False)
     gap_index = models.IntegerField(blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

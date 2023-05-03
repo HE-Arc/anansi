@@ -71,6 +71,12 @@ class DeckModelSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'name', 'privacy']
 
 
+class ClozeCardModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ClozeCard
+        fields = ['id', 'deck', 'text', 'gap_index']
+
+
 class ClozeCardSerializer(serializers.ModelSerializer):
     deck_object = DeckModelSerializer(
         source='deck', read_only=True)
