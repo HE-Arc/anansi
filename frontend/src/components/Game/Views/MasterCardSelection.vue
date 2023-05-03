@@ -38,7 +38,7 @@ const props = defineProps({
       <!-- Display Cloze card with (empty) response card -->
       <q-card-section class="q-my-none q-py-xs">
         <!-- Display Cloze card with (empty) response card -->
-        <div class="row">
+        <div class="text-center row justify-center items-center">
           <ClozeCard :card="clozeCard" class="col-5" />
           <ResponseCard
             v-if="selectedCard !== null"
@@ -50,7 +50,7 @@ const props = defineProps({
         </div>
         <!-- Display message -->
       </q-card-section>
-      <q-card-section class="row justify-center">
+      <q-card-section class="row justify-center text-center">
         <p class="col-12">
           You are the master of this round, please choose the best card
         </p>

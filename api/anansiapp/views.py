@@ -16,6 +16,12 @@ from rest_framework import status
 from django.urls import reverse
 from rest_framework import generics
 from rest_framework.decorators import action
+from rest_framework import permissions
+
+
+class IsOwner(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj.user == request.user
 
 
 class SessionView(APIView):
@@ -74,8 +80,6 @@ class FavouriteDeckViewSet(viewsets.ModelViewSet):
             reverse('user-detail', args=[request.user.id]))
         request.data['user'] = user_url
 
-        print(request.data)
-
         serializer = self.get_serializer(data=request.data)
 
         if serializer.is_valid():
@@ -95,7 +99,7 @@ class FavouriteDeckViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class DeckViewSet(viewsets.ModelViewSet):
+class DeckViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Deck.objects.all()
     serializer_class = ComplexDeckSerializer
 
@@ -107,7 +111,7 @@ class DeckViewSet(viewsets.ModelViewSet):
 
 
 class MyDeckViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsOwner]
 
     queryset = Deck.objects.all()
     serializer_class = ComplexDeckSerializer

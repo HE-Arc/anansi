@@ -60,11 +60,15 @@ const routes: RouteRecordRaw[] = [
     name: 'decks.id',
     props: true,
     component: () => import('src/pages/Deck/DeckPage.vue')
+  },{
+    path: '/',
+    name: 'home',
+    component: () => import('src/pages/Game/GameIndex.vue'),
   },
   {
     path: '/game',
     name: 'game',
-    alias: ['/', '/home', '/index'],
+    alias: ['/', '/home', '/index', ''],
     component: () => import('src/pages/Game/GameIndex.vue')
   },
   {
@@ -84,8 +88,12 @@ const routes: RouteRecordRaw[] = [
     name: 'game.id',
     props: true,
     component: () => import('src/pages/Game/WaitingRoom.vue')
+  },{
+    path: '/404',
+    name: '404',
+    component: () => import('src/pages/ErrorNotFound.vue')
   },
-  // Always leave this as last one,
+  //, Always leave this as last one,
   // but you can also remove it
   {
     path: '/:catchAll(.*)*',

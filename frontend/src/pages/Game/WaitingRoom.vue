@@ -64,6 +64,7 @@ const cloze_card_ = ref({});
 
 const selectedCard = ref(null);
 const masterSelectedCard = ref(null);
+const openDialog = ref(true);
 
 const WAITING_ROOM = computed(() => {
   return !isGameStarted.value;
@@ -74,7 +75,8 @@ const USER_CARD_SELECTION = computed(() => {
     isGameStarted.value &&
     !isRoundOver.value &&
     !isCardSelectionOver.value &&
-    !isMaster.value
+    !isMaster.value &&
+    !hasPlayerSentCard.value
   );
 });
 
@@ -354,6 +356,7 @@ const nextRound = () => {
 
   const msg = {
     action: "next_round",
+    deck_id: selectedDeckId.value,
   };
 
   gameSocket.value.send(JSON.stringify(msg));
@@ -379,6 +382,25 @@ const cardSelected = (card) => {
   <q-page class="row justify-evenly content-start" style="height: 100%">
     <!-- Users list -->
     <div class="col-12 col-lg-3 q-pa-md">
+      <q-dialog persistent v-model="openDialog" v-if="isCreator">
+        <q-card>
+          <q-card-section class="q-pb-none q-mb-none row justify-center">
+            <div class="text-h6">Select deck</div>
+          </q-card-section>
+          <q-card-section class="q-pt-none q-mt-none">
+            <DecksList @on-select-deck="onDeckSelected" />
+          </q-card-section>
+          <q-card-actions align="right">
+            <q-btn
+              flat
+              label="Confirm"
+              color="primary"
+              v-close-popup
+              :disabled="selectedDeckId == null"
+            />
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
       <!-- print players in a list --><!--&& !isGameStarted-->
       <PlayerListComponent
         v-if="players.length > 0 || isGameOver"
@@ -387,9 +409,6 @@ const cardSelected = (card) => {
         :masterId="masterId"
         :displayMobile="$q.screen.lt.lg"
       />
-      <DecksList @on-select-deck="onDeckSelected" />
-      <!--<h6 v-if="isCreator">Your are the game owner</h6>
-      <h6 v-if="!isCreator && username">Game owner: {{ gameOwner.username }}</h6>-->
     </div>
     <div class="col-12 col-lg-9 q-px-sm q-my-md-md">
       <WaitingRoom
@@ -397,6 +416,7 @@ const cardSelected = (card) => {
         :gameOwner="gameOwner"
         :isCreator="isCreator"
         @start-game="startGame"
+        :disabled="players.length < 3"
       />
       <UserCardSelection
         v-if="USER_CARD_SELECTION"

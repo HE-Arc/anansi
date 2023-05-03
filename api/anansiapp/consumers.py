@@ -142,35 +142,26 @@ class GameConsumer(AsyncWebsocketConsumer):
             game.is_started = True
 
             await database_sync_to_async(game.save)()
-<<<<<<< HEAD
-            
+
             # Get the deck id from the request
             deck_id = data['deck_id']
-            
+
             # Fetch the deck from the database
             deck = await database_sync_to_async(Deck.objects.get)(id=deck_id)
-            
+
             # Update the game deck
             game.deck = deck
-            
-            await database_sync_to_async(game.save)()
-            
-=======
 
->>>>>>> f7ec608 (responsive improved, all ui pages for game)
+            await database_sync_to_async(game.save)()
+
             # Select a random player to be the master
             master = await self.select_master(game)
             master_ser = await self.get_player_serialized(master)
 
             # Select a cloze card
-<<<<<<< HEAD
             cloze_card = await self.select_cloze_card(deck)
-            
-=======
-            cloze_card = await self.select_cloze_card()
             cloze_card_serializer = await self.get_cloze_card_serialized(cloze_card)
 
->>>>>>> f7ec608 (responsive improved, all ui pages for game)
             # Create a new round
             round = await database_sync_to_async(Round.objects.create)(game=game, master=master, cloze_card=cloze_card, round_number=0)
 
@@ -325,19 +316,23 @@ class GameConsumer(AsyncWebsocketConsumer):
             master = await self.select_master(game)
             master_ser = await self.get_player_serialized(master)
 
+            # Get the deck id from the request
+            deck_id = data['deck_id']
+
+            # Fetch the deck from the database
+            deck = await database_sync_to_async(Deck.objects.get)(id=deck_id)
+
+            # Update the game deck
+            game.deck = deck
+            await database_sync_to_async(game.save)()
             # Select a random cloze card
-            cloze_card = await self.select_cloze_card()
+            cloze_card = await self.select_cloze_card(deck)
             cloze_card_serializer = await self.get_cloze_card_serialized(cloze_card)
 
             # Get the last round
             last_round = await self.get_last_round(game)
-<<<<<<< HEAD
-            
-            # If the last round number is > 5, the game is finished
-=======
 
-            # If the last round number is > 6, the game is finished
->>>>>>> f7ec608 (responsive improved, all ui pages for game)
+            # If the last round number is > 5, the game is finished
             if last_round.round_number >= 5:
                 # Get the winner
                 winner = await self.get_game_winner(game)
@@ -409,18 +404,16 @@ class GameConsumer(AsyncWebsocketConsumer):
         game = self.player.game
 
         # Get the card deck (deck)
-<<<<<<< HEAD
         deck = game.deck
 
         # Get the cards (Card) from the card deck
-        responseCards = ResponseCardSerializer(ResponseCard.objects.filter(deck=deck), many=True).data
-=======
-        card_game = game.deck  # TODO : Get the card game from the game and use it
+        responseCards = ResponseCardSerializer(
+            ResponseCard.objects.filter(deck=deck), many=True).data
+        # card_game = game.deck  # TODO : Get the card game from the game and use it
 
         # Get the cards (Card) from the card deck
         responseCards = ResponseCardSerializer(
             ResponseCard.objects.filter(deck=1), many=True).data
->>>>>>> f7ec608 (responsive improved, all ui pages for game)
 
         # Return n random cards that have not already been distributed to other players
         return random.sample(responseCards, number_of_cards)
@@ -490,20 +483,10 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     # Select a cloze card
     @database_sync_to_async
-<<<<<<< HEAD
     def select_cloze_card(self, deck):
         ''' Select a random cloze card from the deck '''
         # Get the cloze cards from the deck
-        cloze_cards =  ClozeCard.objects.filter(deck=deck)
-        
-=======
-    def select_cloze_card(self):
-        ''' Select a random cloze card '''
-        # Get the cloze cards
-        # TODO : Select a cloze card from the selected card deck
-        cloze_cards = ClozeCard.objects.all()
-
->>>>>>> f7ec608 (responsive improved, all ui pages for game)
+        cloze_cards = ClozeCard.objects.filter(deck=deck)
         # Select a random cloze card
         cloze_card = random.choice(cloze_cards)
 
@@ -573,9 +556,5 @@ class GameConsumer(AsyncWebsocketConsumer):
         for player in players:
             if winner is None or player.score > winner.score:
                 winner = player
-<<<<<<< HEAD
-                
-=======
 
->>>>>>> f7ec608 (responsive improved, all ui pages for game)
         return winner
