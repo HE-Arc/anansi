@@ -19,9 +19,7 @@ const props = defineProps({
 });
 
 const style = computed(() => {
-  return props.defaultStyle
-    ? ""
-    : "width: 100%;height: 100%;justify-content: space-between;display: flex;flex-direction: column;";
+  return props.defaultStyle ? "" : "justify-content: center;"; // display: flex;flex-direction: column;
 });
 
 const onSelect = () => {
@@ -33,10 +31,10 @@ const onSelect = () => {
   <q-card
     :clickable="action"
     @click="onSelect"
-    class="bg-red-6 text-white"
+    class="bg-red-6 text-white column justify-center items-center"
     :style="style"
   >
-    <q-card-section>
+    <q-card-section class="flex" align="center">
       <!-- Display card text -->
       {{ props.masterSelection ? props.card.response_card_object.text : props.card.text }}
     </q-card-section>

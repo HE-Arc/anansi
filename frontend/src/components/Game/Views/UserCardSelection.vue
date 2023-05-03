@@ -1,11 +1,13 @@
 <script setup>
-import { ref, onMounted, defineProps, defineEmits } from "vue";
+import { ref, onMounted, defineProps, defineEmits, computed } from "vue";
+import { useQuasar } from "quasar";
 import ClozeCard from "../Components/Cards/ClozeCard.vue";
 import EmptyCard from "../Components/Cards/EmptyCard.vue";
 import ResponseCard from "../Components/Cards/ResponseCard.vue";
 import CardComponent from "../CardComponent.vue";
 
 const emit = defineEmits(["onSelect", "onSend"]);
+const $q = useQuasar();
 
 const props = defineProps({
   roundCounter: {
@@ -24,6 +26,14 @@ const props = defineProps({
     default: false,
   },
 });
+
+const bigCardStyle = computed(() => {
+  return $q.screen.lt.lg ? "width: 130px; height: 173px" : "width: 170px; height: 227px";
+});
+
+const smallCardStyle = computed(() => {
+  return $q.screen.lt.lg ? "width: 100px; height: 133px" : "width: 120px; height: 160px";
+});
 </script>
 
 <template>
@@ -38,26 +48,32 @@ const props = defineProps({
 
       <q-card-section class="q-my-none q-py-xs">
         <!-- Display Cloze card with (empty) response card -->
-        <div class="row">
-          <ClozeCard :card="clozeCard" class="col-5" />
+        <div class="row justify-center items-center">
+          <ClozeCard :card="clozeCard" class="col-5 text-bold" :style="bigCardStyle" />
           <ResponseCard
             v-if="selectedCard !== null"
             :card="selectedCard"
-            class="col-5 q-ma-md"
+            class="col-5 q-ma-md text-bold"
+            :style="bigCardStyle"
           />
-          <EmptyCard v-else class="col-5" />
+          <EmptyCard v-else class="col-5 text-bold" :style="bigCardStyle" />
         </div>
       </q-card-section>
     </div>
     <div>
       <!-- Display user response cards -->
       <q-card-section class="col-12 q-my-none q-py-xs">
-        <div class="row justify-start" style="align-items: stretch">
-          <div v-for="card in playersCards" :key="card" class="col-4 q-pa-xs">
+        <div class="row justify-center items-center" style="align-items: stretch">
+          <div
+            v-for="card in playersCards"
+            :key="card"
+            class="q-pa-xs q-pa-lg-sm q-pa-md-sm"
+          >
             <ResponseCard
               :card="card"
               :action="true"
               :defaultStyle="false"
+              :style="smallCardStyle"
               @onSelect="
                 () => {
                   emit('onSelect', card);

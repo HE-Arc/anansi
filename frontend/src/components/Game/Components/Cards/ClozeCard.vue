@@ -15,9 +15,9 @@ const clozeCardText = (text, index) => {
 
 <template>
   <!-- q-card avec contour noir épais et fond bleu -->
-  <q-card class="q-ma-md bg-blue-6 text-white">
+  <q-card class="q-ma-md bg-blue-6 text-white column justify-center items-center">
     <!-- q-card-section avec fond bleu -->
-    <q-card-section>
+    <q-card-section class="flex" align="center">
       {{ clozeCardText(props.card.text, props.card.gap_index) }}
     </q-card-section>
   </q-card>

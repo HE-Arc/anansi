@@ -47,10 +47,19 @@ const winner = ref(props.winningCard.player_object.username);
 
     <!-- Display cloze card and response card -->
     <q-card-section class="q-my-none q-py-xs">
-      <div class="row">
+      <div class="row justify-center items-center">
         <!-- Display cloze card -->
-        <ClozeCard :card="clozeCard" class="col-5" />
-        <ResponseCard :card="winningCard" :masterSelection="true" class="col-5 q-ma-md" />
+        <ClozeCard
+          :card="clozeCard"
+          class="text-bold col-5"
+          style="width: 150px; height: 200px"
+        />
+        <ResponseCard
+          :card="winningCard"
+          :masterSelection="true"
+          style="width: 150px; height: 200px"
+          class="text-bold col-5 q-ma-md"
+        />
       </div>
     </q-card-section>
 
