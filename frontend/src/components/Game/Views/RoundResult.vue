@@ -1,9 +1,7 @@
 <script setup>
-import { ref, onMounted, defineProps, defineEmits } from "vue";
+import { ref, defineProps, defineEmits } from "vue";
 import ClozeCard from "../Components/Cards/ClozeCard.vue";
-import EmptyCard from "../Components/Cards/EmptyCard.vue";
 import ResponseCard from "../Components/Cards/ResponseCard.vue";
-import CardComponent from "../CardComponent.vue";
 
 const emit = defineEmits(["nextRound"]);
 
@@ -31,7 +29,6 @@ const winner = ref(props.winningCard.player_object.username);
     <q-card-section
       class="text-center row justify-center items-center q-pb-none q-mb-none"
     >
-      <!-- Display round number -->
       <text class="text-h6">Round {{ roundCounter }} / 6</text>
     </q-card-section>
 
@@ -39,7 +36,6 @@ const winner = ref(props.winningCard.player_object.username);
     <q-card-section
       class="text-center row justify-center items-center q-pb-none q-mb-none"
     >
-      <!-- Display message -->
       <p>
         🎉 Round winner is <text class="text-primary text-bold">{{ winner }}</text>
       </p>
@@ -48,7 +44,6 @@ const winner = ref(props.winningCard.player_object.username);
     <!-- Display cloze card and response card -->
     <q-card-section class="q-my-none q-py-xs">
       <div class="row justify-center items-center">
-        <!-- Display cloze card -->
         <ClozeCard
           :card="clozeCard"
           class="text-bold col-5"

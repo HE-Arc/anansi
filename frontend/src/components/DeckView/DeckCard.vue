@@ -1,16 +1,11 @@
 <script setup>
-import { ref, onMounted, getCurrentInstance, defineEmits } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import { useQuasar } from "quasar";
-
-const app = getCurrentInstance();
-const api = app.appContext.config.globalProperties.$api;
-const $q = useQuasar();
+import { defineEmits } from "vue";
+import { useRouter } from "vue-router";
+import { useToolsStore } from "src/stores/tools";
 
 const router = useRouter();
-const route = useRoute();
-
 const emit = defineEmits(["delete-card"]);
+const toolsStore = useToolsStore();
 
 const props = defineProps({
   isDeckMine: {
@@ -33,16 +28,13 @@ const editCard = async (id, cardId) => {
 };
 
 const addToDeck = async (id) => {
-  //await fetch(`http://localhost:3000/clozecards/${id}`, {
-  //  method: "PUT",
-  //});
-  //fetchClozeCards();
+  // TODO : add to a deck of the user's choice
 };
 
-const clozeCardText = (text, index) => {
+/*const clozeCardText = (text, index) => {
   const words = text.split(" ");
   return words.slice(0, index).join(" ") + " __________ " + words.slice(index).join(" ");
-};
+};*/
 </script>
 
 <template>
@@ -58,9 +50,10 @@ const clozeCardText = (text, index) => {
     :class="cardType == 'cloze' ? 'bg-blue-5' : 'bg-red-5'"
   >
     <div class="col-12">
+      <!-- Card text -->
       <q-card-section>
         <div v-if="props.cardType == 'cloze'">
-          {{ clozeCardText(card.text, card.gap_index) }}
+          {{ toolsStore.clozeCardText(card.text, card.gap_index) }}
         </div>
         <div v-else>
           {{ card.text }}
@@ -88,6 +81,7 @@ const clozeCardText = (text, index) => {
             flat
           />
         </div>
+        <!-- TODO : add to deck button -->
         <!--<div v-else>
           <q-btn
             class="q-px-xs"

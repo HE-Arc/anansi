@@ -1,10 +1,9 @@
 <script setup>
-import { ref, onMounted, defineProps, defineEmits, computed } from "vue";
+import { defineProps, defineEmits, computed } from "vue";
 import { useQuasar } from "quasar";
 import ClozeCard from "../Components/Cards/ClozeCard.vue";
 import EmptyCard from "../Components/Cards/EmptyCard.vue";
 import ResponseCard from "../Components/Cards/ResponseCard.vue";
-import CardComponent from "../CardComponent.vue";
 
 const emit = defineEmits(["onSelect", "onSend"]);
 const $q = useQuasar();

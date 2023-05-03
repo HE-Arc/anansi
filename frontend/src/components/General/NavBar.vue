@@ -62,7 +62,7 @@
 </template>
 
 <script setup>
-import { defineComponent, ref, onMounted, getCurrentInstance, watch } from "vue";
+import { ref, onMounted, getCurrentInstance, watch } from "vue";
 import { useAuthStore } from "src/stores/auth";
 import { useQuasar } from "quasar";
 import { useRoute, useRouter } from "vue-router";
@@ -75,6 +75,8 @@ const router = useRouter();
 const route = useRoute();
 
 const leftDrawerOpen = ref(false);
+
+const filteredLinksList = ref([]);
 
 const toggleLeftDrawer = () => {
   leftDrawerOpen.value = !leftDrawerOpen.value;
@@ -98,7 +100,17 @@ const logout = async () => {
   router.push({ name: "home" });
 };
 
-const filteredLinksList = ref([]);
+const filterLinksList = () => {
+  if (authStore.isLoggedIn) {
+    filteredLinksList.value = linksList.filter((link) => {
+      return link.link != "login";
+    });
+  } else {
+    filteredLinksList.value = linksList.filter((link) => {
+      return !link.authRequired;
+    });
+  }
+};
 
 const linksList = [
   /*{
@@ -147,18 +159,6 @@ const linksList = [
   },
 ];
 
-const filterLinksList = () => {
-  if (authStore.isLoggedIn) {
-    filteredLinksList.value = linksList.filter((link) => {
-      return link.link != "login";
-    });
-  } else {
-    filteredLinksList.value = linksList.filter((link) => {
-      return !link.authRequired;
-    });
-  }
-};
-
 onMounted(() => {
   filterLinksList();
 });
@@ -167,12 +167,4 @@ watch(
   () => authStore.isLoggedIn,
   () => filterLinksList()
 );
-
-/*filteredLinksList() {
-      if (this.authStore.get) {
-        return this.linksList.filter((link) => link.link != "login");
-      } else {
-        return this.linksList.filter((link) => !link.authRequired);
-      }
-    },*/
 </script>

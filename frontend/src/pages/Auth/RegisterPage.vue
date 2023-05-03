@@ -4,11 +4,13 @@ import { useAuthStore } from "src/stores/auth";
 import { useQuasar } from "quasar";
 import ErrorBanner from "src/components/General/ErrorBanner.vue";
 import { useRoute, useRouter } from "vue-router";
+import { useToolsStore } from "src/stores/tools";
 
 const app = getCurrentInstance();
 const api = app.appContext.config.globalProperties.$api;
 const $q = useQuasar();
 const authStore = useAuthStore();
+const toolsStore = useToolsStore();
 const router = useRouter();
 
 const username = ref("");
@@ -40,12 +42,14 @@ const register = async () => {
 
     router.push({ name: "home" });
   } catch (error) {
-    errors.value = [];
-    for (var key in error.response.data) {
+    //errors.value = [];
+    errors.value = toolsStore.validationErrors(error.response.data);
+
+    /*for (var key in error.response.data) {
       for (var key2 in error.response.data[key]) {
         errors.value.push(key + " : " + error.response.data[key][key2]);
       }
-    }
+    }*/
   }
 };
 </script>

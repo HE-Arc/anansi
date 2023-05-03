@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, defineProps, watch } from "vue";
+import { defineProps } from "vue";
 
 const props = defineProps({
   winner: {

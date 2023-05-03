@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, defineProps, watch, defineEmits, computed } from "vue";
+import { defineProps, defineEmits, computed } from "vue";
 import { useQuasar } from "quasar";
 import ClozeCard from "../Components/Cards/ClozeCard.vue";
 import EmptyCard from "../Components/Cards/EmptyCard.vue";
@@ -48,7 +48,6 @@ const smallCardStyle = computed(() => {
 
       <!-- Display Cloze card with (empty) response card -->
       <q-card-section class="q-my-none q-py-xs">
-        <!-- Display Cloze card with (empty) response card -->
         <div class="row justify-center items-center">
           <ClozeCard :card="clozeCard" class="text-bold col-5" :style="bigCardStyle" />
           <ResponseCard

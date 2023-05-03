@@ -1,3 +1,34 @@
+<script setup>
+import { ref } from "vue";
+import { useAuthStore } from "src/stores/auth";
+import { useRouter } from "vue-router";
+
+const room_id = ref("");
+const username = ref("");
+const dialog = ref(false);
+const router = useRouter();
+
+const generateGameId = () => {
+  room_id.value =
+    Math.random().toString(36).substring(2, 15) +
+    Math.random().toString(36).substring(2, 15);
+};
+
+const goToGameWaitingRoom = () => {
+  if (room_id.value == "" || username.value == "") {
+    return;
+  }
+
+  useAuthStore().username = username.value;
+
+  router.push({
+    name: "game.id",
+    params: { id: room_id.value, username: username.value },
+    props: { username: username.value },
+  });
+};
+</script>
+
 <template>
   <q-page class="row justify-evenly content-start">
     <div class="col-12">
@@ -33,8 +64,8 @@
                 color="primary"
                 @click="
                   () => {
-                    this.generateGameId();
-                    this.goToGameWaitingRoom();
+                    generateGameId();
+                    goToGameWaitingRoom();
                   }
                 "
                 label="Create room"
@@ -67,43 +98,3 @@
     </div>
   </q-page>
 </template>
-
-<script lang="ts">
-import { defineComponent } from "vue";
-import { useAuthStore } from "src/stores/auth";
-
-export default defineComponent({
-  name: "IndexRoom",
-  data() {
-    return {
-      room_id: "",
-      username: "",
-      dialog: false,
-    };
-  },
-  methods: {
-    generateGameId() {
-      console.log("Generating game id");
-      const id =
-        Math.random().toString(36).substring(2, 15) +
-        Math.random().toString(36).substring(2, 15);
-      console.log(id);
-      this.room_id = id;
-    },
-    goToGameWaitingRoom() {
-      if (this.room_id == "" || this.username == "") {
-        return;
-      }
-
-      // save username in local storage
-      useAuthStore().username = this.username;
-
-      this.$router.push({
-        name: "game.id",
-        params: { id: this.room_id, username: this.username },
-        props: { username: this.username },
-      });
-    },
-  },
-});
-</script>

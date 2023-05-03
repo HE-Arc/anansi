@@ -1,20 +1,15 @@
 <script setup>
 import { ref, onMounted, getCurrentInstance, defineEmits } from "vue";
-import { useQuasar } from "quasar";
 import { useAuthStore } from "src/stores/auth";
-import { useRouter } from "vue-router";
 
 const app = getCurrentInstance();
 const api = app.appContext.config.globalProperties.$api;
-const $q = useQuasar();
 const authStore = useAuthStore();
-const router = useRouter();
 
 const searchText = ref("");
 const favoriteOnly = ref(false);
 const decks = ref([]);
 const displayedDecks = ref([]);
-
 const selectedDeckId = ref(null);
 
 const emit = defineEmits(["onSelectDeck"]);
@@ -133,10 +128,6 @@ onMounted(() => {
                 deck.user_object.username
               }}</q-item-label>
             </q-item-section>
-            <!-- Bouton add -->
-            <!-- <q-item-section side>
-              <q-btn class="q-mt-sm" color="primary" @click="() => {}" icon="add" flat />
-            </q-item-section> -->
           </q-item>
           <q-separator spaced inset />
         </div>

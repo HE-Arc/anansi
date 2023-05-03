@@ -1,24 +1,21 @@
 <script setup>
-import { ref, onMounted, defineProps, watch } from "vue";
+import { defineProps } from "vue";
+import { useToolsStore } from "src/stores/tools";
+
+const toolsStore = useToolsStore();
 
 const props = defineProps({
   card: {
     default: {},
   },
 });
-
-const clozeCardText = (text, index) => {
-  const words = text.split(" ");
-  return words.slice(0, index).join(" ") + " __________ " + words.slice(index).join(" ");
-};
 </script>
 
 <template>
-  <!-- q-card avec contour noir épais et fond bleu -->
+  <!-- Display card text -->
   <q-card class="q-ma-md bg-blue-6 text-white column justify-center items-center">
-    <!-- q-card-section avec fond bleu -->
     <q-card-section class="flex" align="center">
-      {{ clozeCardText(props.card.text, props.card.gap_index) }}
+      {{ toolsStore.clozeCardText(props.card.text, props.card.gap_index) }}
     </q-card-section>
   </q-card>
 </template>

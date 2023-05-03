@@ -24,16 +24,20 @@ export const useToolsStore = defineStore('tools', () =>{
       return index;
     }
 
+    function clozeCardText(text:string, index:number) {
+      const words = text.split(" ");
+      return words.slice(0, index).join(" ") + " __________ " + words.slice(index).join(" ");
+    };
+
   function validationErrors(error: any) {
-    const errors: any = {};
-    const errorMessages: any = {};
-    const errorKeys = Object.keys(error.response.data);
-    errorKeys.forEach((key: any) => {
-      errors[key] = true;
-      errorMessages[key] = error.response.data[key][0];
-    });
-    return { errors, errorMessages };
+    const errors = [];
+    for (const key in error) {
+      for (const key2 in error[key]) {
+        errors.push(key + " : " + error[key][key2]);
+      }
+    }
+    return errors;
   }
 
-  return { readCookie, rmExcessSpaces, validationErrors };
+  return { readCookie, rmExcessSpaces, validationErrors, clozeCardText };
 });

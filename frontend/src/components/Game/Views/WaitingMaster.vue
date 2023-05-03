@@ -1,8 +1,7 @@
 <script setup>
-import { ref, onMounted, defineProps, watch, computed } from "vue";
+import { defineProps, computed } from "vue";
 import { useQuasar } from "quasar";
 import ClozeCard from "../Components/Cards/ClozeCard.vue";
-import EmptyCard from "../Components/Cards/EmptyCard.vue";
 import ResponseCard from "../Components/Cards/ResponseCard.vue";
 
 const $q = useQuasar();
@@ -35,7 +34,6 @@ const smallCardStyle = computed(() => {
       <q-card-section
         class="text-center row justify-center items-center q-pb-none q-mb-none"
       >
-        <!-- Display round number -->
         <text class="text-h6">Round {{ roundCounter }} / 6</text>
       </q-card-section>
 
@@ -43,14 +41,13 @@ const smallCardStyle = computed(() => {
       <q-card-section
         class="text-center row justify-center items-center q-pb-none q-mb-none"
       >
-        <!-- Display message -->
         <p>Waiting master to choose round winner...</p>
       </q-card-section>
 
       <!-- Display cloze card -->
       <q-card-section class="q-my-none q-py-xs">
         <div class="row justify-center items-center">
-          <ClozeCard :card="clozeCard" class="col-5" :style="bigCardStyle" />
+          <ClozeCard :card="clozeCard" class="text-bold col-5" :style="bigCardStyle" />
         </div>
       </q-card-section>
     </div>
@@ -60,7 +57,6 @@ const smallCardStyle = computed(() => {
         <div class="row justify-center items-center" style="align-items: stretch">
           <div v-for="card in responseCards" :key="card" class="q-pa-xs">
             <ResponseCard
-              class="text-bold"
               :card="card"
               :action="false"
               :masterSelection="true"

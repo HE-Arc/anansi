@@ -18,18 +18,16 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["start-game"]);
-
 const text = ref("Game name");
-
-const inputText = computed(() => {
-  return props.gameOwner.game_object !== undefined
-    ? props.gameOwner.game_object.name
-    : "Game name";
-});
 
 function onStartGame() {
   emit("start-game");
 }
+
+const copy = () => {
+  console.log("text : ", text.value);
+  copyToClipboard(text.value);
+};
 
 watch(
   () => props.gameOwner.game_object,
@@ -38,11 +36,6 @@ watch(
     console.log("game_name new value : ", newValue.name, "text value : ", text.value);
   }
 );
-
-const copy = () => {
-  console.log("text : ", text.value);
-  copyToClipboard(text.value);
-};
 </script>
 
 <template>

@@ -27,8 +27,6 @@ const colSize = computed(() => {
 onMounted(() => {
   players.value = props.players;
   sortByScore();
-  console.log("PlayerList : ", props.masterId, props.gameOwnerId);
-  //console.log(players.value);
 });
 
 const sortByScore = () => {

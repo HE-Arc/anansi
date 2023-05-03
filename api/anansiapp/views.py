@@ -25,8 +25,6 @@ class IsOwner(permissions.BasePermission):
 
 
 class SessionView(APIView):
-    # permission_classes = [IsAuthenticated]
-
     def get(self, request):
         if request.user.is_authenticated:
             return Response({'isAuthenticated': True})

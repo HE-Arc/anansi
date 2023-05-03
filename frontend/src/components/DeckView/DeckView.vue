@@ -1,16 +1,11 @@
 <script setup>
 import { useQuasar } from "quasar";
 import { ref, onMounted, getCurrentInstance } from "vue";
-import { useAuthStore } from "src/stores/auth";
-import { useRoute, useRouter } from "vue-router";
 import DeckCard from "src/components/DeckView/DeckCard.vue";
 
 const app = getCurrentInstance();
 const api = app.appContext.config.globalProperties.$api;
 const $q = useQuasar();
-const authStore = useAuthStore();
-const router = useRouter();
-const route = useRoute();
 
 const props = defineProps({
   isDeckMine: {

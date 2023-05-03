@@ -23,7 +23,6 @@ const login = async () => {
     });
 
     authStore.login();
-    //authStore.isLoggedIn = true;
 
     $q.notify({
       message: "Login successful",

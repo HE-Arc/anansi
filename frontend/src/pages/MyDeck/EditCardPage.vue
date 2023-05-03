@@ -34,9 +34,7 @@ const fetchCard = async () => {
   } else {
     useToolsStore().rmExcessSpaces(card.value.text);
     text1.value = card.value.text.split(" ").slice(0, card.value.gap_index).join(" ");
-    console.log(text1.value);
     text2.value = card.value.text.split(" ").slice(card.value.gap_index).join(" ");
-    console.log(text2.value);
   }
 };
 
@@ -67,12 +65,12 @@ const patchCard = async () => {
     router.push(`/mydecks/${route.params.id}`);
   } catch (error) {
     console.log(error);
-    errors.value = [];
-    for (var key in error.response.data) {
+    errors.value = useToolsStore().validationErrors(error.response.data);
+    /*for (var key in error.response.data) {
       for (var key2 in error.response.data[key]) {
         errors.value.push(key + " : " + error.response.data[key][key2]);
       }
-    }
+    }*/
   }
 };
 

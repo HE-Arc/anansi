@@ -6,14 +6,7 @@ import { Dictionary } from "express-serve-static-core";
 import { useQuasar } from "quasar";
 import { GameplayerStore } from "src/stores/gameplayerStore";
 
-import CardComponent from "src/components/Game/CardComponent.vue";
-import RoundResponseCard from "src/components/Game/RoundResponseCard.vue";
-import EndOfRoundComponent from "src/components/Game/EndOfRoundComponent.vue";
 import PlayerListComponent from "src/components/Game/PlayerListComponent.vue";
-
-import ClozeCard from "src/components/Game/Components/Cards/ClozeCard.vue";
-import EmptyCard from "src/components/Game/Components/Cards/EmptyCard.vue";
-
 import WaitingRoom from "src/components/Game/Views/WaitingRoom.vue";
 import UserCardSelection from "src/components/Game/Views/UserCardSelection.vue";
 import WaitingUsers from "src/components/Game/Views/WaitingUsers.vue";
@@ -380,8 +373,8 @@ const cardSelected = (card) => {
 
 <template>
   <q-page class="row justify-evenly content-start" style="height: 100%">
-    <!-- Users list -->
     <div class="col-12 col-lg-3 q-pa-md">
+      <!-- Choose deck dialog -->
       <q-dialog persistent v-model="openDialog" v-if="isCreator">
         <q-card>
           <q-card-section class="q-pb-none q-mb-none row justify-center">
@@ -401,7 +394,7 @@ const cardSelected = (card) => {
           </q-card-actions>
         </q-card>
       </q-dialog>
-      <!-- print players in a list --><!--&& !isGameStarted-->
+      <!-- print players in a list -->
       <PlayerListComponent
         v-if="players.length > 0 || isGameOver"
         :players="players"

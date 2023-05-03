@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, defineProps } from "vue";
+import { defineProps } from "vue";
 
 const props = defineProps({
   roundCounter: {
