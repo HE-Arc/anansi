@@ -50,11 +50,6 @@ const createCard = async () => {
   } catch (error) {
     console.log(error);
     errors.value = useToolsStore().validationErrors(error.response.data);
-    /*for (var key in error.response.data) {
-      for (var key2 in error.response.data[key]) {
-        errors.value.push(key + " : " + error.response.data[key][key2]);
-      }
-    }*/
   }
 };
 </script>

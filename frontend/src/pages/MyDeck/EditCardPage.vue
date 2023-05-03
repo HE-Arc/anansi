@@ -26,8 +26,6 @@ const text2 = ref("");
 const fetchCard = async () => {
   const response = await api.get(`${url}${route.params.cardId}`);
   card.value = response.data;
-  console.log(card.value);
-  console.log(cardType.value);
 
   if (cardType.value === "response") {
     textResponse.value = card.value.text;
@@ -66,11 +64,6 @@ const patchCard = async () => {
   } catch (error) {
     console.log(error);
     errors.value = useToolsStore().validationErrors(error.response.data);
-    /*for (var key in error.response.data) {
-      for (var key2 in error.response.data[key]) {
-        errors.value.push(key + " : " + error.response.data[key][key2]);
-      }
-    }*/
   }
 };
 

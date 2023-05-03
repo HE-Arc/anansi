@@ -42,14 +42,7 @@ const register = async () => {
 
     router.push({ name: "home" });
   } catch (error) {
-    //errors.value = [];
     errors.value = toolsStore.validationErrors(error.response.data);
-
-    /*for (var key in error.response.data) {
-      for (var key2 in error.response.data[key]) {
-        errors.value.push(key + " : " + error.response.data[key][key2]);
-      }
-    }*/
   }
 };
 </script>

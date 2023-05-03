@@ -101,14 +101,10 @@ const GAME_RESULT = computed(() => {
 // Dictionary of functions that handle the game
 const handlingGameFunctions: Dictionary<(data: any) => void> = {
   game_joined_or_created: (data: any) => {
-    console.log("game_joined_or_created");
-    console.log(data);
-
     // Set the game
     gameplayerStore.setGameId(data.game_id);
 
     // Set the gameplayer id
-    console.log("gameplayer_id : " + data.gameplayer_id);
     gameplayerStore.setGameplayerId(data.gameplayer_id);
 
     $q.loading.hide();
@@ -116,7 +112,6 @@ const handlingGameFunctions: Dictionary<(data: any) => void> = {
 
   error: (data: any) => {
     console.log("error");
-    console.log(data);
 
     error_message.value = data.message;
 
@@ -124,8 +119,6 @@ const handlingGameFunctions: Dictionary<(data: any) => void> = {
   },
 
   update_players: (data: any) => {
-    console.log("update_players");
-    console.log(data);
     players.value = data.players;
 
     gameOwner.value = data.creator;
@@ -137,9 +130,6 @@ const handlingGameFunctions: Dictionary<(data: any) => void> = {
   },
 
   start_new_round: (data: any) => {
-    console.log("game_starting");
-    console.log(data);
-
     roundCounter.value += 1;
 
     // Update state variables
@@ -164,21 +154,15 @@ const handlingGameFunctions: Dictionary<(data: any) => void> = {
 
   // This function is called when a player sends a card, and used to update the counter of players_cards sent
   update_players_count: (data: any) => {
-    console.log(data);
-
     player_count.value = data.player_number;
   },
 
   update_card_sent_counter: (data: any) => {
-    console.log(data);
-
     card_sent_counter.value = data.card_sent_counter;
   },
 
   // End of the round, display response players_cards
   display_response_cards: (data: any) => {
-    console.log(data);
-
     // Send to counter to 0
     card_sent_counter.value = 0;
     player_count.value = 0;
@@ -188,8 +172,6 @@ const handlingGameFunctions: Dictionary<(data: any) => void> = {
 
     current_round.value = data.round;
     //isMaster.value = data.master_object.id == gameplayerStore.gameplayer_id;
-    console.log("current_round");
-    console.log(current_round.value);
 
     isCardSelectionOver.value = true;
 
@@ -197,9 +179,6 @@ const handlingGameFunctions: Dictionary<(data: any) => void> = {
   },
 
   display_round_winner: (data: any) => {
-    console.log("display_round_winner");
-    console.log(data);
-
     roundWinningCard.value = data.card;
 
     roundWinningPlayerUsername.value = data.card.player_object.username;
@@ -215,9 +194,6 @@ const handlingGameFunctions: Dictionary<(data: any) => void> = {
   },
 
   display_game_winner: (data: any) => {
-    console.log("display_game_winner");
-    console.log(data);
-
     gameWinnerName.value = data.winner;
 
     isGameOver.value = true;
@@ -232,7 +208,6 @@ const connectToGameSocket = () => {
   // Get room_id from url
   const room_id = route.params.id;
 
-  console.log("room_id : " + room_id);
   const url = "ws://127.0.0.1:8000/game/" + room_id + "/";
 
   gameSocket.value = new WebSocket(url);
@@ -281,15 +256,12 @@ const connectToGameSocket = () => {
       username: username.value,
     };
 
-    console.log("GamePlayer username : " + username.value);
     gameSocket.value.send(JSON.stringify(msg));
   };
 };
 
 const sendCard = (card) => {
   // $q.loading.show();
-
-  console.log("sendCard " + card.id);
 
   hasPlayerSelectedCard.value = true;
   hasPlayerSentCard.value = true;
@@ -305,8 +277,6 @@ const sendCard = (card) => {
 const chooseRoundWinner = (card_id: string) => {
   $q.loading.show();
 
-  console.log("chooseRoundWinner " + card_id);
-
   const msg = {
     action: "choose_round_winner",
     card_id: card_id,
@@ -315,9 +285,6 @@ const chooseRoundWinner = (card_id: string) => {
 };
 
 const onDeckSelected = (deck_id) => {
-  console.log("onDeckSelected");
-  console.log(deck_id);
-
   selectedDeckId.value = deck_id;
 };
 
@@ -329,8 +296,6 @@ const startGame = () => {
   // Add the selected deck if not null
   if (selectedDeckId.value != null) {
     $q.loading.show();
-
-    console.log("startGame : " + selectedDeckId.value);
 
     msg["deck_id"] = selectedDeckId.value;
 

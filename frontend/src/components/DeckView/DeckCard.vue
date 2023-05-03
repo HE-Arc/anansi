@@ -30,11 +30,6 @@ const editCard = async (id, cardId) => {
 const addToDeck = async (id) => {
   // TODO : add to a deck of the user's choice
 };
-
-/*const clozeCardText = (text, index) => {
-  const words = text.split(" ");
-  return words.slice(0, index).join(" ") + " __________ " + words.slice(index).join(" ");
-};*/
 </script>
 
 <template>

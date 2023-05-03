@@ -19,7 +19,7 @@ const props = defineProps({
 });
 
 const style = computed(() => {
-  return props.defaultStyle ? "" : "justify-content: center;"; // display: flex;flex-direction: column;
+  return props.defaultStyle ? "" : "justify-content: center;";
 });
 
 const onSelect = () => {
